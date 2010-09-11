@@ -1,0 +1,42 @@
+{% for post in paginator.posts %}
+<div class="hentry" id="{{ post.id }}">
+  <h2 class="entry-title">
+    <a href="{{ post.url }}">{{ post.title }}</a>
+  </h2>
+  {% if post.author %}
+  <div class="vcard">
+    Posted by <span class="fn">{{ post.author }}</span>
+  </div>
+  {% endif %}
+  <abbr class="published" title="{{ post.date | date_to_xmlschema }}">{{ post.date | date_to_string }}</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    {{ post.content }}
+  </div>
+  <ul class="meta">
+    {% if post.categories != empty %}
+      <li>Categories:{% for t in post.categories %} <a href="/{{ t | cgi_escape }}/">{{ t }}</a>{% endfor %}</li>
+    {% endif %}
+    {% if post.tags != empty %}
+      <li>Tags:{% for t in post.tags %} <a rel="tag" href="/tags/#{{ t | cgi_escape }}">{{ t }}</a>{% endfor %}</li>
+    {% endif %}
+    <li>Meta:
+      <a href="{{ site.url }}{{ post.url }}#disqus_thread" rel="bookmark">permalink</a>
+      <a href="{{ site.feed }}">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    {% assign p = paginator.next_page %}{% if paginator.next_page %}
+    <span align="left">&laquo; <a href="/page{{ p }}/">Older Posts</a></span>
+    {% endif %}
+    {% assign p = paginator.previous_page %}{% if paginator.previous_page %}
+      {% if paginator.previous_page > 1 %}
+        <span align="right">&raquo; <a href="/page{{ p }}/">Newer Posts</a></span>
+      {% else %}
+        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</ul>

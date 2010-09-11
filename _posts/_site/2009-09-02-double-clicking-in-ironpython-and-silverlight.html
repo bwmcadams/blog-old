@@ -1,0 +1,62 @@
+<p>Silverlight rather oddly lacks a double click event. You can detect single click, but for double clicking you&#8217;re on your own. I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href='http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/'>here</a> for IronPython.</p>
+
+<p>I&#8217;ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
+
+<pre><code>CLICK_INTERVAL = 500
+ 
+class ClickHandler(object):
+    &quot;&quot;&quot;Attach a Double Click handler to any given UIElement,
+    as by default Silverlight lacks support for double clicking.
+    &quot;&quot;&quot;
+    _lastClickTime = 0
+    _callback = None
+ 
+    @staticmethod
+    def attachDoubleClickHandler(target, callback):
+        return ClickHandler(target, callback)
+ 
+    def __init__(self, target, callback):
+        target.MouseLeftButtonUp += self.target_MouseLeftButtonUp
+        target.MouseLeftButtonDown += self.target_MouseLeftButtonDown
+        self._callback = callback
+ 
+    def target_MouseLeftButtonUp(self, sender, args):
+        self._lastClickTime = DateTime.Now.Ticks / 10000
+ 
+    def target_MouseLeftButtonDown(self, sender, args):
+        now = DateTime.Now.Ticks / 10000
+        if now - self._lastClickTime &lt; CLICK_INTERVAL and \
+          now - self._lastClickTime &gt; 25:
+            self._callback(sender, args)</code></pre>
+
+<p>You may want to tweak the click interval based on what works for you. 500 milliseconds worked well with my users, for the application in question. To attach a ClickHandler simply invoke the static method <code>ClickHandler.attachDoubleClickHandler(&amp;laquo;uiElementObj&amp;raquo;, &amp;laquo;callbackFunc&amp;raquo;)</code></p>
+
+<pre><code>from System import Uri, UriKind
+from System.Windows import Application, UIElement
+from System.Windows.Browser import HtmlPage
+ 
+from util import ClickHandler
+ 
+ 
+class Foo(UIElement):
+  &quot;&quot;&quot;Sample UIElement class demonstrating usage of 
+  ClickHandler and it&#39;s events.
+  &quot;&quot;&quot;
+ 
+  def __init__(self):
+    Application.LoadComponent(self, Uri(&#39;xaml/widgets/foo.xaml&#39;,
+            UriKind.Relative))
+    ClickHandler.attachDoubleClickHandler(self, self.evt_dblClicked)
+ 
+  def evt_dblClicked(self, sender, args):
+    &quot;&quot;&quot;Event for double click; this gets passed
+    the original &quot;MouseLeftButtonDown&quot; arguments 
+    which ClickHandler got, so you&#39;ll want to match
+    the &quot;MouseButtonEventHandler&quot; delegate arguments.
+    Object sender - the object the mouse click handler is attached to,
+            in this case, should be the same as &#39;self&#39;
+    System.Windows.Input.MouseButtonEventArgs args - the mouse event arguments
+    &quot;&quot;&quot;
+    HtmlPage.Window.Alert(&#39;%s got double clicked!&#39; % sender)</code></pre>
+
+<p>It&#8217;s not the world&#8217;s greatest solution, but it gets the job done.</p>

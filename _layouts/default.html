@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  {% if page.title %}<title>{{ page.title }}</title>
+  {% else %}<title>{{ site.name }}</title>{% endif %}
+  {% if page.author %}<meta name="author" content="{{ page.author }}" />{% endif %}
+  <link href="{{ site.feed }}" rel="alternate" title="{{ site.name }}" type="application/atom+xml" />
+  <link rel="openid.delegate" href="http://evilmonkeylabs.myopenid.com" />
+
+  <link rel="stylesheet" href="/stylesheets/application.css" type="text/css" />
+  <link rel="stylesheet" href="/stylesheets/evilmonkey.css" type="text/css" />
+</head>
+
+<body>
+<div id="container">
+  <div id="logo">
+    <img src="/images/logo_small.png"/>
+  </div></div>
+  <div id="header">
+    <h1><span><a href="/">{{ site.name }}</a></span></h1>
+    <h2>{{ site.subtitle }}</h2>
+  </div>
+
+  <div id="page">
+    <div id="content">
+      {{ content }}
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    /**
+      * var disqus_identifier; [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] 
+      */
+    (function() {
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = 'http://evilmonkeyblog.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript=evilmonkeyblog">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </div>
+
+    <div id="sidebar">
+      <!-- sidebar components -->
+      <div class="sidebar-node">
+        <h3 class='sidebar-title'>Blogroll</h3>
+        <div class='static-body'>
+          <ul>
+            <li><a href="http://worldairmaillinks.com" title="World Airmail Links">World Airmail Links</a></li>
+            <li><a href="http://misanthropicscott.wordpress.com" title="The Misanthropic Principle">The Misanthropic Principle</a></li>
+            <li><a href="http://www.david-orkin.com"> A little bit of Jersey in Japan</a></li>
+          </ul>
+        </div>
+        <h3 class='sidebar-title'>Projects & Sites I've Worked On</h3>
+        <div class='static-body'>
+          <ul>
+            <li><a href="http://github.com/bwmcadams/" title="GitHub">GitHub Profile</a></li>
+            <li><a href="http://bitbucket.org/bwmcadams/" title="BitBucket">BitBucket Profile</a> 
+            <br/>
+            <div class="sidebar_tiny">(My public code tends to reside in Github these days.)</div></li>
+            <hr>
+            <li><a href="http://sluggy.com/" title="Sluggy Freelance">Sluggy Freelance</a> <div class="sidebar_tiny">(I wrote &amp; maintain the current code running the site. [Python+Pylons+MongoDB])</div></li>
+            <li><a href="http://userfriendly.org/" title="UserFriendly">UserFriendly</a> <div class="sidebar_tiny">(Once upon a time I built the CMS which runs their site. [Perl+mod_perl])</div></li>
+            <li><a href="http://novus.github.com/docs/casbah" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created &amp; maintain.</div></li>
+            <li><a href="http://bitbucket.org/namlook/mongokit/">MongoKit</a> <div class="sidebar_tiny">(I've contributed Pylons support and a few other useful hacks.)</div></li>
+            <hr>
+          </ul>
+        </div>
+       
+        <h3 class='sidebar-title'>Presentations</h3>
+          <div class='static-body'>
+            <li>
+            MongoDB + Scala @ NY Scala 8/10
+            <ul>
+              <li>
+                <a href="http://www.slideshare.net/bwmcadams/scalany-mongodb-aug10">Slides</a>
+              </li>
+              <li>
+                <a href="http://vimeo.com/14090025">Video</a>
+              </li>
+            </ul>
+            </li>
+            <li>
+            Migrating Sluggy.com from MySQL to MongoDB @ Mongo NY 5/10
+            <ul>
+              <li>
+                <a href="http://www.scribd.com/doc/31748635/From-MySQL-to-MongoDB-at-Sluggy-com">Slides</a> 
+              </li>
+              <li>
+                <a href="http://blip.tv/file/3704023">Video</a>
+                </li>
+             </ul>
+            </li>
+           </ul>
+
+          </div>
+        
+        <h3 class='sidebar-title'>Twitter</h3>
+          <div class='static-body' id='twitter_block'>
+            <div id="twitter_div">
+              <ul id="twitter_update_list"></ul>
+              <a href="http://twitter.com/rit" id="twitter-link" style="display:block;text-align:right;">follow me on Twitter</a>
+            </div>
+            <script type="text/javascript" src="http://twitter.com/javascripts/blogger.js"></script>
+            <script type="text/javascript" src="http://twitter.com/statuses/user_timeline/rit.json?callback=twitterCallback2&amp;count=3"></script>
+          </div>
+        </div>
+        <h3>Syndicate</h3>
+        <ul>
+            <li><a href="/atom.xml" title="Articles feed">Articles</a></li>
+        </ul>
+
+    <br style="clear:both;" />
+  </div>
+
+  <div id="footer">
+    <hr />
+    <p><a href="/">{{ site.name }}</a></p>
+    <ul>
+      <li>made with <a href="http://github.com/vilcans/scribbish-jekyll">scribbish-jekyll</a></li>
+    </ul>
+    <div id="copyright">
+      Copyright &copy; 2009, 2010 Brendan W. McAdams.<br>
+      <span id="disclaimer">
+        Views expressed herein are my own. They in no way reflect the views or opinions of my employer (past, current or future), affiliated projects, publisher, or, in many cases, a sane or rational individual.
+      </span>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+var disqus_shortname = 'evilmonkeyblog';
+(function () {
+  var s = document.createElement('script'); s.async = true;
+  s.src = 'http://disqus.com/forums/evilmonkeyblog/count.js';
+  (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
+
+</body>
+</html>
