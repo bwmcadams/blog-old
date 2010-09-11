@@ -28,7 +28,7 @@ lsi:         true
 pygments:    true
 markdown:    maruku
 permalink:   pretty
-paginate:    1
+paginate:    3
 
 maruku:
   use_tex:    false
