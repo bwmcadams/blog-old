@@ -10,6 +10,7 @@ For 2011, MongoDB has added official support for Scala with the release of [Casb
 
 Because it is designed to be easy to work with for Scala users, Casbah introduces a more 'friendly' syntax for creating MongoDB Objects, using Scala's Map syntax:
 
+
 {% highlight scala %} 
 import com.mongodb.casbah.Imports._
 
@@ -18,9 +19,6 @@ val newObj = MongoDBObject("foo" -> "bar",
                            "x" -> "y",
                            "pie" -> 3.14,
                            "spam" -> "eggs")
-/* newObj: com.mongodb.DBObject =
-           { "foo" : "bar" , "x" : "y" , "pie" : 3.14 , "spam" : "eggs"} */
-
 
 /** Or, use a builder interface */
 val builder = MongoDBObject.newBuilder
@@ -29,10 +27,7 @@ builder += "x" -> "y"
 builder += ("pie" -> 3.14)
 builder += ("spam" -> "eggs", "mmm" -> "bacon")
 val newObj = builder.result
-// newObj: com.mongodb.DBObject =
-/* { "foo" : "bar" , "x" : "y" , "pie" : 3.14 ,
-     "spam" : "eggs" , "mmm" : "bacon"} */
-{% endhighlight }
+{% endhighlight %}
 
 The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.  In contrast, the same statements in Java tend to be more verbose:
 
