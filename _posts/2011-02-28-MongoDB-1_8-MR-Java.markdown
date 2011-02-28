@@ -79,7 +79,7 @@ for ( DBObject obj : out.results() ) {
 
 {% endhighlight %} 
 
-Which should output each DBObject in the results to the screen.  The new MapReduceOutput code detects the result set type from MongoDB and provides it in `results()` as a **Iterable<DBObject>**---whether the results are **INLINE** or stored in a collection.  Note that I did not specify the `finalize` function here, as the interface on **DBCollection** doesn't accept it as a parameter.  Alternately, we could construct a **[MapReduceCommand](http://api.mongodb.org/java/2.5-pre-/com/mongodb/MapReduceCommand.html)** instance, which allows us to set `finalize`:
+Which should output each DBObject in the results to the screen.  The new MapReduceOutput code detects the result set type from MongoDB and provides it in `results()` as a `Iterable<DBObject>`---whether the results are **INLINE** or stored in a collection.  Note that I did not specify the `finalize` function here, as the interface on **DBCollection** doesn't accept it as a parameter.  Alternately, we could construct a **[MapReduceCommand](http://api.mongodb.org/java/2.5-pre-/com/mongodb/MapReduceCommand.html)** instance, which allows us to set `finalize`:
 
 {% highlight java %}
 MapReduceCommand cmd = new MapReduceCommand( coll, m, r, null, MapReduceCommand.OutputType.INLINE, null);
