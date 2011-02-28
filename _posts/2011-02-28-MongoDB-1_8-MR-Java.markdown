@@ -63,7 +63,7 @@ First, we'll need to stick these functions into some Java strings to pass around
                    " for ( var i = 0; i < values.length; i ++ ) { n.sum += values[i].sum; " + 
                    " n.count += values[i].count; } return n; }";
 
-        String f = "function( year, value ) { value.avg = value.sum / value.count; return value; }";%}
+        String f = "function( year, value ) { value.avg = value.sum / value.count; return value; }";
 
 {% endhighlight %}
 
