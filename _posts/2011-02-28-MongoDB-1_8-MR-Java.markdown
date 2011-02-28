@@ -82,7 +82,9 @@ for ( DBObject obj : out.results() ) {
 Which should output each DBObject in the results to the screen.  The new MapReduceOutput code detects the result set type from MongoDB and provides it in `results()` as a `Iterable<DBObject>`---whether the results are **INLINE** or stored in a collection.  Note that I did not specify the `finalize` function here, as the interface on **DBCollection** doesn't accept it as a parameter.  Alternately, we could construct a **[MapReduceCommand](http://api.mongodb.org/java/2.5-pre-/com/mongodb/MapReduceCommand.html)** instance, which allows us to set `finalize`:
 
 {% highlight java %}
-MapReduceCommand cmd = new MapReduceCommand( coll, m, r, null, MapReduceCommand.OutputType.INLINE, null);
+MapReduceCommand cmd = new MapReduceCommand( coll, m, r, null, 
+                                             MapReduceCommand.OutputType.INLINE, null);
+
 cmd.setFinalize(f);
 
 out = coll.mapReduce(cmd);
@@ -96,7 +98,8 @@ for ( DBObject obj : out.results() ) {
 Using the **MERGE** and **REDUCE** Output Modes follows much the same pattern.  I'll leave figuring out **MERGE** as an exercise for the reader (it should be easy if you read my last post) but here's how we would handle a **REDUCE** on two halves of the same year.  
 
 {% highlight java %}
-cmd = new MapReduceCommand( coll, m, r, "yield_historical.out", MapReduceCommand.OutputType.REDUCE, 
+cmd = new MapReduceCommand( coll, m, r, "yield_historical.out", 
+                            MapReduceCommand.OutputType.REDUCE, 
                             new BasicDBObject("_id", new BasicDBObject(
                                                         "$gte", new Date( 101, 0, 1 )
                                                      ).append(
@@ -111,7 +114,8 @@ cmd.setFinalize(f);
 coll.mapReduce(cmd);
 
 /** Reduce in second half */
-cmd = new MapReduceCommand( coll, m, r, "yield_historical.out", MapReduceCommand.OutputType.REDUCE, 
+cmd = new MapReduceCommand( coll, m, r, "yield_historical.out", 
+                            MapReduceCommand.OutputType.REDUCE, 
                             new BasicDBObject("_id", new BasicDBObject(
                                                         "$gt", new Date( 101, 5, 1 )
                                                      ).append(
