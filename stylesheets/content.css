@@ -48,35 +48,35 @@
 }
 
 #content h1 { 
-  font-size: 28px;
+  font-size: 36px;
   margin: 0 0 0.3em;  
 }
 
 #content h2 { 
-  font-size: 24px;
+  font-size: 32px;
   margin: 0 0 0.3em;  
 }
 
 #content h3 { 
-  font-size: 22px;
+  font-size: 30px;
   margin: 1.2em 0 0.3em;  
 }
 
 #content h4 { 
-  font-size: 20px;
+  font-size: 28px;
   margin: 1.2em 0 0.3em;  
   border-bottom: 1px dotted #bbb;
 }
 
 #content h5 {
-  font-size: 20px;
+  font-size: 26px;
   background: #ffd;
   margin: 1.2em 0 0.3em;  
   border-bottom: 1px dotted #aaa;
 }
 
 #content p {
-  line-height: 14px; 
+  line-height: 22px; 
   margin: 0 0 1.2em;
 }
 
@@ -91,7 +91,7 @@
 }
 
 #content li {
-  line-height: 15px; 
+  line-height: 18px; 
   margin: 0 0 0 1em; padding: 0;
 }
 
