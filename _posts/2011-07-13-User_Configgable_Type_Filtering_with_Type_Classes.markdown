@@ -5,7 +5,7 @@ layout: post
 ---
 When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:
 
-    ![@rit when using "_id" $lt new ObjectId(timestamp) it throws ValidDateOrNumericType, but we might want to select records after id timestamp (from @justthor)](/images/oid_lt_casbah.png)
+![@rit when using "_id" $lt new ObjectId(timestamp) it throws ValidDateOrNumericType, but we might want to select records after id timestamp (from @justthor)](/images/oid_lt_casbah.png)
 
 The user in question is complaining that when using [Casbah's DSL](http://github.com/mongodb/casbah), it doesn't allow a MongoDB ``ObjectId`` as a valid type to the ``$lt`` operator.  But as [@justthor](http://twitter.com/justthor) points out, it is entirely possible to use ``ObjectId`` with the ``$lt`` operator since it contains timestamp information (See the [documentation for ObjectId](http://www.mongodb.org/display/DOCS/Object+IDs) if you want nitty gritty detail).   When I wrote the code for ``$lt`` however, I needed to decide what types were valid and weren't valid; I can't exactly guarantee type safety wih a DSL like Casbah's, but I can enforce type *sanity*.  Whether I forgot that you can use ``ObjectId`` in ``$lt`` or just decided that most people wouldn't need to is irrelevant --- I had in this case blocked a user from accomplishing something valid that they needed to.
 
