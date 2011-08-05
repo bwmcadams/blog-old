@@ -13,7 +13,7 @@ boolean valid = false;
 String status = null;
 if (valid) {
     status = "VALIDATED";
-} 
+}
 else {
     status = "INVALID";
 }
@@ -29,7 +29,7 @@ This simplification breaks down quickly once our block becomes more complex.  Ev
 
 {% highlight java %}
 // In this case, valid is now an int that can hold several states
-int valid = -1; 
+int valid = -1;
 
 /* valid = SomeMethodCallThatReturnsValid() */
 
@@ -37,10 +37,10 @@ String status = null;
 
 if (valid == 1) {
     status = "VALIDATED";
-} 
+}
 else if (valid == 0) {
     status = "INVALID"; // A simple not-valid indicator
-} 
+}
 else if (valid == -1) {
     status = "UNINITIALIZED\_ERROR";
 }
