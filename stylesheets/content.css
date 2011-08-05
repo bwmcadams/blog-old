@@ -102,14 +102,14 @@
 }
 
 #content code { 
-  font: normal 12px "bitstream vera sans mono", monaco "lucida console", "courier new", courier, serif;
+  font: normal 14px "bitstream vera sans mono", monaco, "lucida console", "courier new", courier, serif;
 }
 
 #content pre {
   color: #63FF00;
   background: #000;
   overflow: auto;
-  font: normal 12px "bitstream vera sans mono", monaco "lucida console", "courier new", courier, serif;
+  font: normal 14px "bitstream vera sans mono", monaco, "lucida console", "courier new", courier, serif;
   margin: 0.9em 0; padding: 8px;
 }
 

@@ -278,6 +278,26 @@ for (x <- 1 until 42) yield x
 
 The output of the `for` loop which uses `yield` will always be an *immutable* `Seq[_]`, letting us save that result for later usage much like we did with our Python generators and comprehensions.  And of course, Scala's `for` loops allow for filters just like Python's:
 
+{% highlight scala %}
+val items = List("foo", "bar", "baz", "spam", "eggs", "apples", "oranges")
+
+val itemList = for (item <- items) yield item
+/* itemList: List[java.lang.String] = List(foo, bar, baz, spam, eggs, apples, oranges) */
+
+val foodList = 
+    for (item <- items if "spam" :: "eggs" :: "apples" :: "oranges" :: Nil contains item) 
+        yield item
+/* foodList: List[java.lang.String] = List(spam, eggs, apples, oranges) */
+
+// We can also expand that for comprehension into the alternate syntax for clarity
+val expandedFoodList = for {
+  item <- items
+  if "spam" :: "eggs" :: "apples" :: "oranges" :: Nil contains item
+} yield item
+
+// expandedFoodList: List[java.lang.String] = List(spam, eggs, apples, oranges)
+
+{% endhighlight %}
 
 
 The intention here wasn't to "bash" on Java or even champion Python or Scala; rather, to highlight the ways that different syntactic features add power, flexiblity and (in the case of things like mutability) potential safety to our code.  Though I'm accused of being a Scala fanboy, I want to clearly reiterate generators as something that I still think Python gets as a *major* edge over Scala.  I work in all three of the highlighted languages on a daily basis and though I probably enjoy Java the least, find gems and strengths in each tool as I switch between them (to be honest though, most of Java's gems these days exist in the JVM and the JDK libraries rather than the language).
