@@ -83,7 +83,7 @@ else:
     status = "UNKNOWN_ERROR"
 {% endhighlight %}
 
-Here's that magic I'm talking about — depite us not explicitly declaring/initializing it, Python will instantiate a variable `status` at the *outer* scope (that is to say, outside of our if-else block).  This is incredibly useful for cutting down line noise related to unecessary declaration of variables; unfortunately it is also a common confusion point for beginning Pythonistas. 
+Here's that magic I'm talking about — despite us not explicitly declaring/initializing it, Python will instantiate a variable `status` at the *outer* scope (that is to say, outside of our if-else block).  This is incredibly useful for cutting down line noise related to unecessary declaration of variables; unfortunately it is also a common confusion point for beginning Pythonistas. 
 
     *"Where the hell did this `status` variable come from? It wasn't ever declared in an outer scope!"*
 
