@@ -91,7 +91,7 @@ While we've avoided initializing `status` to null, we still encounter the pesky 
 
 Python also can take us closer to an ideal state with the for/foreach constructs.  My big gripe with the previous Java for loop code was the need to declare a mutable `List` and incrementally add to it.  Python has a cure for what ails us here, in the form of generators — a feature which, as you'll see, I'd give my left pinkie (or maybe just the last millimeter of my left pinkie nail) to have in Scala as well.
 
-Here's how a smart Pythonista would express our database processing loop in a way that limits the declaration of mutable variables:
+Here's how a smart Pythonista might express our database processing loop in a way that limits the declaration of mutable variables:
 
 {% highlight python %}
 def process_dbusers(dbResults):
