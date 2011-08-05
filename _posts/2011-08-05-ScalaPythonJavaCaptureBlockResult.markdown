@@ -112,7 +112,7 @@ type(users)
 # <type 'generator'>
 {% endhighlight %}
 
-Python supports a special type of expression (which again, I'd love to have in Scala and have been playing with ways to support) called a *generator*.  In addition to being immutable, a generator is also lazy.  Note that Python's `yield` keyword differs from Scala's; it may be easiest to think of it as a "super-return" or "return on crack" in that it actually suspends execution (via coroutines) after returning *each* value.  
+Python supports a special type of expression (which again, I'd love to have in Scala and have been playing with ways to support) called a *generator*.  In addition to being immutable, a generator is also lazy; it does not evaluate the entire list at creation, instead evaluating each member as it is first read (notably though, Python generators do not memoize and cannot be iterated repeatedly).  Note that Python's `yield` keyword differs from Scala's; it may be easiest to think of it as a "super-return" or "return on crack" in that it actually suspends execution (via coroutines) after returning *each* value.  
 
 The 'generator' produced is actually an iterable value; requesting the 'next' item resumes execution, runs the next iteration of the internal for loop again, yields the return value and suspends again.  Not only is this generator value immutable, but it should be significantly more efficient in many cases; if we don't need to store each `User` but process them as we read them, we should see a lot better resource usage.
 
