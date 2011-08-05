@@ -237,7 +237,7 @@ We can also easily simplify this whole block into a pattern match, which will re
 import annotation.switch
 
 // Even better, cut out one more variable storage by calling our valid check inline
-val status = (someMethodCallThatSetsValidity(): @switch) match {
+val status: String = (someMethodCallThatSetsValidity(): @switch) match {
     case 1  => "VALIDATED"
     case 0  => "INVALID"
     case -1 => "UNINITIALIZED_ERROR"
