@@ -175,17 +175,17 @@ One of the cool little edge behaviors of Scala's syntax is the ability to captur
 val valid: Int = someMethodCallThatSetsValidity() 
 
 val status = if (valid == 1) { 
-  "VALIDATED"
+  "VALIDATED" // returns "VALIDATED"
 } else if (valid == 0) {
-  "INVALID" 
+  "INVALID"  // returns "INVALID"
 } else if (valid == -1) {
-  "UNINITIALIZED_ERROR"
+  "UNINITIALIZED_ERROR" // returns "UNINITIALIZED_ERROR"
 } else { 
-  "UNKNOWN_ERROR"
+  "UNKNOWN_ERROR" // returns "UNKNOWN_ERROR"
 }
 {% endhighlight %}
 
-Much better! The way that Scala evaluates this code, you can think of each branch of the block (the body of each "if", "else if" and "else" statements) as an anonymous function.  Because it is evaluated this way, Scala allows us to return values, which can be captured from the entire block (The use of the explicit `return` keyword is typically considered bad form in Scala which is why it is omitted here).  If `valid` has a value of `1`, this block will return `"VALIDATED`.
+Much better! The way that Scala evaluates this code, you can think of each branch of the block (the body of each "if", "else if" and "else" statements) as an anonymous function.  Because it is evaluated this way, Scala allows us to return values, which can be captured from the entire block (The use of the explicit `return` keyword is typically considered bad form in Scala which is why it is omitted here).  If `valid` has a value of `1`, this block will return `"VALIDATED"`.
 
 The type of `safe` in this code will be inferred to `String`, because each branch returns a `String`. Although in Scala it is usually recommended to let type inference do its work wherever possible and avoid explicit type annotations, variables capturing values from a block like this might be a good exception.  The argument that I make is that if the type inference system finds multiple *differing* types in each branch, it will search backwards on the type hierarchies for the closest "ancestor" type of each type.  This can quickly lead to the type of `status` being something far too generic (or even unexpected in the case of a bug).
 
