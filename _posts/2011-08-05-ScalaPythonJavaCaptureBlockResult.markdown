@@ -110,7 +110,7 @@ users
 
 type(users)
 # <type 'generator'>
-{% endhlight %}
+{% endhighlight %}
 
 Python supports a special type of expression (which again, I'd love to have in Scala and have been playing with ways to support) called a *generator*.  In addition to being immutable, a generator is also lazy.  Note that Python's `yield` keyword differs from Scala's; it may be easiest to think of it as a "super-return" or "return on crack" in that it actually suspends execution (via coroutines) after returning *each* value.  
 
