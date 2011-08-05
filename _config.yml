@@ -26,7 +26,7 @@ plugins:     ./_plugins
 future:      true
 lsi:         true
 pygments:    true
-markdown:    maruku
+markdown:    rdiscount
 permalink:   pretty
 paginate:    3
 
