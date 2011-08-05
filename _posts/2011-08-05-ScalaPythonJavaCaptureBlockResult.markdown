@@ -87,7 +87,7 @@ Here's that magic I'm talking about — despite us not explicitly declaring/init
 
     *"Where the hell did this `status` variable come from? It wasn't ever declared in an outer scope!"*
 
-While we've avoided initialzing `status` to null, we still encounter the pesky mutability issue.  We ultimately ended up with a variable `status` which can be mutated later.  This isn't ideal, but as far as I know Python has no way to enable/enforce immutable state.
+While we've avoided initializing `status` to null, we still encounter the pesky mutability issue.  We ultimately ended up with a variable `status` which can be mutated later.  This isn't ideal, but as far as I know Python has no way to enable/enforce immutable state.
 
 Python also can take us closer to an ideal state with the for/foreach constructs.  My big gripe with the previous Java for loop code was the need to declare a mutable `List` and incrementally add to it.  Python has a cure for what ails us here, in the form of generators — a feature which, as you'll see, I'd give my left pinkie (or maybe just the last millimeter of my left pinkie nail) to have in Scala as well.
 
