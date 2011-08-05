@@ -13,7 +13,7 @@ boolean valid = false;
 String status = null;
 if (valid) {
     status = "VALIDATED";
-}
+} 
 else {
     status = "INVALID";
 }
@@ -29,7 +29,7 @@ This simplification breaks down quickly once our block becomes more complex.  Ev
 
 {% highlight java %}
 // In this case, valid is now an int that can hold several states
-int valid = -1;
+int valid = -1; 
 
 /* valid = SomeMethodCallThatReturnsValid() */
 
@@ -37,15 +37,15 @@ String status = null;
 
 if (valid == 1) {
     status = "VALIDATED";
-}
+} 
 else if (valid == 0) {
     status = "INVALID"; // A simple not-valid indicator
-}
+} 
 else if (valid == -1) {
-    status = "UNINITIALIZED\_ERROR";
+    status = "UNINITIALIZED_ERROR";
 }
 else {
-    status = "UNKNOWN\_ERROR";
+    status = "UNKNOWN_ERROR";
 }
 {% endhighlight %}
 
@@ -55,7 +55,7 @@ We've already bounced ourselves back to the land of `null` and forced mutability
 List<User> users = new List<User>();
 
 for (DBRow row : databaseQuery(queryArgs)) {
-    users.add(new User(row.get("username"), row.get("first\_name"), row.get("last\_name"));
+    users.add(new User(row.get("username"), row.get("first_name"), row.get("last_name"));
 }
 {% endhighlight %}
 
@@ -71,16 +71,16 @@ For those that know Python — a language that I have long loved, and using Scal
 # Again, valid is now an int that can hold several states
 valid = -1 
 
-/* valid = some\_method\_to\_set\_valid() */
+/* valid = some_method_to_set_valid() */
 
 if valid == 1:
     status = "VALIDATED"
 elif valid == 0:
     status = "INVALID"
 elif valid == -1:
-    status = "UNINITIALIZED\_ERROR"
+    status = "UNINITIALIZED_ERROR"
 else:
-    status = "UNKNOWN\_ERROR"
+    status = "UNKNOWN_ERROR"
 {% endhighlight %}
 
 Here's that magic I'm talking about — depite us not explicitly declaring/initializing it, Python will instantiate a variable `status` at the *outer* scope (that is to say, outside of our if-else block).  This is incredibly useful for cutting down line noise related to unecessary declaration of variables; unfortunately it is also a common confusion point for beginning Pythonistas. 
@@ -94,15 +94,15 @@ Python also can take us closer to an ideal state with the for/foreach constructs
 Here's how a smart Pythonista would express our database processing loop in a way that limits the declaration of mutable variables:
 
 {% highlight python %}
-def process\_dbusers(dbResults):
+def process_dbusers(dbResults):
     for entry in dbResults:
-        yield User(row.field('username'), row.field('first\_name'), 
-                   row.field('last\_name'))
+        yield User(row.field('username'), row.field('first_name'), 
+                   row.field('last_name'))
 
-users = process\_dbusers(db\_query(query\_args))
+users = process_dbusers(db_query(query_args))
 {% endhighlight %}
 
-With this code, we've already quickly wandered into the land of "Things Java Can't Even Pretend To Do" here (which I think highlights my amusement at people arguing Java's power over Python.  It's all relative when you know the right syntax ... ).  To best handle this expression we've constructed a higher- order function `process\_dbusers`, which takes in a database results iterator, returning a list-like construct with the results.  I want to emphasize the term *list-like* here because what we got is not, in fact, a list (rather it is "Iterable").  A quick peek at the REPL (if you don't already have [IPython](http://ipython.org) you are really missing out) evinces this:
+With this code, we've already quickly wandered into the land of "Things Java Can't Even Pretend To Do" here (which I think highlights my amusement at people arguing Java's power over Python.  It's all relative when you know the right syntax ... ).  To best handle this expression we've constructed a higher- order function `process_dbusers`, which takes in a database results iterator, returning a list-like construct with the results.  I want to emphasize the term *list-like* here because what we got is not, in fact, a list (rather it is "Iterable").  A quick peek at the REPL (if you don't already have [IPython](http://ipython.org) you are really missing out) evinces this:
 
 {% highlight python %}
 users
@@ -110,7 +110,7 @@ users
 
 type(users)
 # <type 'generator'>
-{% endhighlight %}
+{% endhlight %}
 
 Python supports a special type of expression (which again, I'd love to have in Scala and have been playing with ways to support) called a *generator*.  In addition to being immutable, a generator is also lazy.  Note that Python's `yield` keyword differs from Scala's; it may be easiest to think of it as a "super-return" or "return on crack" in that it actually suspends execution (via coroutines) after returning *each* value.  
 
@@ -124,7 +124,7 @@ items = ('Foo', 'bar', 'Baz', 'spam', 'eggs', 'apples', 'oranges')
 
 # Use a List Comprehension, returns a list
 itemList = [item for item in items]
-# ['Foo', 'bar', 'Baz', 'spam', 'eggs', 'apples', 'oranges']()
+# ['Foo', 'bar', 'Baz', 'spam', 'eggs', 'apples', 'oranges']
 # Use a Generator Expression which returns a generator
 itemGen  = (item for item in items)
 # <generator object <genexpr> at 0x10cafa050>
@@ -132,7 +132,7 @@ itemGen  = (item for item in items)
 # You can also filter these expressions
 # Return a list which filters to return only items which are 'food'
 foodList = [item for item in items if item in ('spam', 'eggs', 'apples', 'oranges')]
-# ['spam', 'eggs', 'apples', 'oranges']()
+# ['spam', 'eggs', 'apples', 'oranges']
 # The same filter, but as a generator expression
 foodGen = (item for item in items if item in ('spam', 'eggs', 'apples', 'oranges'))
 # <generator object <genexpr> at 0x10cafa140>
@@ -161,9 +161,9 @@ if (valid == 1) {
 } else if (valid == 0) {
   status = "INVALID" 
 } else if (valid == -1) {
-  status = "UNINITIALIZED\_ERROR"
+  status = "UNINITIALIZED_ERROR"
 } else { 
-  status = "UNKNOWN\_ERROR"
+  status = "UNKNOWN_ERROR"
 }
 {% endhighlight %}
 
@@ -179,9 +179,9 @@ val status = if (valid == 1) {
 } else if (valid == 0) {
   "INVALID" 
 } else if (valid == -1) {
-  "UNINITIALIZED\_ERROR"
+  "UNINITIALIZED_ERROR"
 } else { 
-  "UNKNOWN\_ERROR"
+  "UNKNOWN_ERROR"
 }
 {% endhighlight %}
 
@@ -197,7 +197,7 @@ val status = if (valid == 1) {
 } else if (valid == 0) {
   "INVALID" 
 } else if (valid == -1) {
-  "UNINITIALIZED\_ERROR"
+  "UNINITIALIZED_ERROR"
 } else { 
   false 
 }
@@ -216,7 +216,7 @@ val status: String = if (valid == 1) {
 } else if (valid == 0) {
   "INVALID" 
 } else if (valid == -1) {
-  "UNINITIALIZED\_ERROR"
+  "UNINITIALIZED_ERROR"
 } else { 
   false 
 }
@@ -238,8 +238,8 @@ import annotation.switch
 val status = (someMethodCallThatSetsValidity(): @switch) match {
     case 1  => "VALIDATED"
     case 0  => "INVALID"
-    case -1 => "UNINITIALIZED\_ERROR"
-    case default => "UNKNOWN\_ERROR"
+    case -1 => "UNINITIALIZED_ERROR"
+    case default => "UNKNOWN_ERROR"
 }
 {% endhighlight %}
 
@@ -263,7 +263,7 @@ for (x <- 1 until 42) return x
 /* Fails to compile 
 <console>:29: error: return outside method definition
        for (x <- 1 until 42) return x 
-*///>
+*/
 {% endhighlight %}
 
 Instead, we need to use a special keyword, `yield`, to signify our intention to create a List Comprehension rather than a simple loop.  Like in Python, `yield` changes the behavior of a `for` loop.  However, the behavior of the `yield` keyword in Scala differs significantly from Python, as it does not invoke generator behavior.  The use of `yield` inside a Scala `for` loop will produce results along the lines of those of Python's square bracket enclosed List Comprehensions:
@@ -271,7 +271,7 @@ Instead, we need to use a special keyword, `yield`, to signify our intention to 
 {% highlight scala %}
 for (x <- 1 until 42) yield x
 /* scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42)
-*///>
+*/
 {% endhighlight %}
 
 The output of the `for` loop which uses `yield` will always be an *immutable* `Seq[_]`, letting us save that result for later usage much like we did with our Python generators and comprehensions.  And of course, Scala's `for` loops allow for filters just like Python's:
