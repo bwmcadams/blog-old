@@ -245,7 +245,7 @@ val status: String = (someMethodCallThatSetsValidity(): @switch) match {
 }
 {% endhighlight %}
 
-*The use of the @switch annotation is a trick I learned from [Josh Suereth's](http://suereth.blogspot.com/) absolutely superb book [Scala in Depth](http://www.manning.com/suereth/); when used with certain matches (they typically need to match numeric values) they ensure the compiler generates a much more efficient JVM bytecode for the match.*
+*The use of the @switch annotation is a trick I learned from [Josh Suereth's](http://suereth.blogspot.com/) absolutely superb book [Scala in Depth](http://www.manning.com/suereth/); when used with certain matches (they typically need to match numeric values) they ensure the compiler generates a much more efficient JVM bytecode for the match execution/evaluation.*
 
 I'll leave the evaluation of that last as an exercise for the reader.  Fundamentally it is a simple restatement of our previous if-else blocks and should make sense.
 
@@ -253,10 +253,10 @@ Now that we've looked at branching block statements and value capture in Scala, 
 
 {% highlight scala %}
 for (x <- 1 until 42) x
-// Loops 42 times, but returns / prints nothing >
+// Loops 42 times, but returns / prints nothing 
 {% endhighlight %}
 
-Unlike other the previously examined branching blocks (if-else and matches), Scala's `for` loops do *not* implicitly return the last value.  I would make an educated guess that this is because most developers would not expect or require the default behavior of a `for` loop to generate return values.  I'd also go so far as to posit that this is also a very sane default. 
+Unlike other the previously examined branching blocks (if-else and matches), Scala's `for` loops do *not* implicitly return the last value.  I would make an educated guess that this is because most developers would not expect or require the default behavior of a `for` loop to generate return values.  I'd also go so far as to posit that this is a very sane default. 
 
 Much like Python, to generate a return value from a `for` loop in Scala we must explicitly declare our intention to return a value. While (as I lamented previously) Scala lacks support for Python style generators, it does support a form of List Comprehensions which allow us to get the behavior we want.  For a Python developer, the rules for constructing these in Scala may get quickly confusing.  The first is that `return` is not a valid keyword at *all* inside of a Scala `for` statement (Incidentally, Python allows it as a 'valid' keyword, but the function will always return the result of the first loop iteration and never progress).
 
