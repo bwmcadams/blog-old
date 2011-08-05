@@ -14,11 +14,11 @@
 
 body {
   background: url(/images/theme/background.gif) repeat-x left top;
-  font: normal 13px "lucida grande", verdana, sans-serif;
+  font: normal 15px "lucida grande", verdana, sans-serif;
 }
 
 input,
-textarea { font: normal 12px "bitstream vera sans", verdana, sans-serif; }
+textarea { font: normal 13px "bitstream vera sans", verdana, sans-serif; }
 
 abbr  { border: none; }
 cite  { font-style: normal; }
