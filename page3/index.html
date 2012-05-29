@@ -30,6 +30,46 @@
   
   
 
+<div class="hentry" id="/2009/10/20/talking-to-activedirectory-from-iron-python">
+  <h2 class="entry-title">
+    <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory from IronPython</a>
+  </h2>
+  
+  <abbr class="published" title="2009-10-20T00:00:00-04:00">20 Oct 2009</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>We're building a new intranet system at work, and I've been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people's Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
+
+<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I've been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
+
+<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of 'valid' attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn't know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
+
+ 
+        <p> <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#IronPython">IronPython</a> <a rel="tag" href="/tags/#Silverlight">Silverlight</a> <a rel="tag" href="/tags/#Python">Python</a> <a rel="tag" href="/tags/#ActiveDirectory">ActiveDirectory</a> <a rel="tag" href="/tags/#LDAP">LDAP</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    
+      
+        <span align="right">&raquo; <a href="/page2/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2009/09/02/double-clicking-in-ironpython-and-silverlight">
   <h2 class="entry-title">
     <a href="/2009/09/02/double-clicking-in-ironpython-and-silverlight/">Double Clicking in IronPython + Silverlight</a>
