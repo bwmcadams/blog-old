@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Evil Monkey Labs</title>
+  
+  
+  <link href="http://blog.evilmonkeylabs.com" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml" />
+  <link rel="openid.delegate" href="http://evilmonkeylabs.myopenid.com" />
+
+  <link rel="stylesheet" href="/stylesheets/application.css" type="text/css" />
+  <link rel="stylesheet" href="/stylesheets/evilmonkey.css" type="text/css" />
+</head>
+
+<body>
+<div id="container">
+  <div id="logo">
+    <img src="/images/logo_small.png" alt="Evil Monkey Logo"/>
+  </div>
+  <div id="header">
+    <h1><span><a href="/">Evil Monkey Labs</a></span></h1>
+    <h2>Code and related ramblings.</h2>
+  </div>
+
+  <div id="page">
+    <div id="content">
+      <div id="home">
+  <h1>Blog Posts</h1>
+  
+  
+
+<div class="hentry" id="/2011/01/27/MongoDB-1_8-MapReduce">
+  <h2 class="entry-title">
+    <a href="/2011/01/27/MongoDB-1_8-MapReduce/">A Look At MongoDB 1.8's MapReduce Changes</a>
+  </h2>
+  
+  <abbr class="published" title="2011-01-27T00:00:00-05:00">27 Jan 2011</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last 'beta' release of what will become MongoDB 1.8.  As part of the release, I've been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
+
+<p>If you aren't new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn't possible to safely clean these up–--they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they've been replaced with an even better system for saving the results of MapReduce jobs!</p>
+
+<p>While the <em>out</em> argument is now a required parameter in MapReduce jobs, it has a number of options for controlling what MongoDB does with results.  If you're running a truly one-off job where you don't need to keep the results later, MongoDB now supports returning results "inline".  Be careful here though: your results are being returned in a single document and are subject to the document size limitations of MongoDB (16MB per document in 1.8).  To use inline results, set the value of <em>out</em> to a document <code>{inline: 1}</code>.  The result object will contain an additional key <em>results</em> which contains the MapReduce output; the <em>result</em> field will be omitted.</p>
+
+<p>As with previous versions of MongoDB, you can specify a collection name (as a string) in the <em>out</em> argument.  If the named collection already exists MongoDB will replace it entirely with the MapReduce results. Along with the inline mode, MongoDB 1.8 introduces support for "merge" and "reduce" output modes; instead of replacing the target collection MongoDB can be instructed to reconcile the MapReduce results with the existing data.  To use these modes, set the value of <em>out</em> to a document with a key of either "merge" or "reduce" and a value of the collection to save to.</p>
+
+<p>The difference in "merge" and "reduce" has to do with MongoDB does when it encounters duplicate keys in both the existing collection and the MapReduce results.  In "merge" mode, MongoDB will simply overwrite the existing key with the new one from the MapReduce output.  In "reduce" mode, MongoDB will run the reduce function again with both the new and old data, saving those results to the collection (you remembered to make your reduce function idempotent, right?). <strong>UPDATE</strong>: If you specified a "finalize" function, MongoDB will re-run this after the "reduce" runs.</p>
+
+<p>Now that I've thoroughly confused you, lets dig into examples of each of these behaviors.  I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
+
+<div class="highlight"><pre><code class="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
+</code></pre>
+</div>
+
+
+
+
+ 
+        <p> <a href="/2011/01/27/MongoDB-1_8-MapReduce/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#mapreduce">mapreduce</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page3/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
+<div class="hentry" id="/2011/01/10/intro-scala-mongo">
+  <h2 class="entry-title">
+    <a href="/2011/01/10/intro-scala-mongo/">Exploring Scala with MongoDB</a>
+  </h2>
+  
+  <abbr class="published" title="2011-01-10T00:00:00-05:00">10 Jan 2011</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>2010 proved to be a great year for growth and adoption of many fledgling technologies---not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala's adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
+
+<p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
+
+<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more 'friendly' syntax for creating MongoDB Objects, using Scala's Map syntax:</p>
+
+<div class="highlight"><pre><code class="scala"> 
+<span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
+
+<span class="cm">/** Create an object directly */</span>
+<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span>
+                           <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">,</span>
+                           <span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">,</span>
+                           <span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">)</span>
+
+<span class="cm">/** Or, use a builder interface */</span>
+<span class="k">val</span> <span class="n">builder</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">.</span><span class="n">newBuilder</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">)</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span>
+</code></pre>
+</div>
+
+
+<p>The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.</p>
+
+ 
+        <p> <a href="/2011/01/10/intro-scala-mongo/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#casbah">casbah</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page3/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
+<div class="hentry" id="/2009/10/20/talking-to-activedirectory-from-iron-python">
+  <h2 class="entry-title">
+    <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory from IronPython</a>
+  </h2>
+  
+  <abbr class="published" title="2009-10-20T00:00:00-04:00">20 Oct 2009</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>We're building a new intranet system at work, and I've been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people's Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
+
+<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I've been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
+
+<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of 'valid' attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn't know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
+
+ 
+        <p> <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#IronPython">IronPython</a> <a rel="tag" href="/tags/#Silverlight">Silverlight</a> <a rel="tag" href="/tags/#Python">Python</a> <a rel="tag" href="/tags/#ActiveDirectory">ActiveDirectory</a> <a rel="tag" href="/tags/#LDAP">LDAP</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page3/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+</ul>
+
+</div>
+
+    </div>
+
+    <div id="sidebar">
+      <!-- sidebar components -->
+      <div class="sidebar-node">
+          <h3 class='sidebar-title'>Blogroll</h3>
+          <div class='static-body'>
+            <ul>
+              <li><a href="http://blog.10gen.com/" title="10gen Blog">The 10Gen Blog on MongoDB and NoSQL</a></li>
+              <li><a href="http://snailinaturtleneck.com/blog/" title="Snail In A Turtleneck">Snail In a Turtleneck - Kristina Chodorow (Maintainer of PHP &amp; Perl for MongoDB)</a></li>
+              <li><a href="http://kylebanker.com/blog/" title="Hwaet!">Hwaet! - Kyle Banker (Maintainer of Ruby for MongoDB)</a></li>
+              <li><a href="http://worldairmaillinks.com" title="World Airmail Links">World Airmail Links</a></li>
+            </ul>
+         </div>
+        <h3 class='sidebar-title'>Projects &amp; Sites I've Worked On</h3>
+        <div class='static-body'>
+          <ul>
+            <li><a href="http://github.com/bwmcadams/" title="GitHub">GitHub Profile</a></li>
+            <li><a href="http://mongodb.org/" title="MongoDB">MongoDB</a> 
+            <div class="sidebar_tiny">I work fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
+            </li>
+            <li><a href="http://api.mongodb.org/scala/casbah/latest/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created &amp; maintain.</div></li>
+            <li><a href="http://sluggy.com/" title="Sluggy Freelance">Sluggy Freelance</a> <div class="sidebar_tiny">(I wrote &amp; maintain the current code running the site. [Python+Pylons+MongoDB])</div></li>
+            <li><a href="http://userfriendly.org/" title="UserFriendly">UserFriendly</a> <div class="sidebar_tiny">(Once upon a time I built the CMS which runs their site. [Perl+mod_perl])</div></li>
+            <li><a href="http://bitbucket.org/namlook/mongokit/">MongoKit</a> <div class="sidebar_tiny">(I've contributed Pylons support and a few other useful hacks.)</div></li>
+          </ul>
+        </div>
+       
+        <h3 class='sidebar-title'>Presentations</h3>
+          <div class='static-body'>
+            <ul>
+                <li>
+                    <a href="http://www.10gen.com/video/mongosv2010/coolfeatures">MongoDB Cool Features @ MongoSV 12/10</a>
+                </li>
+                <li>
+                    <a href="http://www.10gen.com/video/mongosv2010/hadoop">The Hadoop Plugin for MongoDB @ MongoSV 12/10</a> 
+                </li>
+                <li>
+                    <a href="http://www.10gen.com/video/mongodc2010/schemadesign">Schema Design with MongoDB @ MongoDC 11/10</a>
+                </li>
+                <li>
+                    MongoDB + Scala @ NY Scala 8/10
+                    <ul>
+                      <li>
+                        <a href="http://www.slideshare.net/bwmcadams/scalany-mongodb-aug10">Slides</a>
+                      </li>
+                      <li>
+                        <a href="http://vimeo.com/14090025">Video</a>
+                      </li>
+                    </ul>
+                </li>
+                <li>
+                    Migrating Sluggy.com from MySQL to MongoDB @ Mongo NY 5/10
+                    <ul>
+                      <li>
+                        <a href="http://www.scribd.com/doc/31748635/From-MySQL-to-MongoDB-at-Sluggy-com">Slides</a> 
+                      </li>
+                      <li>
+                        <a href="http://blip.tv/file/3704023">Video</a>
+                        </li>
+                     </ul>
+                </li>
+           </ul>
+
+          </div>
+        
+        <h3 class='sidebar-title'>Twitter</h3>
+          <div class='static-body' id='twitter_block'>
+            <div id="twitter_div">
+                <script src="http://widgets.twimg.com/j/2/widget.js"></script>
+                <script>
+                new TWTR.Widget({
+                  version: 2,
+                  type: 'profile',
+                  rpp: 4,
+                  interval: 6000,
+                  width: 'auto',
+                  height: 300,
+                  theme: {
+                    shell: {
+                      background: '#333333',
+                      color: '#ffffff'
+                    },
+                    tweets: {
+                      background: '#000000',
+                      color: '#ffffff',
+                      links: '#4aed05'
+                    }
+                  },
+                  features: {
+                    scrollbar: false,
+                    loop: false,
+                    live: true,
+                    hashtags: true,
+                    timestamp: true,
+                    avatars: true,
+                    behavior: 'all'
+                  }
+                }).render().setUser('rit').start();
+                </script>
+          </div>
+        </div>
+        <h3>Syndicate</h3>
+        <ul>
+            <li><a href="/atom.xml" title="Articles feed">Articles</a></li>
+        </ul>
+
+    <br style="clear:both;" />
+  </div>
+  </div>
+  <div id="footer">
+    <hr />
+    <p><a href="/">Evil Monkey Labs</a></p>
+    <ul>
+      <li>made with <a href="http://github.com/vilcans/scribbish-jekyll">scribbish-jekyll</a></li>
+    </ul>
+    <div id="copyright">
+      Copyright &copy; 2009-2011 Brendan W. McAdams.<br>
+      <span id="disclaimer">
+        Views expressed herein are my own. They in no way reflect the views or opinions of my employer (past, current or future), affiliated projects, publisher, or, in many cases, a sane or rational individual.
+      </span>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+var disqus_shortname = 'evilmonkeyblog';
+(function () {
+  var s = document.createElement('script'); s.async = true;
+  s.src = 'http://disqus.com/forums/evilmonkeyblog/count.js';
+  (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
+
+</body>
+</html>
