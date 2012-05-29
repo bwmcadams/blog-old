@@ -19,6 +19,8 @@ else {
 }
 {% endhighlight %}
 
+<!--more-->
+
 Not only have we had to declare a mutable value, but adding insult to injury the typical usage pattern includes declaring it as `null` (FACT: Everytime you explicitly use null, someone drowns a basket of adorable, whimpering puppies. Even if your language paradigm practically requires it.).  Within our if/else block we have established a new value for `status` based on the value of `valid`. Granted, this is a somewhat weak example of my point, as you could just as easily have expressed this in a more concise ternary statement:
 
 {% highlight java %}

@@ -9,6 +9,8 @@ This seemed like a fairly reasonable request, presuming we could figure out how 
  
 The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of 'valid' attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn't know).  The `DirectoryEntry` object has a Properties attribute, which contains a hashmap of these values. 
 
+<!--more-->
+
 The object will **not** allow you to set an "Invalid" key \(see [this list](http://www.dotnetactivedirectory.com/Understanding_LDAP_Active_Directory_User_Object_Properties.html) for valid keys\).  But if you call `.Properties.Keys` you *only* get back the Properties that have values set.  So, it doesn't appear to be possible to actually ask *What keys are valid?* and do some introspective programming.  I have written a wrapper class to make the DirectoryEntry properties look a bit more pythonic (but disabled support for multi-value attributes for now) - at some point in the near future i'll likely add in a "valid value" filter.
 
 The end result is, if I want to find my own user in ActiveDirectory by my name, I can do the following from the IronPython console:

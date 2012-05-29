@@ -23,6 +23,8 @@ Now that I've thoroughly confused you, lets dig into examples of each of these b
 { "_id" : ISODate("1990-01-16T00:00:00Z"), "dayOfWeek" : "TUESDAY", "bc3Year" : 8.13, "bc5Year" : 8.11, "bc10Year" : 8.2, "bc20Year" : null, "bc1Month" : null, "bc2Year" : 8.1, "bc3Month" : 7.89, "bc30Year" : 8.25, "bc1Year" : 7.92, "bc7Year" : 8.18, "bc6Month" : 7.99 }
 
 {% endhighlight %}
+
+<!--more-->
         
 The map function I'm using extracts the year from the date, and the 10 year benchmark value:
 

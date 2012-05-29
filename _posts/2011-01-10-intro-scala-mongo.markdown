@@ -29,7 +29,11 @@ builder += ("spam" -> "eggs", "mmm" -> "bacon")
 val newObj = builder.result
 {% endhighlight %}
 
-The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.  In contrast, the same statements in Java tend to be more verbose:
+The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.  
+
+<!--more-->
+
+In contrast, the same statements in Java tend to be more verbose:
 
 {% highlight scala %}
 import com.mongodb.*;

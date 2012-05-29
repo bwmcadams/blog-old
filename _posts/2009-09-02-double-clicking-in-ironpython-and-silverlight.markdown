@@ -38,6 +38,8 @@ class ClickHandler(object):
  
 You may want to tweak the click interval based on what works for you.  500 milliseconds worked well with my users, for the application in question. To attach a ClickHandler simply invoke the static method `ClickHandler.attachDoubleClickHandler(«uiElementObj», «callbackFunc»)`
 
+<!--more-->
+
 {% highlight python %}
 from System import Uri, UriKind
 from System.Windows import Application, UIElement

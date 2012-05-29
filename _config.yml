@@ -14,7 +14,7 @@ author:
   name: Brendan W. McAdams
   email: bwmcadams+blog@evilmonkeylabs.com
 
-safe:        true
+safe:        false
 auto:        true
 server:      false
 server_port: 4000

@@ -13,6 +13,8 @@ It is a more than reasonable problem, and my initial reaction was "oh crap, I gu
 
 So the question at hand is, how exactly does Casbah allow us to do this magical type filtering that I just mentioned, without patching the driver or creating a new release?  First, let's look at how Casbah used to do things before the introduction of the as-yet unexplained Type Class introduction.
 
+<!--more-->
+
 {% highlight scala %}
 /**
  * Trait to provide the $lt (Less Than) method on appropriate callers.
