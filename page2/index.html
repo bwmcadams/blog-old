@@ -30,6 +30,61 @@
   
   
 
+<div class="hentry" id="/2011/08/05/ScalaPythonJavaCaptureBlockResult">
+  <h2 class="entry-title">
+    <a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/">Immutability and Clever Variable Usage in the Land of Blocks and Branches</a>
+  </h2>
+  
+  <abbr class="published" title="2011-08-05T00:00:00-04:00">05 Aug 2011</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>Last night, I found myself unconciously refactoring some Scala code (I don't recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don't seem entirely aware of one of my favorite features.  What I'm talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
+
+<p>In typical C-like languages (such as C, C++, and Java) we are restricted in our syntax should we wish to capture a value when running many branching blocks such as if-else statements, switch statements and even for/foreach constructs. When we find ourselves wanting to set the value of a variable within each possible condition or iteration, we need to declare a mutable variable before the block.  We then mutate this variable within each condition or iteration.  Take this example from Java:</p>
+
+<div class="highlight"><pre><code class="java"><span class="kt">boolean</span> <span class="n">valid</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+
+<span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">valid</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;VALIDATED&quot;</span><span class="o">;</span>
+<span class="o">}</span> 
+<span class="k">else</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;INVALID&quot;</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+
+
+
+ 
+        <p> <a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#effectivescala">effectivescala</a> <a rel="tag" href="/tags/#bestpractices">bestpractices</a> <a rel="tag" href="/tags/#python">python</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page3/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes">
   <h2 class="entry-title">
     <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">User Configurable Type Filtering with Scala Type Classes</a>
@@ -113,64 +168,6 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
     
     <li>Meta:
       <a href="http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java/#disqus_thread" rel="bookmark">permalink</a>
-      <a href="http://blog.evilmonkeylabs.com">atom</a>
-    </li>
-  </ul>
-  <div class="posts">
-    
-    <span align="left">&laquo; <a href="/page3/">Older Posts</a></span>
-    
-    
-      
-        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
-      
-    
-  </div>
-</div>
-
-
-<div class="hentry" id="/2011/01/27/MongoDB-1_8-MapReduce">
-  <h2 class="entry-title">
-    <a href="/2011/01/27/MongoDB-1_8-MapReduce/">A Look At MongoDB 1.8's MapReduce Changes</a>
-  </h2>
-  
-  <abbr class="published" title="2011-01-27T00:00:00-05:00">27 Jan 2011</abbr>
-  <br class="clear" />
-  <div class="entry-content">
-    
-        <p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last 'beta' release of what will become MongoDB 1.8.  As part of the release, I've been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
-
-<p>If you aren't new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn't possible to safely clean these up–--they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they've been replaced with an even better system for saving the results of MapReduce jobs!</p>
-
-<p>While the <em>out</em> argument is now a required parameter in MapReduce jobs, it has a number of options for controlling what MongoDB does with results.  If you're running a truly one-off job where you don't need to keep the results later, MongoDB now supports returning results "inline".  Be careful here though: your results are being returned in a single document and are subject to the document size limitations of MongoDB (16MB per document in 1.8).  To use inline results, set the value of <em>out</em> to a document <code>{inline: 1}</code>.  The result object will contain an additional key <em>results</em> which contains the MapReduce output; the <em>result</em> field will be omitted.</p>
-
-<p>As with previous versions of MongoDB, you can specify a collection name (as a string) in the <em>out</em> argument.  If the named collection already exists MongoDB will replace it entirely with the MapReduce results. Along with the inline mode, MongoDB 1.8 introduces support for "merge" and "reduce" output modes; instead of replacing the target collection MongoDB can be instructed to reconcile the MapReduce results with the existing data.  To use these modes, set the value of <em>out</em> to a document with a key of either "merge" or "reduce" and a value of the collection to save to.</p>
-
-<p>The difference in "merge" and "reduce" has to do with MongoDB does when it encounters duplicate keys in both the existing collection and the MapReduce results.  In "merge" mode, MongoDB will simply overwrite the existing key with the new one from the MapReduce output.  In "reduce" mode, MongoDB will run the reduce function again with both the new and old data, saving those results to the collection (you remembered to make your reduce function idempotent, right?). <strong>UPDATE</strong>: If you specified a "finalize" function, MongoDB will re-run this after the "reduce" runs.</p>
-
-<p>Now that I've thoroughly confused you, lets dig into examples of each of these behaviors.  I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
-
-<div class="highlight"><pre><code class="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
-</code></pre>
-</div>
-
-
-
-
- 
-        <p> <a href="/2011/01/27/MongoDB-1_8-MapReduce/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
-    
-  </div>
-  <ul class="meta">
-    
-    
-      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#mapreduce">mapreduce</a></li>
-    
-    <li>Meta:
-      <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/#disqus_thread" rel="bookmark">permalink</a>
       <a href="http://blog.evilmonkeylabs.com">atom</a>
     </li>
   </ul>

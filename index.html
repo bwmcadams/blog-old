@@ -30,6 +30,48 @@
   
   
 
+<div class="hentry" id="/2012/06/11/Understanding_Scala_Type_Classes">
+  <h2 class="entry-title">
+    <a href="/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala's Type Classes</a>
+  </h2>
+  
+  <abbr class="published" title="2012-06-11T00:00:00-04:00">11 Jun 2012</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>Over the last year or so, I have found myself making more and more use of Scala's Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
+
+<p>During this work however, I've found during that many otherwise adroit Scala engineers seem befuddled or daunted by the Type Class. It does me no good to take advantage of clever features that my users don't understand, and many will benefit from introducing these concepts to their own code. So let's take a look at what type classes are, as well as how &amp; why we can utilize them.</p>
+
+<p>Wikipedia defines a Type Class as <em>"... a type system construct that supports ad-hoc polymorphism. This is achieved by adding constraints to type variables in parametrically polymorphic types"</em>. Admittedly, a bit of a mouthful -- and not very helpful to those of us who are self taught and lack the benefit of a comprehensive academic Computer Science education (myself included). Surely, there must be a way to simplify this concept?</p>
+
+<p>In evaluating these ideas, I've found it easiest to think of a Type Class (in Scala, at least) as a special kind of <em>adapter</em>, which can impart additional capabilities upon a given type or set of types. In Scala the Type Class is communicated through <em>implicits</em>, and imparts one, or both, of two behaviors. First, a Type Class can be to utilized to <em>filter</em> what types are valid for a given method call (which I detailed in <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">this earlier post</a>). Second, a Type Class can impart additional features and behaviors upon a type at method invocation time. This latter is much along the lines of an enhanced kind of composition, rather than the weaker inheritance which often plagues similar behaviors in a language like Java.</p>
+
+<p>To better understand what I am describing, let's compare a few concepts around the creation and interaction of custom domain objects. I have several sets of tasks I have had to accomplish in Scala in the past -- and Scala solutions show some elegant Type Class oriented approaches which are rooted in the Standard Library. While this may seem a bit contrived, it is exactly the kind of problem through which <em>I</em> initially came to understand Type Classes –– and is thus an ideal lesson.</p>
+
+ 
+        <p> <a href="/2012/06/11/Understanding_Scala_Type_Classes/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#effectivescala">effectivescala</a> <a rel="tag" href="/tags/#typeclasses">typeclasses</a> <a rel="tag" href="/tags/#polymorphism">polymorphism</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page2/">Older Posts</a></span>
+    
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2012/05/31/Forcing_Compiler_Nothing_checks">
   <h2 class="entry-title">
     <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler 'Nothing' Checks</a>
@@ -114,57 +156,6 @@
     
     <li>Meta:
       <a href="http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released/#disqus_thread" rel="bookmark">permalink</a>
-      <a href="http://blog.evilmonkeylabs.com">atom</a>
-    </li>
-  </ul>
-  <div class="posts">
-    
-    <span align="left">&laquo; <a href="/page2/">Older Posts</a></span>
-    
-    
-  </div>
-</div>
-
-
-<div class="hentry" id="/2011/08/05/ScalaPythonJavaCaptureBlockResult">
-  <h2 class="entry-title">
-    <a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/">Immutability and Clever Variable Usage in the Land of Blocks and Branches</a>
-  </h2>
-  
-  <abbr class="published" title="2011-08-05T00:00:00-04:00">05 Aug 2011</abbr>
-  <br class="clear" />
-  <div class="entry-content">
-    
-        <p>Last night, I found myself unconciously refactoring some Scala code (I don't recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don't seem entirely aware of one of my favorite features.  What I'm talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
-
-<p>In typical C-like languages (such as C, C++, and Java) we are restricted in our syntax should we wish to capture a value when running many branching blocks such as if-else statements, switch statements and even for/foreach constructs. When we find ourselves wanting to set the value of a variable within each possible condition or iteration, we need to declare a mutable variable before the block.  We then mutate this variable within each condition or iteration.  Take this example from Java:</p>
-
-<div class="highlight"><pre><code class="java"><span class="kt">boolean</span> <span class="n">valid</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
-
-<span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-<span class="k">if</span> <span class="o">(</span><span class="n">valid</span><span class="o">)</span> <span class="o">{</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;VALIDATED&quot;</span><span class="o">;</span>
-<span class="o">}</span> 
-<span class="k">else</span> <span class="o">{</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;INVALID&quot;</span><span class="o">;</span>
-<span class="o">}</span>
-</code></pre>
-</div>
-
-
-
-
- 
-        <p> <a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
-    
-  </div>
-  <ul class="meta">
-    
-    
-      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#effectivescala">effectivescala</a> <a rel="tag" href="/tags/#bestpractices">bestpractices</a> <a rel="tag" href="/tags/#python">python</a></li>
-    
-    <li>Meta:
-      <a href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/#disqus_thread" rel="bookmark">permalink</a>
       <a href="http://blog.evilmonkeylabs.com">atom</a>
     </li>
   </ul>
