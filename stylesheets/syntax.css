@@ -7,7 +7,7 @@
 #content .typocode pre { margin: 0; padding: 0;}
 
 #content .typocode_linenumber .lineno     { text-align: right; }
-#content .typocode_linenumber .lineno pre { width: 23px; padding-right: 3px; color: #777; background: #222; }
+#content .typocode_linenumber .lineno pre { width: 23px; padding-right: 3px; color: #777; background: white; }
 
 #content .typocode_ruby .normal    {}
 #content .typocode_ruby .comment   { color: #9933cc; }
