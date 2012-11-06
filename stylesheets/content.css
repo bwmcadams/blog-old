@@ -76,7 +76,6 @@
 }
 
 #content p {
-  line-height: 14px; 
   margin: 0 0 1.2em;
 }
 
@@ -91,7 +90,6 @@
 }
 
 #content li {
-  line-height: 15px; 
   margin: 0 0 0 1em; padding: 0;
 }
 
@@ -106,8 +104,8 @@
 }
 
 #content pre {
-  color: #63FF00;
-  background: #000;
+  #color: #63FF00;
+  background: #F8F8F8;
   overflow: auto;
   font: normal 14px "bitstream vera sans mono", monaco, "lucida console", "courier new", courier, serif;
   margin: 0.9em 0; padding: 8px;
@@ -120,8 +118,7 @@
 
 #content .hentry .entry-title {
   font-size: 30px;
-  line-height: 99%;
-  letter-spacing: -1.5px; 
+  letter-spacing: 1.5px; 
   margin: 0;
 }
 
@@ -172,7 +169,6 @@
 }
 
 #content .hentry ul.meta li { 
-  line-height: 13px;
   margin: 0; padding: 0;
 }
 

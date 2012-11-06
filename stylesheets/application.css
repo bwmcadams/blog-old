@@ -9,7 +9,7 @@
 
 @media print { #sidebar { display: none; }
                #content { float: none; width: 90%; }
-               #content pre { color: #000; background: #eee; }
+               #content pre { color: #000; background: white; }
                #content form.comments { display: none; } }
 
 body {
