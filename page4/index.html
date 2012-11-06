@@ -30,12 +30,52 @@
   
   
 
+<div class="hentry" id="/2009/10/20/talking-to-activedirectory-from-iron-python">
+  <h2 class="entry-title">
+    <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory from IronPython</a>
+  </h2>
+  
+  <abbr class="published" title="2009-10-20T00:00:00+00:00">20 Oct 2009</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>We're building a new intranet system at work, and I've been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people's Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
+
+<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I've been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
+
+<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of 'valid' attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn't know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
+
+ 
+        <p> <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#IronPython">IronPython</a> <a rel="tag" href="/tags/#Silverlight">Silverlight</a> <a rel="tag" href="/tags/#Python">Python</a> <a rel="tag" href="/tags/#ActiveDirectory">ActiveDirectory</a> <a rel="tag" href="/tags/#LDAP">LDAP</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    
+      
+        <span align="right">&raquo; <a href="/page3/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2009/09/02/double-clicking-in-ironpython-and-silverlight">
   <h2 class="entry-title">
     <a href="/2009/09/02/double-clicking-in-ironpython-and-silverlight/">Double Clicking in IronPython + Silverlight</a>
   </h2>
   
-  <abbr class="published" title="2009-09-02T00:00:00-04:00">02 Sep 2009</abbr>
+  <abbr class="published" title="2009-09-02T00:00:00+00:00">02 Sep 2009</abbr>
   <br class="clear" />
   <div class="entry-content">
     
@@ -43,34 +83,33 @@
 
 <p>I've been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
 
-<div class="highlight"><pre><code class="python"> 
-<span class="n">CLICK_INTERVAL</span> <span class="o">=</span> <span class="mi">500</span>
+<div>
+  <pre><code class='python'>CLICK_INTERVAL = 500
  
-<span class="k">class</span> <span class="nc">ClickHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Attach a Double Click handler to any given UIElement,</span>
-<span class="sd">    as by default Silverlight lacks support for double clicking.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_lastClickTime</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">_callback</span> <span class="o">=</span> <span class="bp">None</span>
+class ClickHandler(object):
+    &quot;&quot;&quot;Attach a Double Click handler to any given UIElement,
+    as by default Silverlight lacks support for double clicking.
+    &quot;&quot;&quot;
+    _lastClickTime = 0
+    _callback = None
  
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">attachDoubleClickHandler</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ClickHandler</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+    @staticmethod
+    def attachDoubleClickHandler(target, callback):
+        return ClickHandler(target, callback)
  
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
-        <span class="n">target</span><span class="o">.</span><span class="n">MouseLeftButtonUp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_MouseLeftButtonUp</span>
-        <span class="n">target</span><span class="o">.</span><span class="n">MouseLeftButtonDown</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_MouseLeftButtonDown</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span> <span class="o">=</span> <span class="n">callback</span>
+    def __init__(self, target, callback):
+        target.MouseLeftButtonUp += self.target_MouseLeftButtonUp
+        target.MouseLeftButtonDown += self.target_MouseLeftButtonDown
+        self._callback = callback
  
-    <span class="k">def</span> <span class="nf">target_MouseLeftButtonUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">=</span> <span class="n">DateTime</span><span class="o">.</span><span class="n">Now</span><span class="o">.</span><span class="n">Ticks</span> <span class="o">/</span> <span class="mi">10000</span>
+    def target_MouseLeftButtonUp(self, sender, args):
+        self._lastClickTime = DateTime.Now.Ticks / 10000
  
-    <span class="k">def</span> <span class="nf">target_MouseLeftButtonDown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="n">now</span> <span class="o">=</span> <span class="n">DateTime</span><span class="o">.</span><span class="n">Now</span><span class="o">.</span><span class="n">Ticks</span> <span class="o">/</span> <span class="mi">10000</span>
-        <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&lt;</span> <span class="n">CLICK_INTERVAL</span> <span class="ow">and</span> \
-          <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-</code></pre>
+    def target_MouseLeftButtonDown(self, sender, args):
+        now = DateTime.Now.Ticks / 10000
+        if now - self._lastClickTime &lt; CLICK_INTERVAL and \
+          now - self._lastClickTime &gt; 25:
+            self._callback(sender, args)</code></pre>
 </div>
 
 

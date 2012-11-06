@@ -30,12 +30,65 @@
   
   
 
+<div class="hentry" id="/2011/02/28/MongoDB-1_8-MR-Java">
+  <h2 class="entry-title">
+    <a href="/2011/02/28/MongoDB-1_8-MR-Java/">MapReduce with MongoDB 1.8 and Java</a>
+  </h2>
+  
+  <abbr class="published" title="2011-02-28T00:00:00+00:00">28 Feb 2011</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>In my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the
+new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://www.mongodb.org/display/DOCS/1.8+Release+Notes">available as a release candidate</a>.  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the <em>merge</em> and <em>reduce</em> output modes.</p>
+
+<p>As I write this, we are prepping new releases of our <a href="http://www.mongodb.org/display/DOCS/Java+Language+Center">Java Driver</a> (v2.5) and our <a href="http://api.mongodb.org/scala/casbah">Scala Driver, Casbah</a> (v2.1) which are intended to support MongoDB 1.8's new features including incremental MapReduce.  Since I implemented the APIs for the new MapReduce output in both drivers, I thought I'd demonstrate the application of these new output features to the previous dataset.  This post is focused on the Java API, but a Scala one will likely follow.</p>
+
+<p>As a reminder (or a primer for those who skipped my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>), I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
+
+<div>
+  <pre><code class='javascript'>{ &quot;_id&quot; : ISODate(&quot;1990-01-10T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;WEDNESDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.92, &quot;bc10Year&quot; : 8.03, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.75, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8, &quot;bc6Month&quot; : 7.78 }
+{ &quot;_id&quot; : ISODate(&quot;1990-01-11T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;THURSDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.94, &quot;bc10Year&quot; : 8.04, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.8, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8.01, &quot;bc6Month&quot; : 7.8 }
+{ &quot;_id&quot; : ISODate(&quot;1990-01-12T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;FRIDAY&quot;, &quot;bc3Year&quot; : 7.98, &quot;bc5Year&quot; : 7.99, &quot;bc10Year&quot; : 8.1, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.93, &quot;bc3Month&quot; : 7.74, &quot;bc30Year&quot; : 8.17, &quot;bc1Year&quot; : 7.76, &quot;bc7Year&quot; : 8.07, &quot;bc6Month&quot; : 7.8100000000000005 }
+{ &quot;_id&quot; : ISODate(&quot;1990-01-16T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;TUESDAY&quot;, &quot;bc3Year&quot; : 8.13, &quot;bc5Year&quot; : 8.11, &quot;bc10Year&quot; : 8.2, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 8.1, &quot;bc3Month&quot; : 7.89, &quot;bc30Year&quot; : 8.25, &quot;bc1Year&quot; : 7.92, &quot;bc7Year&quot; : 8.18, &quot;bc6Month&quot; : 7.99 }</code></pre>
+</div>
+
+
+
+
+ 
+        <p> <a href="/2011/02/28/MongoDB-1_8-MR-Java/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#mapreduce">mapreduce</a> <a rel="tag" href="/tags/#java">java</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page4/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/page2/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2011/01/27/MongoDB-1_8-MapReduce">
   <h2 class="entry-title">
     <a href="/2011/01/27/MongoDB-1_8-MapReduce/">A Look At MongoDB 1.8's MapReduce Changes</a>
   </h2>
   
-  <abbr class="published" title="2011-01-27T00:00:00-05:00">27 Jan 2011</abbr>
+  <abbr class="published" title="2011-01-27T00:00:00+00:00">27 Jan 2011</abbr>
   <br class="clear" />
   <div class="entry-content">
     
@@ -51,11 +104,11 @@
 
 <p>Now that I've thoroughly confused you, lets dig into examples of each of these behaviors.  I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
 
-<div class="highlight"><pre><code class="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
-</code></pre>
+<div>
+  <pre><code class='javascript'>{ &quot;_id&quot; : ISODate(&quot;1990-01-10T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;WEDNESDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.92, &quot;bc10Year&quot; : 8.03, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.75, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8, &quot;bc6Month&quot; : 7.78 }
+{ &quot;_id&quot; : ISODate(&quot;1990-01-11T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;THURSDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.94, &quot;bc10Year&quot; : 8.04, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.8, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8.01, &quot;bc6Month&quot; : 7.8 }
+{ &quot;_id&quot; : ISODate(&quot;1990-01-12T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;FRIDAY&quot;, &quot;bc3Year&quot; : 7.98, &quot;bc5Year&quot; : 7.99, &quot;bc10Year&quot; : 8.1, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.93, &quot;bc3Month&quot; : 7.74, &quot;bc30Year&quot; : 8.17, &quot;bc1Year&quot; : 7.76, &quot;bc7Year&quot; : 8.07, &quot;bc6Month&quot; : 7.8100000000000005 }
+{ &quot;_id&quot; : ISODate(&quot;1990-01-16T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;TUESDAY&quot;, &quot;bc3Year&quot; : 8.13, &quot;bc5Year&quot; : 8.11, &quot;bc10Year&quot; : 8.2, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 8.1, &quot;bc3Month&quot; : 7.89, &quot;bc30Year&quot; : 8.25, &quot;bc1Year&quot; : 7.92, &quot;bc7Year&quot; : 8.18, &quot;bc6Month&quot; : 7.99 }</code></pre>
 </div>
 
 
@@ -93,7 +146,7 @@
     <a href="/2011/01/10/intro-scala-mongo/">Exploring Scala with MongoDB</a>
   </h2>
   
-  <abbr class="published" title="2011-01-10T00:00:00-05:00">10 Jan 2011</abbr>
+  <abbr class="published" title="2011-01-10T00:00:00+00:00">10 Jan 2011</abbr>
   <br class="clear" />
   <div class="entry-content">
     
@@ -103,23 +156,22 @@
 
 <p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more 'friendly' syntax for creating MongoDB Objects, using Scala's Map syntax:</p>
 
-<div class="highlight"><pre><code class="scala"> 
-<span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
+<div>
+  <pre><code class='scala'>import com.mongodb.casbah.Imports._
 
-<span class="cm">/** Create an object directly */</span>
-<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span>
-                           <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">,</span>
-                           <span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">,</span>
-                           <span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">)</span>
+/** Create an object directly */
+val newObj = MongoDBObject(&quot;foo&quot; -&gt; &quot;bar&quot;,
+                           &quot;x&quot; -&gt; &quot;y&quot;,
+                           &quot;pie&quot; -&gt; 3.14,
+                           &quot;spam&quot; -&gt; &quot;eggs&quot;)
 
-<span class="cm">/** Or, use a builder interface */</span>
-<span class="k">val</span> <span class="n">builder</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">.</span><span class="n">newBuilder</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">)</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span>
-</code></pre>
+/** Or, use a builder interface */
+val builder = MongoDBObject.newBuilder
+builder += &quot;foo&quot; -&gt; &quot;bar&quot;
+builder += &quot;x&quot; -&gt; &quot;y&quot;
+builder += (&quot;pie&quot; -&gt; 3.14)
+builder += (&quot;spam&quot; -&gt; &quot;eggs&quot;, &quot;mmm&quot; -&gt; &quot;bacon&quot;)
+val newObj = builder.result</code></pre>
 </div>
 
 
@@ -136,48 +188,6 @@
     
     <li>Meta:
       <a href="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/#disqus_thread" rel="bookmark">permalink</a>
-      <a href="http://blog.evilmonkeylabs.com">atom</a>
-    </li>
-  </ul>
-  <div class="posts">
-    
-    <span align="left">&laquo; <a href="/page4/">Older Posts</a></span>
-    
-    
-      
-        <span align="right">&raquo; <a href="/page2/">Newer Posts</a></span>
-      
-    
-  </div>
-</div>
-
-
-<div class="hentry" id="/2009/10/20/talking-to-activedirectory-from-iron-python">
-  <h2 class="entry-title">
-    <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory from IronPython</a>
-  </h2>
-  
-  <abbr class="published" title="2009-10-20T00:00:00-04:00">20 Oct 2009</abbr>
-  <br class="clear" />
-  <div class="entry-content">
-    
-        <p>We're building a new intranet system at work, and I've been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people's Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
-
-<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I've been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
-
-<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of 'valid' attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn't know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
-
- 
-        <p> <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
-    
-  </div>
-  <ul class="meta">
-    
-    
-      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#IronPython">IronPython</a> <a rel="tag" href="/tags/#Silverlight">Silverlight</a> <a rel="tag" href="/tags/#Python">Python</a> <a rel="tag" href="/tags/#ActiveDirectory">ActiveDirectory</a> <a rel="tag" href="/tags/#LDAP">LDAP</a></li>
-    
-    <li>Meta:
-      <a href="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/#disqus_thread" rel="bookmark">permalink</a>
       <a href="http://blog.evilmonkeylabs.com">atom</a>
     </li>
   </ul>

@@ -30,7 +30,7 @@
     <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory from IronPython</a>
   </h2>
   
-  <abbr class="published" title="2009-10-20T00:00:00-04:00">20 Oct 2009</abbr>
+  <abbr class="published" title="2009-10-20T00:00:00+00:00">20 Oct 2009</abbr>
   <br class="clear" />
   <div class="entry-content">
     <p>We're building a new intranet system at work, and I've been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people's Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
@@ -46,16 +46,16 @@
 
 <p>The end result is, if I want to find my own user in ActiveDirectory by my name, I can do the following from the IronPython console:</p>
 
-<div class="highlight"><pre><code class="python"><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">ad_util</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">adh</span> <span class="o">=</span> <span class="n">ad_util</span><span class="o">.</span><span class="n">ActiveDirectorySearcher</span><span class="p">(</span><span class="s">&#39;mydomaincontroller.hostname.or.ip&#39;</span><span class="p">,</span> <span class="s">&#39;my.domain&#39;</span><span class="p">,</span> <span class="s">&#39;myUsernameAllowedToChangeObjects&#39;</span><span class="p">,</span> <span class="s">&#39;myPassword&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">adh</span>
-<span class="o">&lt;</span><span class="n">ActiveDirectorySearcher</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x000000000000002D</span><span class="o">&gt;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">userObj</span> <span class="o">=</span> <span class="n">adh</span><span class="o">.</span><span class="n">find_name</span><span class="p">(</span><span class="s">&#39;McAdams&#39;</span><span class="p">,</span> <span class="s">&#39;Brendan&#39;</span><span class="p">)</span>
-<span class="p">[</span><span class="n">debug</span><span class="p">]</span> <span class="n">Searching</span> <span class="n">activedirectory</span> <span class="k">for</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;(</span><span class="n">objectCategory</span><span class="o">=</span><span class="n">user</span><span class="p">)(</span><span class="n">objectClass</span><span class="o">=</span><span class="n">person</span><span class="p">)(</span><span class="n">sAMAccountName</span><span class="o">=*</span><span class="p">)(</span><span class="n">sn</span><span class="o">=</span><span class="n">McAdams</span><span class="o">*</span><span class="p">)</span>
-<span class="p">(</span><span class="n">givenname</span><span class="o">=</span><span class="n">Brendan</span><span class="o">*</span><span class="p">))</span><span class="o">.</span>  <span class="n">Allow</span> <span class="n">multiple</span> <span class="n">results</span><span class="err">?</span> <span class="bp">False</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">userObj</span>
-<span class="o">&lt;</span><span class="n">DirectoryEntryHelper</span><span class="p">:{</span><span class="n">sn</span><span class="o">=</span><span class="n">McAdams</span><span class="p">,</span><span class="n">givenName</span><span class="o">=</span><span class="n">Brendan</span><span class="p">,</span><span class="n">mail</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">sAMAccountName</span><span class="o">=</span><span class="n">brendan</span><span class="o">.</span><span class="n">mcadams</span><span class="p">}</span><span class="o">&gt;</span>
-</code></pre>
+<div>
+  <pre><code class='python'>&gt;&gt;&gt; import ad_util
+&gt;&gt;&gt; adh = ad_util.ActiveDirectorySearcher('mydomaincontroller.hostname.or.ip', 'my.domain', 'myUsernameAllowedToChangeObjects', 'myPassword')
+&gt;&gt;&gt; adh
+&lt;ActiveDirectorySearcher object at 0x000000000000002D&gt;
+&gt;&gt;&gt; userObj = adh.find_name('McAdams', 'Brendan')
+[debug] Searching activedirectory for (&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=*)(sn=McAdams*)
+(givenname=Brendan*)).  Allow multiple results? False
+&gt;&gt;&gt; userObj
+&lt;DirectoryEntryHelper:{sn=McAdams,givenName=Brendan,mail=None,sAMAccountName=brendan.mcadams}&gt;</code></pre>
 </div>
 
 
@@ -63,14 +63,14 @@
 
 <p>You can see the keys that are already defined on the object with the <code>keys</code> helper method I added onto <code>DirectoryEntryHelper</code>:</p>
 
-<div class="highlight"><pre><code class="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">userObj</span><span class="o">.</span><span class="n">keys</span>
-<span class="p">[</span><span class="s">&#39;lockouttime&#39;</span><span class="p">,</span> <span class="s">&#39;primarygroupid&#39;</span><span class="p">,</span> <span class="s">&#39;msexchuseraccountcontrol&#39;</span><span class="p">,</span> <span class="s">&#39;distinguishedname&#39;</span><span class="p">,</span> <span class="s">&#39;cn&#39;</span><span class="p">,</span> <span class="s">&#39;dscorepropagationdata&#39;</span><span class="p">,</span> 
-<span class="s">&#39;whencreated&#39;</span><span class="p">,</span> <span class="s">&#39;logoncount&#39;</span><span class="p">,</span> <span class="s">&#39;msexchhomeservername&#39;</span><span class="p">,</span> <span class="s">&#39;objectclass&#39;</span><span class="p">,</span> <span class="s">&#39;memberof&#39;</span><span class="p">,</span> <span class="s">&#39;lastlogontimestamp&#39;</span><span class="p">,</span> <span class="s">&#39;displayname&#39;</span><span class="p">,</span>    <span class="s">&#39;msexchalobjectversion&#39;</span><span class="p">,</span> <span class="s">&#39;objectguid&#39;</span><span class="p">,</span> <span class="s">&#39;whenchanged&#39;</span><span class="p">,</span> <span class="s">&#39;badpwdcount&#39;</span><span class="p">,</span> <span class="s">&#39;useraccountcontrol&#39;</span><span class="p">,</span> <span class="s">&#39;badpasswordtime&#39;</span><span class="p">,</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> 
-<span class="s">&#39;samaccountname&#39;</span><span class="p">,</span> <span class="s">&#39;mdbusedefaults&#39;</span><span class="p">,</span> <span class="s">&#39;accountexpires&#39;</span><span class="p">,</span> <span class="s">&#39;countrycode&#39;</span><span class="p">,</span> <span class="s">&#39;msds-supportedencryptiontypes&#39;</span><span class="p">,</span> <span class="s">&#39;homedirectory&#39;</span><span class="p">,</span> 
-<span class="s">&#39;userprincipalname&#39;</span><span class="p">,</span> <span class="s">&#39;lastlogon&#39;</span><span class="p">,</span> <span class="s">&#39;objectsid&#39;</span><span class="p">,</span> <span class="s">&#39;givenname&#39;</span><span class="p">,</span> <span class="s">&#39;homedrive&#39;</span><span class="p">,</span> <span class="s">&#39;usncreated&#39;</span><span class="p">,</span> <span class="s">&#39;admincount&#39;</span><span class="p">,</span> <span class="s">&#39;instancetype&#39;</span><span class="p">,</span> 
-<span class="s">&#39;codepage&#39;</span><span class="p">,</span> <span class="s">&#39;physicaldeliveryofficename&#39;</span><span class="p">,</span> <span class="s">&#39;samaccounttype&#39;</span><span class="p">,</span> <span class="s">&#39;sn&#39;</span><span class="p">,</span> <span class="s">&#39;objectcategory&#39;</span><span class="p">,</span> <span class="s">&#39;telephonenumber&#39;</span><span class="p">,</span> <span class="s">&#39;pwdlastset&#39;</span><span class="p">,</span> 
-<span class="s">&#39;usnchanged&#39;</span><span class="p">,</span> <span class="s">&#39;lastlogoff&#39;</span><span class="p">,</span> <span class="s">&#39;initials&#39;</span><span class="p">]</span>
-</code></pre>
+<div>
+  <pre><code class='python'>&gt;&gt;&gt; userObj.keys
+['lockouttime', 'primarygroupid', 'msexchuseraccountcontrol', 'distinguishedname', 'cn', 'dscorepropagationdata', 
+'whencreated', 'logoncount', 'msexchhomeservername', 'objectclass', 'memberof', 'lastlogontimestamp', 'displayname',    'msexchalobjectversion', 'objectguid', 'whenchanged', 'badpwdcount', 'useraccountcontrol', 'badpasswordtime', 'name', 
+'samaccountname', 'mdbusedefaults', 'accountexpires', 'countrycode', 'msds-supportedencryptiontypes', 'homedirectory', 
+'userprincipalname', 'lastlogon', 'objectsid', 'givenname', 'homedrive', 'usncreated', 'admincount', 'instancetype', 
+'codepage', 'physicaldeliveryofficename', 'samaccounttype', 'sn', 'objectcategory', 'telephonenumber', 'pwdlastset', 
+'usnchanged', 'lastlogoff', 'initials']</code></pre>
 </div>
 
 
@@ -78,308 +78,308 @@
 
 <p>If I want to setup my mobile phone # (which isn't already set already) in Active Directory:</p>
 
-<div class="highlight"><pre><code class="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">userObj</span><span class="o">.</span><span class="n">mobile</span>
-<span class="c"># Nothing returned as mobile isn&#39;t set...</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">userObj</span><span class="o">.</span><span class="n">mobile</span> <span class="o">=</span> <span class="s">&#39;(646) 555-1212&#39;</span>
-<span class="c"># It is committed on set to Active Directory, so another find gets it...</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">newUserObj</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">adh</span><span class="o">.</span><span class="n">find_name</span><span class="p">(</span><span class="s">&#39;McAdams&#39;</span><span class="p">,</span> <span class="s">&#39;Brendan&#39;</span><span class="p">)</span>   
-<span class="p">[</span><span class="n">debug</span><span class="p">]</span> <span class="n">Searching</span> <span class="n">activedirectory</span> <span class="k">for</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;(</span><span class="n">objectCategory</span><span class="o">=</span><span class="n">user</span><span class="p">)(</span><span class="n">objectClass</span><span class="o">=</span><span class="n">person</span><span class="p">)(</span><span class="n">sAMAccountName</span><span class="o">=*</span><span class="p">)(</span><span class="n">sn</span><span class="o">=</span><span class="n">McAdams</span><span class="o">*</span><span class="p">)</span>
-<span class="p">(</span><span class="n">givenname</span><span class="o">=</span><span class="n">Brendan</span><span class="o">*</span><span class="p">))</span><span class="o">.</span>  <span class="n">Allow</span> <span class="n">multiple</span> <span class="n">results</span><span class="err">?</span> <span class="bp">False</span> 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">newUserObj</span><span class="o">.</span><span class="n">mobile</span>
-<span class="s">&#39;(646)555-1212&#39;</span>
-</code></pre>
+<div>
+  <pre><code class='python'>&gt;&gt;&gt; userObj.mobile
+# Nothing returned as mobile isn't set...
+&gt;&gt;&gt; userObj.mobile = '(646) 555-1212'
+# It is committed on set to Active Directory, so another find gets it...
+&gt;&gt;&gt; newUserObj = test.adh.find_name('McAdams', 'Brendan')   
+[debug] Searching activedirectory for (&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=*)(sn=McAdams*)
+(givenname=Brendan*)).  Allow multiple results? False 
+&gt;&gt;&gt; newUserObj.mobile
+'(646)555-1212'</code></pre>
 </div>
 
 
 <p>I'll leave the rest as an exercise for the reader, but I'm interested in comments and changes.  You can fetch the latest code from <a href="http://bitbucket.org/bwmcadams/toybox/src/tip/ad_util.py">my BitBucket toybox</a>.  I've also pasted it, for posterity sake, below the fold.</p>
 
-<div class="highlight"><pre><code class="python"><span class="c">#!IronPython Specific Script!</span>
-<span class="c"># </span>
-<span class="c"># Brendan W. McAdams &lt;bwmcadams@gmail.com&gt;</span>
-<span class="c">#</span>
-<span class="c">#------------------------------------------------- </span>
-<span class="c"># No copyright or licensing, made public</span>
-<span class="c"># as example code.  Feel free to use it as you like;</span>
-<span class="c"># No warranty, liability or guarantees are implied.  </span>
-<span class="c"># In other words, if you use it YOU ARE ON YOUR OWN. </span>
-<span class="c">#-------------------------------------------------</span>
-<span class="c">#</span>
-<span class="c"># Utility script to interface from IronPython to </span>
-<span class="c"># MS Active Directory, allowing queries of properties </span>
-<span class="c"># such as telephone numbers, and changes to said properties</span>
-<span class="c"># if you&#39;d like to update them.</span>
-<span class="c"># </span>
-<span class="c"># Note that your authentication user has to have valid permissions.</span>
-<span class="c"># If you&#39;re uncertain as to what permissions are needed, please see</span>
-<span class="c"># your AD Admin.</span>
+<div>
+  <pre><code class='python'>#!IronPython Specific Script!
+# 
+# Brendan W. McAdams &lt;bwmcadams@gmail.com&gt;
+#
+#------------------------------------------------- 
+# No copyright or licensing, made public
+# as example code.  Feel free to use it as you like;
+# No warranty, liability or guarantees are implied.  
+# In other words, if you use it YOU ARE ON YOUR OWN. 
+#-------------------------------------------------
+#
+# Utility script to interface from IronPython to 
+# MS Active Directory, allowing queries of properties 
+# such as telephone numbers, and changes to said properties
+# if you'd like to update them.
+# 
+# Note that your authentication user has to have valid permissions.
+# If you're uncertain as to what permissions are needed, please see
+# your AD Admin.
 
-<span class="kn">import</span> <span class="nn">clr</span> 
+import clr 
 
-<span class="c"># Add the System.DirectoryServices Mono DLL in.</span>
-<span class="c"># not sure on Windows what you need to add,</span>
-<span class="c"># but for Mono/Linux you just need to set IRONPYTHONPATH</span>
-<span class="c"># to include the location of the dll</span>
+# Add the System.DirectoryServices Mono DLL in.
+# not sure on Windows what you need to add,
+# but for Mono/Linux you just need to set IRONPYTHONPATH
+# to include the location of the dll
 
-<span class="n">clr</span><span class="o">.</span><span class="n">AddReference</span><span class="p">(</span><span class="s">&#39;System.DirectoryServices.dll&#39;</span><span class="p">)</span>
+clr.AddReference('System.DirectoryServices.dll')
 
-<span class="kn">import</span> <span class="nn">sys</span>
+import sys
 
-<span class="c"># Import the LDAP / ActiveDirectory interface</span>
-<span class="kn">from</span> <span class="nn">System.DirectoryServices</span> <span class="kn">import</span> <span class="o">*</span>
+# Import the LDAP / ActiveDirectory interface
+from System.DirectoryServices import *
 
-<span class="c"># A few predefined values to simplify LDAP querying, pilfered from various internet-ey type places.</span>
-<span class="n">BINARY_PROPS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;objectguid&#39;</span><span class="p">,</span> <span class="s">&#39;objectsid&#39;</span><span class="p">,</span> <span class="s">&#39;msexchmailboxsecuritydescriptor&#39;</span><span class="p">,</span> <span class="s">&#39;msexchmailboxguid&#39;</span><span class="p">)</span>
-<span class="n">ACCOUNT_QUERY</span> <span class="o">=</span> <span class="s">&quot;(&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=_ACCOUNTNAME_))&quot;</span>
-<span class="n">PRINCIPAL_QUERY</span> <span class="o">=</span> <span class="s">&quot;(&amp;amp;(objectCategory=user)(objectClass=person)(userPrincipalName=_PRINCIPALID__))&quot;</span>
-<span class="n">GROUP_QUERY</span> <span class="o">=</span> <span class="s">&quot;(&amp;amp;(objectCategory=group)(sAMAccountName=_GROUPNAME_))&quot;</span>
-<span class="n">PARTIAL_LAST_QUERY</span> <span class="o">=</span> <span class="s">&quot;(&amp;amp;(objectCategory=user)(sAMAccountName=*)(objectClass=person)(sn=_LASTNAME_*))&quot;</span> 
-<span class="n">PARTIAL_NAME_QUERY</span> <span class="o">=</span> <span class="s">&quot;(&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=*)(sn=_LASTNAME_*)(givenname=_FIRSTNAME_*))&quot;</span> 
-<span class="n">PARTIAL_FIRST_QUERY</span> <span class="o">=</span> <span class="s">&quot;(&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=*)(givenname=_FIRSTNAME_*))&quot;</span> 
-
-
-
-<span class="k">class</span> <span class="nc">DirectoryEntryHelper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-  <span class="sd">&quot;&quot;&quot; Helper class for wrapping</span>
-<span class="sd">  and simplifying AD search results.</span>
-<span class="sd">  As much fun as dealing with Microsoft style</span>
-<span class="sd">  object hierarchies can be...</span>
-<span class="sd">  TODO: Is there an easy way to inject things into __dict__ for dir &amp;amp; ipy tab completion?</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
-      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">SearchResult</span><span class="p">):</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s">&#39;_entry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">GetDirectoryEntry</span><span class="p">()</span>
-      <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">DirectoryEntry</span><span class="p">):</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="s">&#39;_entry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
-      <span class="k">else</span><span class="p">:</span>
-          <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="s">&quot;Invalid type &#39;</span><span class="si">%s</span><span class="s">&#39;, don&#39;t know how to proxy it&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
-
-  <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">Properties</span>
-
-  <span class="nd">@property</span>
-  <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Returns a comprehended list</span>
-<span class="sd">      of the *defined* Keys on the Properties object.</span>
-<span class="sd">      Any valid keys w/o values won&#39;t get listed.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">return</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">Keys</span><span class="p">]</span>
-
-  <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Proxies the Properties objects in the DirectoryEntry</span>
-<span class="sd">      to provide a simple getter.</span>
-<span class="sd">      First checks if DirectoryEntry has an attribute (property)</span>
-<span class="sd">      matching requested key, and passes that if so.</span>
-<span class="sd">      Otherwise, fetches a matching property.  If you have</span>
-<span class="sd">      a name collison, use the .properties property on this object</span>
-<span class="sd">      to get a clean copy of the Properties object</span>
-<span class="sd">      TODO: Better support for multi-value keys (only returns first idx right now]</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-          <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-      <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">Count</span><span class="p">:</span>
-          <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-      <span class="k">else</span><span class="p">:</span>
-          <span class="k">return</span> <span class="bp">None</span>
-
-  <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Proxies the Properties objects in the DirectoryEntry </span>
-<span class="sd">      to provide a simpler setter.</span>
-<span class="sd">      First checks if DirectoryEntry has an attribute (property)</span>
-<span class="sd">      matching requested key, and sets on that if so.</span>
-<span class="sd">      Otherwise, sets upon a matching property.  </span>
-<span class="sd">      If the property has an existing count &gt; 0, sets Index 0  </span>
-<span class="sd">      If not, it does an Add().</span>
-<span class="sd">      The way the MS Classes work, Properties.Keys only returns keys that</span>
-<span class="sd">      have a value count.  However, any *valid* Key has a silent value which</span>
-<span class="sd">      can be initialized via Add().</span>
-<span class="sd">      Invalid keys throw an error, so you can&#39;t be arbitrary.</span>
-<span class="sd">      I use a list of keyspace found at: </span>
-
-<span class="sd">          http://www.dotnetactivedirectory.com/\</span>
-<span class="sd">              Understanding_LDAP_Active_Directory_User_Object_Properties.html</span>
-
-<span class="sd">      If you have a name collison, use the .properties property on this object</span>
-<span class="sd">      to get a clean copy of the Properties object</span>
-<span class="sd">      TODO: Better support for multi-value keys (only sets first idx right now]</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-          <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-          <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">Count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-              <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">Count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                  <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="s">&quot;[warning] Key &#39;</span><span class="si">%s</span><span class="s">&#39; contains multiple values which we don&#39;t properly support yet.  Using Index 0&quot;</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-          <span class="k">else</span><span class="p">:</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-          <span class="c"># commit early, commit often...</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_entry</span><span class="o">.</span><span class="n">CommitChanges</span><span class="p">()</span>
-
-  <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Print all pretty like on console.</span>
-<span class="sd">      My biggest pet peeve working in .Net is that most objects don&#39;t have</span>
-<span class="sd">      any kind of __str__/__repr__ value on them to give you quick information</span>
-<span class="sd">      on their contents.  ARGH!</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">return</span> <span class="s">&quot;&lt;DirectoryEntryHelper:{sn=</span><span class="si">%s</span><span class="s">,givenName=</span><span class="si">%s</span><span class="s">,mail=</span><span class="si">%s</span><span class="s">,sAMAccountName=</span><span class="si">%s</span><span class="s">}&gt;&quot;</span> <span class="o">%</span>\
-          <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">givenName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mail</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sAMAccountName</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">ActiveDirectory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-  <span class="sd">&quot;&quot;&quot; ActiveDirectory interface class.</span>
-<span class="sd">  Tested on IronPython 2.6RC + Mono 2.4.2.3 on Linux. YMMV.</span>
-<span class="sd">  &quot;&quot;&quot;</span>
-
-  <span class="c"># Active Directory Handle</span>
-  <span class="n">adh</span> <span class="o">=</span> <span class="bp">None</span>
-
-  <span class="n">server</span> <span class="o">=</span> <span class="bp">None</span>
-  <span class="n">domain</span> <span class="o">=</span> <span class="bp">None</span>
-  <span class="n">baseDN</span> <span class="o">=</span> <span class="bp">None</span>
-
-  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">baseDN</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Constructor to instantiate the LDAP connection.</span>
-<span class="sd">      server is a resolvable address to your domain controller (e.g. the resolvable hostname or IP)</span>
-<span class="sd">      domain should be the ActiveDirectory domain as specified by your admin.</span>
-<span class="sd">      If you don&#39;t pass BaseDN, your &#39;domain&#39; argument will be split on</span>
-<span class="sd">      . and each piece will be passed as DC=&lt;piece&gt;. This will be used as your BaseDN</span>
-<span class="sd">      E.G. domain aurigasv.local becomes &quot;DC=aurigasv,DC=local&quot;</span>
-
-<span class="sd">      *** Any exception in connecting will be wrapped and rethrown, aborting construction.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">try</span><span class="p">:</span>
-          <span class="c"># Setup the baseDN</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span>
-          <span class="k">if</span> <span class="n">baseDN</span><span class="p">:</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">baseDN</span> <span class="o">=</span> <span class="n">baseDN</span>
-          <span class="k">else</span><span class="p">:</span>
-              <span class="k">for</span> <span class="n">tier</span> <span class="ow">in</span> <span class="n">domain</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
-                  <span class="n">baseDN</span> <span class="o">+=</span> <span class="s">&quot;DC=</span><span class="si">%s</span><span class="s">,&quot;</span> <span class="o">%</span> <span class="n">tier</span>
-              <span class="bp">self</span><span class="o">.</span><span class="n">baseDN</span> <span class="o">=</span> <span class="n">baseDN</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-              <span class="c">#print &quot;Established a parsed BaseDN of &#39;%s&#39;&quot; % self.baseDN</span>
-
-          <span class="c"># Establish a directory object, with auth info, pointing at the authenticating user</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">adh</span> <span class="o">=</span> <span class="n">DirectoryEntry</span><span class="p">(</span><span class="s">&quot;LDAP://</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseDN</span><span class="p">))</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">adh</span><span class="o">.</span><span class="n">AuthenticationType</span> <span class="o">=</span> <span class="n">AuthenticationTypes</span><span class="o">.</span><span class="n">Secure</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">adh</span><span class="o">.</span><span class="n">Username</span> <span class="o">=</span> <span class="n">username</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">adh</span><span class="o">.</span><span class="n">Password</span> <span class="o">=</span> <span class="n">password</span>
-
-          <span class="c"># connect and fetch a copy of the authenticating user</span>
-          <span class="nb">filter</span> <span class="o">=</span> <span class="s">&quot;sAMAccountName=</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">username</span>
-          <span class="n">dsSystem</span> <span class="o">=</span> <span class="n">DirectorySearcher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adh</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
-          <span class="n">dsSystem</span><span class="o">.</span><span class="n">SearchScope</span> <span class="o">=</span> <span class="n">SearchScope</span><span class="o">.</span><span class="n">Subtree</span>
-          <span class="n">result</span> <span class="o">=</span> <span class="n">dsSystem</span><span class="o">.</span><span class="n">FindOne</span><span class="p">()</span>
-
-          <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
-              <span class="k">raise</span> <span class="ne">Exception</span><span class="p">,</span> <span class="s">&quot;Found no result searching for specified authentication user </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="n">username</span>
-
-      <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
-          <span class="k">raise</span> <span class="n">e</span><span class="p">,</span> <span class="s">&quot;Authentication failure.  Did you provide valid connection information / authentication credentials?&quot;</span>
-
-  <span class="k">def</span> <span class="nf">get_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
-      <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s">&quot;__iter__&quot;</span><span class="p">):</span>
-          <span class="k">return</span> <span class="p">(</span><span class="n">DirectoryEntryHelper</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">result</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-          <span class="k">return</span> <span class="n">DirectoryEntryHelper</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+# A few predefined values to simplify LDAP querying, pilfered from various internet-ey type places.
+BINARY_PROPS = ('objectguid', 'objectsid', 'msexchmailboxsecuritydescriptor', 'msexchmailboxguid')
+ACCOUNT_QUERY = &quot;(&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=_ACCOUNTNAME_))&quot;
+PRINCIPAL_QUERY = &quot;(&amp;amp;(objectCategory=user)(objectClass=person)(userPrincipalName=_PRINCIPALID__))&quot;
+GROUP_QUERY = &quot;(&amp;amp;(objectCategory=group)(sAMAccountName=_GROUPNAME_))&quot;
+PARTIAL_LAST_QUERY = &quot;(&amp;amp;(objectCategory=user)(sAMAccountName=*)(objectClass=person)(sn=_LASTNAME_*))&quot; 
+PARTIAL_NAME_QUERY = &quot;(&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=*)(sn=_LASTNAME_*)(givenname=_FIRSTNAME_*))&quot; 
+PARTIAL_FIRST_QUERY = &quot;(&amp;amp;(objectCategory=user)(objectClass=person)(sAMAccountName=*)(givenname=_FIRSTNAME_*))&quot; 
 
 
-<span class="k">class</span> <span class="nc">ActiveDirectorySearcher</span><span class="p">(</span><span class="n">ActiveDirectory</span><span class="p">):</span>
 
-  <span class="k">def</span> <span class="nf">_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Semi-private method for searching.</span>
-<span class="sd">      Note that &quot;filter&quot; needs to be a string which is a </span>
-<span class="sd">      *VALID* LDAP query/filter.  You should probably use one of the useful</span>
-<span class="sd">      utility find methods instead of querying this directly</span>
-<span class="sd">      unless you understand LDAP queries</span>
-<span class="sd">      By default searches for one only, pass multi=True for multiple results.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">print</span> <span class="s">&quot;[debug] Searching activedirectory for </span><span class="si">%s</span><span class="s">.  Allow multiple results? </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">multi</span><span class="p">)</span>
-      <span class="n">searcher</span> <span class="o">=</span> <span class="n">DirectorySearcher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adh</span><span class="p">)</span>
+class DirectoryEntryHelper(object):
+  &quot;&quot;&quot; Helper class for wrapping
+  and simplifying AD search results.
+  As much fun as dealing with Microsoft style
+  object hierarchies can be...
+  TODO: Is there an easy way to inject things into __dict__ for dir &amp;amp; ipy tab completion?
+  &quot;&quot;&quot;
 
-      <span class="n">searcher</span><span class="o">.</span><span class="n">ReferralChasing</span> <span class="o">=</span> <span class="n">ReferralChasingOption</span><span class="o">.</span><span class="n">All</span>
-      <span class="n">searcher</span><span class="o">.</span><span class="n">SearchScope</span> <span class="o">=</span> <span class="n">SearchScope</span><span class="o">.</span><span class="n">Subtree</span>
-      <span class="n">searcher</span><span class="o">.</span><span class="n">Filter</span> <span class="o">=</span> <span class="nb">filter</span>
+  def __init__(self, entry):
+      if isinstance(entry, SearchResult):
+          self.__dict__['_entry'] = entry.GetDirectoryEntry()
+      elif isinstance(entry, DirectoryEntry):
+          self.__dict__['_entry'] = entry
+      else:
+          raise TypeError, &quot;Invalid type '%s', don't know how to proxy it&quot; % type(entry)
 
-      <span class="n">results</span> <span class="o">=</span> <span class="n">searcher</span><span class="o">.</span><span class="n">FindAll</span><span class="p">()</span>
+  @property
+  def properties(self):
+      return self._entry.Properties
 
-      <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">Count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-          <span class="k">raise</span> <span class="ne">Exception</span><span class="p">,</span> <span class="s">&quot;No results found for search.&quot;</span>
+  @property
+  def keys(self):
+      &quot;&quot;&quot;Returns a comprehended list
+      of the *defined* Keys on the Properties object.
+      Any valid keys w/o values won't get listed.
+      &quot;&quot;&quot;
+      return [key for key in self.properties.Keys]
 
-      <span class="k">if</span> <span class="n">multi</span><span class="p">:</span>
-          <span class="c"># Generator for performance</span>
-          <span class="k">return</span> <span class="p">(</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-          <span class="k">if</span> <span class="n">results</span><span class="o">.</span><span class="n">Count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-              <span class="k">raise</span> <span class="ne">Exception</span><span class="p">,</span> <span class="s">&quot;Found multiple results in single-search mode.  To support multiples, please pass multi=True to the find method.&quot;</span>
-          <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  
+  def __getattr__(self, key):
+      &quot;&quot;&quot;Proxies the Properties objects in the DirectoryEntry
+      to provide a simple getter.
+      First checks if DirectoryEntry has an attribute (property)
+      matching requested key, and passes that if so.
+      Otherwise, fetches a matching property.  If you have
+      a name collison, use the .properties property on this object
+      to get a clean copy of the Properties object
+      TODO: Better support for multi-value keys (only returns first idx right now]
+      &quot;&quot;&quot;
+      if hasattr(self._entry, key):
+          return getattr(self._entry, key)
+      elif self._entry.Properties[key].Count:
+          return self._entry.Properties[key][0]
+      else:
+          return None
+
+  def __setattr__(self, key, value):
+      &quot;&quot;&quot;Proxies the Properties objects in the DirectoryEntry 
+      to provide a simpler setter.
+      First checks if DirectoryEntry has an attribute (property)
+      matching requested key, and sets on that if so.
+      Otherwise, sets upon a matching property.  
+      If the property has an existing count &gt; 0, sets Index 0  
+      If not, it does an Add().
+      The way the MS Classes work, Properties.Keys only returns keys that
+      have a value count.  However, any *valid* Key has a silent value which
+      can be initialized via Add().
+      Invalid keys throw an error, so you can't be arbitrary.
+      I use a list of keyspace found at: 
+
+          http://www.dotnetactivedirectory.com/\
+              Understanding_LDAP_Active_Directory_User_Object_Properties.html
+
+      If you have a name collison, use the .properties property on this object
+      to get a clean copy of the Properties object
+      TODO: Better support for multi-value keys (only sets first idx right now]
+      &quot;&quot;&quot;
+      if hasattr(self._entry, key):
+          setattr(self._entry, key, value)
+      else:
+          if self._entry.Properties[key].Count &gt; 0:
+              if self._entry.Properties[key].Count &gt; 1:
+                  print &gt;&gt; sys.stderr, &quot;[warning] Key '%s' contains multiple values which we don't properly support yet.  Using Index 0&quot;
+              self._entry.Properties[key][0] = value
+          else:
+              self._entry.Properties[key].Add(value)
+          # commit early, commit often...
+          self._entry.CommitChanges()
+
+  def __repr__(self):
+      &quot;&quot;&quot;Print all pretty like on console.
+      My biggest pet peeve working in .Net is that most objects don't have
+      any kind of __str__/__repr__ value on them to give you quick information
+      on their contents.  ARGH!
+      &quot;&quot;&quot;
+      return &quot;&lt;DirectoryEntryHelper:{sn=%s,givenName=%s,mail=%s,sAMAccountName=%s}&gt;&quot; %\
+          (self.sn, self.givenName, self.mail, self.sAMAccountName)
+
+class ActiveDirectory(object):
+  &quot;&quot;&quot; ActiveDirectory interface class.
+  Tested on IronPython 2.6RC + Mono 2.4.2.3 on Linux. YMMV.
+  &quot;&quot;&quot;
+
+  # Active Directory Handle
+  adh = None
+
+  server = None
+  domain = None
+  baseDN = None
+
+  def __init__(self, server, domain, username, password, baseDN=&quot;&quot;):
+      &quot;&quot;&quot;Constructor to instantiate the LDAP connection.
+      server is a resolvable address to your domain controller (e.g. the resolvable hostname or IP)
+      domain should be the ActiveDirectory domain as specified by your admin.
+      If you don't pass BaseDN, your 'domain' argument will be split on
+      . and each piece will be passed as DC=&lt;piece&gt;. This will be used as your BaseDN
+      E.G. domain aurigasv.local becomes &quot;DC=aurigasv,DC=local&quot;
+
+      *** Any exception in connecting will be wrapped and rethrown, aborting construction.
+      &quot;&quot;&quot;
+      try:
+          # Setup the baseDN
+          self.server = server
+          self.domain = domain
+          if baseDN:
+              self.baseDN = baseDN
+          else:
+              for tier in domain.split('.'):
+                  baseDN += &quot;DC=%s,&quot; % tier
+              self.baseDN = baseDN[:-1]
+              #print &quot;Established a parsed BaseDN of '%s'&quot; % self.baseDN
+
+          # Establish a directory object, with auth info, pointing at the authenticating user
+          self.adh = DirectoryEntry(&quot;LDAP://%s/%s&quot; % (server, self.baseDN))
+          self.adh.AuthenticationType = AuthenticationTypes.Secure
+          self.adh.Username = username
+          self.adh.Password = password
+
+          # connect and fetch a copy of the authenticating user
+          filter = &quot;sAMAccountName=%s&quot; % username
+          dsSystem = DirectorySearcher(self.adh, filter)
+          dsSystem.SearchScope = SearchScope.Subtree
+          result = dsSystem.FindOne()
+
+          if not result:
+              raise Exception, &quot;Found no result searching for specified authentication user %s.&quot; % username
+
+      except Exception, e:
+          raise e, &quot;Authentication failure.  Did you provide valid connection information / authentication credentials?&quot;
+
+  def get_helper(self, result):
+      if hasattr(result, &quot;__iter__&quot;):
+          return (DirectoryEntryHelper(item) for item in result)
+      else:
+          return DirectoryEntryHelper(result)
 
 
-  <span class="k">def</span> <span class="nf">find_last_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_name</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">nowrap</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Searches by sn (lastname).</span>
-<span class="sd">      This can be a partial query, as long as the first</span>
-<span class="sd">      few letters of last_name are defined </span>
-<span class="sd">      By default searches for one only, pass multi=True for multiple results.</span>
-<span class="sd">      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise</span>
-<span class="sd">      you get it back wrapped in a helper class.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">(</span><span class="n">PARTIAL_LAST_QUERY</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_LASTNAME_&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="p">),</span> <span class="n">multi</span><span class="p">)</span>
-      <span class="k">if</span> <span class="ow">not</span> <span class="n">nowrap</span><span class="p">:</span>
-          <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_helper</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+class ActiveDirectorySearcher(ActiveDirectory):
 
-      <span class="k">return</span> <span class="n">result</span>
+  def _search(self, filter, multi=True):
+      &quot;&quot;&quot;Semi-private method for searching.
+      Note that &quot;filter&quot; needs to be a string which is a 
+      *VALID* LDAP query/filter.  You should probably use one of the useful
+      utility find methods instead of querying this directly
+      unless you understand LDAP queries
+      By default searches for one only, pass multi=True for multiple results.
+      &quot;&quot;&quot;
+      print &quot;[debug] Searching activedirectory for %s.  Allow multiple results? %s&quot; % (filter, multi)
+      searcher = DirectorySearcher(self.adh)
 
-  <span class="k">def</span> <span class="nf">find_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">first_name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">nowrap</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Searches by sn (lastname) &amp;amp; givenName( firstname) </span>
-<span class="sd">      This can be a partial query, as long as the first</span>
-<span class="sd">      few letters of last_name are defined</span>
-<span class="sd">      If firstname is None, it quietly passes into find_last_name.</span>
-<span class="sd">      By default searches for one only, pass multi=True for multiple results.</span>
-<span class="sd">      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise</span>
-<span class="sd">      you get it back wrapped in a helper class.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="k">if</span> <span class="ow">not</span> <span class="n">last_name</span><span class="p">:</span>
-          <span class="k">raise</span> <span class="ne">Exception</span><span class="p">,</span> <span class="s">&quot;You must, at a minimum, specify last_name for a name search.&quot;</span>
+      searcher.ReferralChasing = ReferralChasingOption.All
+      searcher.SearchScope = SearchScope.Subtree
+      searcher.Filter = filter
 
-      <span class="k">if</span> <span class="ow">not</span> <span class="n">first_name</span><span class="p">:</span>
-          <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_last_name</span><span class="p">(</span><span class="n">last_name</span><span class="p">,</span> <span class="n">multi</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-          <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">(</span><span class="n">PARTIAL_NAME_QUERY</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_FIRSTNAME_&#39;</span><span class="p">,</span> <span class="n">first_name</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_LASTNAME_&#39;</span><span class="p">,</span> <span class="n">last_name</span><span class="p">),</span> <span class="n">multi</span><span class="p">)</span>
-          <span class="k">if</span> <span class="ow">not</span> <span class="n">nowrap</span><span class="p">:</span>
-              <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_helper</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+      results = searcher.FindAll()
 
-      <span class="k">return</span> <span class="n">result</span>
+      if results.Count == 0:
+          raise Exception, &quot;No results found for search.&quot;
 
-  <span class="k">def</span> <span class="nf">find_account</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">account_name</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">nowrap</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Searches by  sAMAccountName (account_name), which should be unique</span>
-<span class="sd">      This can be a partial query, as long as the first</span>
-<span class="sd">      few letters of account_name are defined</span>
-<span class="sd">      If firstname is None, it quietly passes into find_last_name.</span>
-<span class="sd">      By default searches for one only, pass multi=True for multiple results.</span>
-<span class="sd">      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise</span>
-<span class="sd">      you get it back wrapped in a helper class.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">(</span><span class="n">ACCOUNT_QUERY</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_ACCOUNTNAME_&#39;</span><span class="p">,</span> <span class="n">account_name</span><span class="p">),</span> <span class="n">multi</span><span class="p">)</span>
-      <span class="k">if</span> <span class="ow">not</span> <span class="n">nowrap</span><span class="p">:</span>
-          <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_helper</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+      if multi:
+          # Generator for performance
+          return (entry for entry in results)
+      else:
+          if results.Count &gt; 1:
+              raise Exception, &quot;Found multiple results in single-search mode.  To support multiples, please pass multi=True to the find method.&quot;
+          return results[0]  
 
-      <span class="k">return</span> <span class="n">result</span>
 
-  <span class="k">def</span> <span class="nf">find_first_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_name</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">nowrap</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-      <span class="sd">&quot;&quot;&quot;Searches by givenName, which should be unique</span>
-<span class="sd">      This can be a partial query, as long as the first</span>
-<span class="sd">      few letters of account_name are defined</span>
-<span class="sd">      If firstname is None, it quietly passes into find_last_name.</span>
-<span class="sd">      By default searches for one only, pass multi=True for multiple results.</span>
-<span class="sd">      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise</span>
-<span class="sd">      you get it back wrapped in a helper class.</span>
-<span class="sd">      &quot;&quot;&quot;</span>
-      <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">(</span><span class="n">PARTIAL_FIRST_QUERY</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_FIRSTNAME_&#39;</span><span class="p">,</span> <span class="n">first_name</span><span class="p">),</span> <span class="n">multi</span><span class="p">)</span>
-      <span class="k">if</span> <span class="ow">not</span> <span class="n">nowrap</span><span class="p">:</span>
-          <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_helper</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+  def find_last_name(self, last_name, multi=False, nowrap=False):
+      &quot;&quot;&quot;Searches by sn (lastname).
+      This can be a partial query, as long as the first
+      few letters of last_name are defined 
+      By default searches for one only, pass multi=True for multiple results.
+      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise
+      you get it back wrapped in a helper class.
+      &quot;&quot;&quot;
+      result = self._search(PARTIAL_LAST_QUERY.replace('_LASTNAME_', last_name), multi)
+      if not nowrap:
+          result = self.get_helper(result)
 
-      <span class="k">return</span> <span class="n">result</span>
-</code></pre>
+      return result
+
+  def find_name(self, last_name=None, first_name=None, multi=False, nowrap=False):
+      &quot;&quot;&quot;Searches by sn (lastname) &amp;amp; givenName( firstname) 
+      This can be a partial query, as long as the first
+      few letters of last_name are defined
+      If firstname is None, it quietly passes into find_last_name.
+      By default searches for one only, pass multi=True for multiple results.
+      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise
+      you get it back wrapped in a helper class.
+      &quot;&quot;&quot;
+      if not last_name:
+          raise Exception, &quot;You must, at a minimum, specify last_name for a name search.&quot;
+
+      if not first_name:
+          result = self.find_last_name(last_name, multi)
+      else:
+          result = self._search(PARTIAL_NAME_QUERY.replace('_FIRSTNAME_', first_name).replace('_LASTNAME_', last_name), multi)
+          if not nowrap:
+              result = self.get_helper(result)
+
+      return result
+
+  def find_account(self, account_name, multi=False, nowrap=False):
+      &quot;&quot;&quot;Searches by  sAMAccountName (account_name), which should be unique
+      This can be a partial query, as long as the first
+      few letters of account_name are defined
+      If firstname is None, it quietly passes into find_last_name.
+      By default searches for one only, pass multi=True for multiple results.
+      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise
+      you get it back wrapped in a helper class.
+      &quot;&quot;&quot;
+      result = self._search(ACCOUNT_QUERY.replace('_ACCOUNTNAME_', account_name), multi)
+      if not nowrap:
+          result = self.get_helper(result)
+
+      return result
+
+  def find_first_name(self, first_name, multi=False, nowrap=False):
+      &quot;&quot;&quot;Searches by givenName, which should be unique
+      This can be a partial query, as long as the first
+      few letters of account_name are defined
+      If firstname is None, it quietly passes into find_last_name.
+      By default searches for one only, pass multi=True for multiple results.
+      If you want  raw .Net SearchResult(s) object(s), pass nowrap=True, otherwise
+      you get it back wrapped in a helper class.
+      &quot;&quot;&quot;
+      result = self._search(PARTIAL_FIRST_QUERY.replace('_FIRSTNAME_', first_name), multi)
+      if not nowrap:
+          result = self.get_helper(result)
+
+      return result</code></pre>
 </div>
 
 

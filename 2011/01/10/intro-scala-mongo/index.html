@@ -30,7 +30,7 @@
     <a href="/2011/01/10/intro-scala-mongo/">Exploring Scala with MongoDB</a>
   </h2>
   
-  <abbr class="published" title="2011-01-10T00:00:00-05:00">10 Jan 2011</abbr>
+  <abbr class="published" title="2011-01-10T00:00:00+00:00">10 Jan 2011</abbr>
   <br class="clear" />
   <div class="entry-content">
     <p>2010 proved to be a great year for growth and adoption of many fledgling technologies---not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala's adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
@@ -39,23 +39,22 @@
 
 <p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more 'friendly' syntax for creating MongoDB Objects, using Scala's Map syntax:</p>
 
-<div class="highlight"><pre><code class="scala"> 
-<span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
+<div>
+  <pre><code class='scala'>import com.mongodb.casbah.Imports._
 
-<span class="cm">/** Create an object directly */</span>
-<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span>
-                           <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">,</span>
-                           <span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">,</span>
-                           <span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">)</span>
+/** Create an object directly */
+val newObj = MongoDBObject(&quot;foo&quot; -&gt; &quot;bar&quot;,
+                           &quot;x&quot; -&gt; &quot;y&quot;,
+                           &quot;pie&quot; -&gt; 3.14,
+                           &quot;spam&quot; -&gt; &quot;eggs&quot;)
 
-<span class="cm">/** Or, use a builder interface */</span>
-<span class="k">val</span> <span class="n">builder</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">.</span><span class="n">newBuilder</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">)</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span>
-</code></pre>
+/** Or, use a builder interface */
+val builder = MongoDBObject.newBuilder
+builder += &quot;foo&quot; -&gt; &quot;bar&quot;
+builder += &quot;x&quot; -&gt; &quot;y&quot;
+builder += (&quot;pie&quot; -&gt; 3.14)
+builder += (&quot;spam&quot; -&gt; &quot;eggs&quot;, &quot;mmm&quot; -&gt; &quot;bacon&quot;)
+val newObj = builder.result</code></pre>
 </div>
 
 
@@ -66,54 +65,54 @@
 
 <p>In contrast, the same statements in Java tend to be more verbose:</p>
 
-<div class="highlight"><pre><code class="scala"><span class="k">import</span> <span class="nn">com.mongodb.</span><span class="o">*;</span>
+<div>
+  <pre><code class='scala'>import com.mongodb.*;
 
-<span class="nc">DBObject</span> <span class="n">newObj</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">BasicDBObject</span><span class="o">();</span>
-<span class="n">newObj</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">,</span> <span class="s">&quot;bar&quot;</span><span class="o">);</span>
-<span class="n">newObj</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="s">&quot;x&quot;</span><span class="o">,</span> <span class="s">&quot;y&quot;</span><span class="o">);</span>
-<span class="n">newObj</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="s">&quot;pie&quot;</span><span class="o">,</span> <span class="mf">3.14</span><span class="o">);</span>
-<span class="n">newObj</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="s">&quot;spam&quot;</span><span class="o">,</span> <span class="s">&quot;eggs&quot;</span><span class="o">);</span>
+DBObject newObj = new BasicDBObject();
+newObj.put(&quot;foo&quot;, &quot;bar&quot;);
+newObj.put(&quot;x&quot;, &quot;y&quot;);
+newObj.put(&quot;pie&quot;, 3.14);
+newObj.put(&quot;spam&quot;, &quot;eggs&quot;);
 
-<span class="cm">/** or, builder style */</span>
+/** or, builder style */
 
-<span class="nc">BasicDBObjectBuilder</span> <span class="n">builder</span> <span class="k">=</span> <span class="nc">BasicDBObjectBuilder</span><span class="o">.</span><span class="n">start</span><span class="o">();</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">,</span> <span class="s">&quot;bar&quot;</span><span class="o">);</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="s">&quot;x&quot;</span><span class="o">,</span> <span class="s">&quot;y&quot;</span><span class="o">);</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="s">&quot;pie&quot;</span><span class="o">,</span> <span class="mf">3.14</span><span class="o">);</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="s">&quot;spam&quot;</span><span class="o">,</span> <span class="s">&quot;eggs&quot;</span><span class="o">);</span>
-<span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="s">&quot;mmm&quot;</span><span class="o">,</span> <span class="s">&quot;bacon&quot;</span><span class="o">);</span>
-<span class="nc">DBObject</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get</span><span class="o">();</span>
-</code></pre>
+BasicDBObjectBuilder builder = BasicDBObjectBuilder.start();
+builder.add(&quot;foo&quot;, &quot;bar&quot;);
+builder.add(&quot;x&quot;, &quot;y&quot;);
+builder.add(&quot;pie&quot;, 3.14);
+builder.add(&quot;spam&quot;, &quot;eggs&quot;);
+builder.add(&quot;mmm&quot;, &quot;bacon&quot;);
+DBObject newObj = builder.get();</code></pre>
 </div>
 
 
 <p>The semantics of working with Collections and Cursors in Casbah are similar to the Java driver they wrap, with a bit of Scala-friendly syntactic sugar added for things like <a href="http://www.scala-lang.org/node/111">for comprehensions</a>.  Where Casbah really shines is in its use of a DSL syntax for creating MongoDB Queries.</p>
 
-<div class="highlight"><pre><code class="scala"><span class="cm">/** This Query Object ... */</span>
-<span class="k">val</span> <span class="n">query</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">MongoDBObject</span><span class="o">(</span>
-                <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="nc">MongoDObject</span><span class="o">(</span><span class="s">&quot;$gte&quot;</span> <span class="o">-&gt;</span> <span class="mi">5</span><span class="o">,</span> <span class="s">&quot;$lte&quot;</span> <span class="o">-&gt;</span> <span class="mi">10</span><span class="o">),</span>
-                <span class="s">&quot;baz&quot;</span> <span class="o">-&gt;</span> <span class="mi">5</span><span class="o">,</span>
-                <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">,</span>
-                <span class="s">&quot;n&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;r&quot;</span>
-            <span class="o">)</span>
-<span class="cm">/** Can be constructed instead with the Query DSL: */</span>
-<span class="k">val</span> <span class="n">queryDSL</span> <span class="k">=</span> <span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="nc">$gte</span> <span class="mi">5</span> <span class="nc">$lte</span> <span class="mi">10</span><span class="o">)</span> <span class="o">++</span> <span class="o">(</span><span class="s">&quot;baz&quot;</span> <span class="o">-&gt;</span> <span class="mi">5</span><span class="o">)</span> <span class="o">++</span> <span class="o">(</span><span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">)</span> <span class="o">++</span> <span class="o">(</span><span class="s">&quot;n&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;r&quot;</span><span class="o">)</span>
+<div>
+  <pre><code class='scala'>/** This Query Object ... */
+val query = new MongoDBObject(
+                &quot;foo&quot; -&gt; MongoDObject(&quot;$gte&quot; -&gt; 5, &quot;$lte&quot; -&gt; 10),
+                &quot;baz&quot; -&gt; 5,
+                &quot;x&quot; -&gt; &quot;y&quot;,
+                &quot;n&quot; -&gt; &quot;r&quot;
+            )
+/** Can be constructed instead with the Query DSL: */
+val queryDSL = (&quot;foo&quot; $gte 5 $lte 10) ++ (&quot;baz&quot; -&gt; 5) ++ (&quot;x&quot; -&gt; &quot;y&quot;) ++ (&quot;n&quot; -&gt; &quot;r&quot;)
 
-<span class="cm">/** Easily create negated statements. </span>
-<span class="cm">    Instead of a nested DBObject constructor like this: */</span>
+/** Easily create negated statements. 
+    Instead of a nested DBObject constructor like this: */
 
-<span class="k">val</span> <span class="n">ltGt</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span>
-            <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="nc">MongoDBObject</span><span class="o">(</span>
-                <span class="s">&quot;$not&quot;</span> <span class="o">-&gt;</span> <span class="nc">MongoDBObject</span><span class="o">(</span>
-                    <span class="s">&quot;$gte&quot;</span> <span class="o">-&gt;</span> <span class="mi">15</span><span class="o">,</span> 
-                    <span class="s">&quot;$lt&quot;</span> <span class="o">-&gt;</span> <span class="mf">35.2</span><span class="o">,</span> 
-                    <span class="s">&quot;$ne&quot;</span> <span class="o">-&gt;</span> <span class="mi">16</span><span class="o">)</span>
-                <span class="o">)</span>
-            <span class="o">)</span>
+val ltGt = MongoDBObject(
+            &quot;foo&quot; -&gt; MongoDBObject(
+                &quot;$not&quot; -&gt; MongoDBObject(
+                    &quot;$gte&quot; -&gt; 15, 
+                    &quot;$lt&quot; -&gt; 35.2, 
+                    &quot;$ne&quot; -&gt; 16)
+                )
+            )
 
-<span class="cm">/** Use Casbah&#39;s Query DSL to say it much simpler */</span>
-<span class="k">val</span> <span class="n">ltGtDSL</span> <span class="k">=</span> <span class="s">&quot;foo&quot;</span> <span class="nc">$not</span> <span class="o">{</span> <span class="k">_</span> <span class="nc">$gte</span> <span class="mi">15</span> <span class="nc">$lt</span> <span class="mf">35.2</span> <span class="nc">$ne</span> <span class="mi">16</span> <span class="o">}</span>
-</code></pre>
+/** Use Casbah's Query DSL to say it much simpler */
+val ltGtDSL = &quot;foo&quot; $not { _ $gte 15 $lt 35.2 $ne 16 }</code></pre>
 </div>
 
 

@@ -30,7 +30,7 @@
     <a href="/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala's Type Classes</a>
   </h2>
   
-  <abbr class="published" title="2012-06-11T00:00:00-04:00">11 Jun 2012</abbr>
+  <abbr class="published" title="2012-06-11T00:00:00+00:00">11 Jun 2012</abbr>
   <br class="clear" />
   <div class="entry-content">
     <p>Over the last year or so, I have found myself making more and more use of Scala's Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
@@ -48,55 +48,55 @@
 
 <p>First, let's take a look at <em>sorting</em> and custom objects to best understand how one accomplishes this. It is not an uncommon task in development for us to create our own objects and need to integrate them into Standard Library behaviors, such as sorting. Let's work with a few sample objects in the form of "Bank Accounts" to look at how this all work (and I'm aware of the poor concurrency control, etc. around balance -- this is a contrived example). Here's our Bank Account object:</p>
 
-<div class="highlight"><pre><code class="scala"><span class="k">class</span> <span class="nc">BankAccount</span><span class="o">(</span><span class="k">val</span> <span class="n">accountNumber</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span> <span class="k">val</span> <span class="n">holderFirst</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
-                  <span class="k">val</span> <span class="n">holderMiddle</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">],</span> <span class="k">val</span> <span class="n">holderLast</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
-                  <span class="k">var</span> <span class="n">balance</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span> <span class="o">{</span>
+<div>
+  <pre><code class='scala'>class BankAccount(val accountNumber: Long, val holderFirst: String,
+                  val holderMiddle: Option[String], val holderLast: String,
+                  var balance: Double) {
 
-  <span class="k">def</span> <span class="n">holderName</span> <span class="k">=</span> 
-    <span class="s">&quot;%s, %s %s&quot;</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">holderLast</span><span class="o">,</span> <span class="n">holderFirst</span><span class="o">,</span> <span class="n">holderMiddle</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">))</span>
+  def holderName = 
+    &quot;%s, %s %s&quot;.format(holderLast, holderFirst, holderMiddle.getOrElse(&quot;&quot;))
 
-  <span class="k">override</span> <span class="k">def</span> <span class="n">toString</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> 
-    <span class="s">&quot;{ Acct # %s, Held by %s with a balance of $%8.2f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="o">(</span>
-        <span class="n">accountNumber</span><span class="o">,</span> <span class="n">holderName</span><span class="o">,</span> <span class="n">balance</span>
-    <span class="o">)</span>
+  override def toString: String = 
+    &quot;{ Acct # %s, Held by %s with a balance of $%8.2f}&quot;.format(
+        accountNumber, holderName, balance
+    )
                               
-<span class="o">}</span>
-</code></pre>
+}</code></pre>
 </div>
 
 
 <p>We can easily populate collections with instances of these accounts as well.</p>
 
-<div class="highlight"><pre><code class="scala"><span class="k">val</span> <span class="n">accounts</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="k">new</span> <span class="nc">BankAccount</span><span class="o">(</span><span class="mi">1000893</span><span class="o">,</span> <span class="s">&quot;Brendan&quot;</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;W.&quot;</span><span class="o">),</span> <span class="s">&quot;McAdams&quot;</span><span class="o">,</span>
-                                    <span class="mf">1234.56</span><span class="o">),</span>
-                    <span class="k">new</span> <span class="nc">BankAccount</span><span class="o">(</span><span class="mi">1000256</span><span class="o">,</span> <span class="s">&quot;John&quot;</span><span class="o">,</span> <span class="nc">None</span><span class="o">,</span> <span class="s">&quot;Smith&quot;</span><span class="o">,</span> 
-                                    <span class="mf">10000291.83</span><span class="o">),</span>
-                    <span class="k">new</span> <span class="nc">BankAccount</span><span class="o">(</span><span class="mi">1000012</span><span class="o">,</span> <span class="s">&quot;Jane&quot;</span><span class="o">,</span> <span class="nc">None</span><span class="o">,</span> <span class="s">&quot;Doe&quot;</span><span class="o">,</span> 
-                                    <span class="mf">45.28</span><span class="o">),</span>
-                    <span class="k">new</span> <span class="nc">BankAccount</span><span class="o">(</span><span class="mi">4002158</span><span class="o">,</span> <span class="s">&quot;Alan&quot;</span><span class="o">,</span> <span class="nc">None</span><span class="o">,</span> <span class="s">&quot;Smithee&quot;</span><span class="o">,</span> 
-                                    <span class="mf">834567.00</span><span class="o">))</span>
+<div>
+  <pre><code class='scala'>val accounts = List(new BankAccount(1000893, &quot;Brendan&quot;, Some(&quot;W.&quot;), &quot;McAdams&quot;,
+                                    1234.56),
+                    new BankAccount(1000256, &quot;John&quot;, None, &quot;Smith&quot;, 
+                                    10000291.83),
+                    new BankAccount(1000012, &quot;Jane&quot;, None, &quot;Doe&quot;, 
+                                    45.28),
+                    new BankAccount(4002158, &quot;Alan&quot;, None, &quot;Smithee&quot;, 
+                                    834567.00))
 
-<span class="n">println</span><span class="o">(</span><span class="s">&quot;Bank Accounts: &quot;</span> <span class="o">+</span> <span class="n">accounts</span><span class="o">)</span>
-</code></pre>
+println(&quot;Bank Accounts: &quot; + accounts)</code></pre>
 </div>
 
 
 <p>Given collections of instances of these bank accounts in each language, we'd like to easily sort them –– given an arbitrary set of requirements.  Now, neither Scala or Java can "automatically" figure out how to sort these, instead requiring assistance from us (the developer).</p>
 
-<div class="highlight"><pre><code class="scala"><span class="k">val</span> <span class="n">sortedAccounts</span> <span class="k">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">sorted</span>
+<div>
+  <pre><code class='scala'>val sortedAccounts = accounts.sorted
 
-<span class="n">println</span><span class="o">(</span><span class="s">&quot;* Sorted Accounts: &quot;</span> <span class="o">+</span> <span class="n">sortedAccounts</span><span class="o">)</span>
-</code></pre>
+println(&quot;* Sorted Accounts: &quot; + sortedAccounts)</code></pre>
 </div>
 
 
 <p>It is unfortunately not <em>quite</em> that easy, as the above code will fail to compile asking for a missing argument:</p>
 
-<div class="highlight"><pre><code class="scala"><span class="nc">BankAccount</span><span class="o">.</span><span class="n">scala</span><span class="k">:</span><span class="err">39</span><span class="kt">:</span> <span class="kt">error:</span> <span class="kt">No</span> <span class="kt">implicit</span> <span class="kt">Ordering</span> <span class="kt">defined</span> <span class="kt">for</span> <span class="kt">this.BankAccount.</span>
-<span class="kt">val</span> <span class="kt">sortedAccounts</span> <span class="o">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">sorted</span>
-                                    <span class="o">^</span>
-<span class="n">one</span> <span class="n">error</span> <span class="n">found</span>
-</code></pre>
+<div>
+  <pre><code class='scala'>BankAccount.scala:39: error: No implicit Ordering defined for this.BankAccount.
+val sortedAccounts = accounts.sorted
+                                    ^
+one error found</code></pre>
 </div>
 
 
@@ -116,47 +116,47 @@
 
 <p>Let's take a look at how our <code>Ordering</code> instance for sorting a <code>BankAccount</code> by <code>accountNumber</code> might look.</p>
 
-<div class="highlight"><pre><code class="scala"><span class="k">trait</span> <span class="nc">BankAccountNumberOrder</span> <span class="k">extends</span> <span class="n">scala</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="nc">Ordering</span><span class="o">[</span><span class="kt">BankAccount</span><span class="o">]</span> <span class="o">{</span>
-  <span class="k">def</span> <span class="n">compare</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">BankAccount</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">BankAccount</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> 
-    <span class="k">if</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="n">accountNumber</span> <span class="o">&lt;</span> <span class="n">y</span><span class="o">.</span><span class="n">accountNumber</span><span class="o">)</span> 
-      <span class="o">-</span><span class="mi">1</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="n">accountNumber</span> <span class="o">&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">accountNumber</span><span class="o">)</span> 
-      <span class="mi">1</span>
-    <span class="k">else</span>
-      <span class="mi">0</span>
+<div>
+  <pre><code class='scala'>trait BankAccountNumberOrder extends scala.math.Ordering[BankAccount] {
+  def compare(x: BankAccount, y: BankAccount): Int = 
+    if (x.accountNumber &lt; y.accountNumber) 
+      -1
+    else if (x.accountNumber &gt; y.accountNumber) 
+      1
+    else
+      0
   
-<span class="o">}</span>
+}
 
-<span class="k">implicit</span> <span class="k">object</span> <span class="nc">BankAccountNumberSort</span> <span class="k">extends</span> <span class="nc">BankAccountNumberOrder</span>
-</code></pre>
+implicit object BankAccountNumberSort extends BankAccountNumberOrder</code></pre>
 </div>
 
 
 <p>Now with an implicit instance of <code>Ordering[BankAccount]</code> in scope, our sort can succeed. Running our code should produce expected results:</p>
 
-<div class="highlight"><pre><code class="scala"><span class="nc">Bank</span> <span class="nc">Accounts</span><span class="k">:</span> <span class="kt">List</span><span class="o">({</span> <span class="kt">Acct</span> <span class="k">#</span> <span class="err">1000893</span><span class="o">,</span> <span class="kt">Held</span> <span class="kt">by</span> <span class="kt">McAdams</span><span class="o">,</span> <span class="kt">Brendan</span> <span class="kt">W.</span> <span class="kt">with</span> <span class="kt">a</span> <span class="kt">balance</span> <span class="kt">of</span> <span class="kt">$</span> <span class="err">1234</span><span class="kt">.</span><span class="err">56</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000256</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smith</span><span class="o">,</span> <span class="nc">John</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$10000291</span><span class="o">.</span><span class="mi">83</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000012</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Doe</span><span class="o">,</span> <span class="nc">Jane</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$</span>   <span class="mf">45.28</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">4002158</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smithee</span><span class="o">,</span> <span class="nc">Alan</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$834567</span><span class="o">.</span><span class="mi">00</span><span class="o">})</span>
+<div>
+  <pre><code class='scala'>Bank Accounts: List({ Acct # 1000893, Held by McAdams, Brendan W. with a balance of $ 1234.56}, { Acct # 1000256, Held by Smith, John  with a balance of $10000291.83}, { Acct # 1000012, Held by Doe, Jane  with a balance of $   45.28}, { Acct # 4002158, Held by Smithee, Alan  with a balance of $834567.00})
 
-<span class="nc">Sorted</span> <span class="nc">Accounts</span><span class="k">:</span> <span class="kt">List</span><span class="o">({</span> <span class="kt">Acct</span> <span class="k">#</span> <span class="err">1000012</span><span class="o">,</span> <span class="kt">Held</span> <span class="kt">by</span> <span class="kt">Doe</span><span class="o">,</span> <span class="kt">Jane</span>  <span class="kt">with</span> <span class="kt">a</span> <span class="kt">balance</span> <span class="kt">of</span> <span class="kt">$</span>   <span class="err">45</span><span class="kt">.</span><span class="err">28</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000256</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smith</span><span class="o">,</span> <span class="nc">John</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$10000291</span><span class="o">.</span><span class="mi">83</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000893</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">McAdams</span><span class="o">,</span> <span class="nc">Brendan</span> <span class="n">W</span><span class="o">.</span> <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$</span> <span class="mf">1234.56</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">4002158</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smithee</span><span class="o">,</span> <span class="nc">Alan</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$834567</span><span class="o">.</span><span class="mi">00</span><span class="o">})</span>
-</code></pre>
+Sorted Accounts: List({ Acct # 1000012, Held by Doe, Jane  with a balance of $   45.28}, { Acct # 1000256, Held by Smith, John  with a balance of $10000291.83}, { Acct # 1000893, Held by McAdams, Brendan W. with a balance of $ 1234.56}, { Acct # 4002158, Held by Smithee, Alan  with a balance of $834567.00})</code></pre>
 </div>
 
 
 <p>The big benefit here (in my eyes) is that we didn't need to modify our <code>BankAccount</code> class at all to provide this behavior. <em>Even if <code>BankAccount</code> was a sealed third party class</em> we can provide sorting information for it. This is far superior to an inheritance based solution such as Java's. And if we wanted later to sort by <code>balance</code> instead of <code>accountNumber</code> we can explicitly pass a different instance to sort:</p>
 
-<div class="highlight"><pre><code class="scala"><span class="k">object</span> <span class="nc">BankAccountBalanceOrder</span> <span class="k">extends</span> <span class="n">scala</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="nc">Ordering</span><span class="o">[</span><span class="kt">BankAccount</span><span class="o">]</span> <span class="o">{</span>
-  <span class="k">def</span> <span class="n">compare</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">BankAccount</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">BankAccount</span><span class="o">)</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> 
-    <span class="k">if</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="n">balance</span> <span class="o">&lt;</span> <span class="n">y</span><span class="o">.</span><span class="n">balance</span><span class="o">)</span> 
-      <span class="o">-</span><span class="mi">1</span>
-    <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">x</span><span class="o">.</span><span class="n">balance</span> <span class="o">&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">balance</span><span class="o">)</span> 
-      <span class="mi">1</span>
-    <span class="k">else</span>
-      <span class="mi">0</span>
-<span class="o">}</span>
+<div>
+  <pre><code class='scala'>object BankAccountBalanceOrder extends scala.math.Ordering[BankAccount] {
+  def compare(x: BankAccount, y: BankAccount): Int = 
+    if (x.balance &lt; y.balance) 
+      -1
+    else if (x.balance &gt; y.balance) 
+      1
+    else
+      0
+}
 
-<span class="k">val</span> <span class="n">sortedByBalance</span> <span class="k">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">sorted</span><span class="o">(</span><span class="nc">BankAccountBalanceOrder</span><span class="o">)</span>
+val sortedByBalance = accounts.sorted(BankAccountBalanceOrder)
 
-<span class="n">println</span><span class="o">(</span><span class="s">&quot;$ Sorted By Balance: &quot;</span> <span class="o">+</span> <span class="n">sortedByBalance</span><span class="o">)</span>
-</code></pre>
+println(&quot;$ Sorted By Balance: &quot; + sortedByBalance)</code></pre>
 </div>
 
 
@@ -181,6 +181,8 @@
     
     <li><span>Previous: 31 May 2012</span> &raquo; <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler 'Nothing' Checks</a></li>
     
+    
+    <li><span>    Next: 06 Nov 2012</span> &raquo; <a href="/2012/11/06/and-now-for-something-completely-different/">And Now For Something Completely Different!</a></li>
     
   </ul>
   <div id="disqus_thread"></div>
