@@ -30,6 +30,58 @@
   
   
 
+<div class="hentry" id="/2012/11/14/mongodb-community-call-for-postcards">
+  <h2 class="entry-title">
+    <a href="/2012/11/14/mongodb-community-call-for-postcards/">MongoDB Community – Call for Postcards</a>
+  </h2>
+  
+  <abbr class="published" title="2012-11-14T00:00:00+00:00">14 Nov 2012</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>In the distant annals of MongoDB History, when Men were Real Men, Women were Real Women, and Small Furry Creatures from Alpha Centauri were <em>real</em> Small Furry Creatures from Alpha Centauri... There were postcards.</p>
+
+<p>The tradition was started before I started at 10gen, wherein when we travelled somewhere for MongoDB we would send postcards back for <a href="http://twitter.com/meghanpgill">Meghan Gill</a>.  Meghan, being the evil genius behind growing MongoDB's community, was often indirectly responsible for our travel (which is why I of course sent a postcard from Armenia reminding her of this fact). When 10gen finally moved into our first New York office (having shared space, in the form of a few spare desks, with another company in the beginning), Meghan got her own office and created an entire wall for the postcards.  As postcards came in they went up on the wall, and by the time 10gen moved to yet another office the wall was pretty impressive.</p>
+
+<p>Unfortunately, between the new office not having a wall for postcards and newer employees not picking up the postcard tradition, our efforts fell off. Which makes me somewhat sad, because MongoDB's community has grown all over the globe. With my departure from 10gen imminent, I had an evil thought – to bury poor Meghan in postcards from around the world, written and mailed by members of the community which she has helped create.</p>
+
+<p>And so, I call upon you, MongoDB community members. Do your darndest, from your distanct corners of the globe, to flood Meghan with postcards about how much you love MongoDB. Bonus points if you send it from somewhere out of the way that nobody has sent her a postcard from yet!</p>
+
+<p>If you are game, find your most awesome postcard from the town you live in (or even are travelling to), write a message and put a stamp on it.  Send it away to this address:</p>
+
+<pre><code>Meghan Gill
+c/o 10gen, Inc.
+578 Broadway
+7th Floor 
+New York, NY 10012
+United States of America
+</code></pre>
+
+<p>That's it. My thanks in advance for helping advance my evil, evil plans.</p>
+
+<p>-b</p>
+
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#community">community</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2012/11/14/mongodb-community-call-for-postcards/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page2/">Older Posts</a></span>
+    
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2012/11/06/and-now-for-something-completely-different">
   <h2 class="entry-title">
     <a href="/2012/11/06/and-now-for-something-completely-different/">And Now For Something Completely Different!</a>
@@ -112,58 +164,6 @@
     
     <li>Meta:
       <a href="http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes/#disqus_thread" rel="bookmark">permalink</a>
-      <a href="http://blog.evilmonkeylabs.com">atom</a>
-    </li>
-  </ul>
-  <div class="posts">
-    
-    <span align="left">&laquo; <a href="/page2/">Older Posts</a></span>
-    
-    
-  </div>
-</div>
-
-
-<div class="hentry" id="/2012/05/31/Forcing_Compiler_Nothing_checks">
-  <h2 class="entry-title">
-    <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler 'Nothing' Checks</a>
-  </h2>
-  
-  <abbr class="published" title="2012-05-31T00:00:00+00:00">31 May 2012</abbr>
-  <br class="clear" />
-  <div class="entry-content">
-    
-        <p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is "Some type you'd like to fetch a particular field as". Because of type erasure on the JVM, working with a Mongo Document can be annoying -- the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
-
-<div>
-  <pre><code class='scala'>val doc: DBObject = MongoDBObject(&quot;foo&quot; -&gt; &quot;bar&quot;, &quot;balance&quot; -&gt; 2.5)
-
-val balance = doc.get(&quot;balance&quot;)</code></pre>
-</div>
-
-
-<p>We have already hit another issue here -- in Scala, invoking <code>get</code> on a <code>Map</code> returns <code>Option[T]</code> (Where, in this case, <code>T</code> is of type <code>Any</code>). Which means casting has become more complex: to get a <code>Double</code> we also have to unwrap the <code>Option[Any]</code> first. A lazy man's approach might be something hairy like so:</p>
-
-<div>
-  <pre><code class='scala'>balance.getOrElse(null).asInstanceOf[Double]</code></pre>
-</div>
-
-
-<p>In the annals of history (when men were <em>real</em> men, and small furry creatures from Alpha Centauri were <em>real</em> small furry creatures from Alpha Centauri), the above became an annoyingly common pattern. A solution was needed - and so <code>getAs[T]</code> was born. The idea was not only to allow a shortcut to casting, but take care of the <code>Option[T]</code> wrapping for you as well. Invoking <code>getAs[Double]</code> will, in this case, return us an <code>Option[Double]</code>.</p>
-
-<p>But not everything is perfect in the land of <code>getAs[T]</code> -- if the type requested doesn't match the actual type, runtime failures occur. Worse, if the user fails to pass a type, the Scala compiler substitutes <code>Nothing</code>, which <em>guarantees</em> a runtime failure. Runtime failures are bad -- but fortunately, <a href="http://twitter.com/milessabin">Miles Sabin</a> &amp; <a href="http://twitter.com/jteigen">Jon-Anders Teigen</a> came up with an awesome solution.</p>
-
- 
-        <p> <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
-    
-  </div>
-  <ul class="meta">
-    
-    
-      <li>Tags: <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#effectivescala">effectivescala</a> <a rel="tag" href="/tags/#stupidpettricks">stupidpettricks</a></li>
-    
-    <li>Meta:
-      <a href="http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks/#disqus_thread" rel="bookmark">permalink</a>
       <a href="http://blog.evilmonkeylabs.com">atom</a>
     </li>
   </ul>

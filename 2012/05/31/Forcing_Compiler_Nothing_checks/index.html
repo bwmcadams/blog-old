@@ -35,17 +35,17 @@
   <div class="entry-content">
     <p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is "Some type you'd like to fetch a particular field as". Because of type erasure on the JVM, working with a Mongo Document can be annoying -- the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
-<div>
-  <pre><code class='scala'>val doc: DBObject = MongoDBObject(&quot;foo&quot; -&gt; &quot;bar&quot;, &quot;balance&quot; -&gt; 2.5)
+<div class="highlight"><pre><code class="scala"><span class="k">val</span> <span class="n">doc</span><span class="k">:</span> <span class="kt">DBObject</span> <span class="o">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span> <span class="s">&quot;balance&quot;</span> <span class="o">-&gt;</span> <span class="mf">2.5</span><span class="o">)</span>
 
-val balance = doc.get(&quot;balance&quot;)</code></pre>
+<span class="k">val</span> <span class="n">balance</span> <span class="k">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;balance&quot;</span><span class="o">)</span> 
+</code></pre>
 </div>
 
 
 <p>We have already hit another issue here -- in Scala, invoking <code>get</code> on a <code>Map</code> returns <code>Option[T]</code> (Where, in this case, <code>T</code> is of type <code>Any</code>). Which means casting has become more complex: to get a <code>Double</code> we also have to unwrap the <code>Option[Any]</code> first. A lazy man's approach might be something hairy like so:</p>
 
-<div>
-  <pre><code class='scala'>balance.getOrElse(null).asInstanceOf[Double]</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="n">balance</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span>
+</code></pre>
 </div>
 
 
@@ -58,44 +58,44 @@ val balance = doc.get(&quot;balance&quot;)</code></pre>
 
 
 
-<div>
-  <pre><code class='scala'>doc.getAs[String](&quot;foo&quot;)
-/* res1: Option[String] = Some(bar) */'
-doc.getAs[Double](&quot;balance&quot;)
-/* res2: Option[Double] = Some(2.5) */
-doc.getAs(&quot;balance&quot;)
-/* res3: Option[Nothing] = Some(2.5) */
+<div class="highlight"><pre><code class="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="s">&quot;foo&quot;</span><span class="o">)</span>
+<span class="cm">/* res1: Option[String] = Some(bar) */</span><span class="err">&#39;</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">Double</span><span class="o">](</span><span class="s">&quot;balance&quot;</span><span class="o">)</span>
+<span class="cm">/* res2: Option[Double] = Some(2.5) */</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">(</span><span class="s">&quot;balance&quot;</span><span class="o">)</span>
+<span class="cm">/* res3: Option[Nothing] = Some(2.5) */</span>
 
-/* Notably at least, the Scala compiler is smart enough to infer &quot;A&quot; from the left-hand side *if* 
-   an explicit type is declared */ 
-val bal: Option[Double] = getAs(doc, &quot;balance&quot;)
-/* bal: Option[Double] = Some(2.5) */</code></pre>
+<span class="cm">/* Notably at least, the Scala compiler is smart enough to infer &quot;A&quot; from the left-hand side *if* </span>
+<span class="cm">   an explicit type is declared */</span> 
+<span class="k">val</span> <span class="n">bal</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="n">getAs</span><span class="o">(</span><span class="n">doc</span><span class="o">,</span> <span class="s">&quot;balance&quot;</span><span class="o">)</span>
+<span class="cm">/* bal: Option[Double] = Some(2.5) */</span>
+</code></pre>
 </div>
 
 
 <p>We get back an option of <code>Nothing</code>, which is less than ideal (The REPL appears to be somewhat more forgiving in some of this behavior than the actual runtime is). My reaction to this early on was quite strong –– I wanted to <em>require</em> that the user pass their type argument. Unfortunately, the best I could do within Casbah was attempt to detect the compiler substituted <code>Nothing</code> and warn the user at runtime. Less than ideal, I know.</p>
 
-<div>
-  <pre><code class='scala'>def getAs[A &lt;: Any: Manifest](key: String): Option[A] = {
-  require(manifest[A] != manifest[scala.Nothing],
-    &quot;Type inference failed; getAs[A]() requires an explicit type argument &quot; +
-    &quot;(e.g. dbObject.getAs[&lt;ReturnType&gt;](\&quot;somegetAKey\&quot;) ) to function correctly.&quot;)
+<div class="highlight"><pre><code class="scala"><span class="k">def</span> <span class="n">getAs</span><span class="o">[</span><span class="kt">A</span> <span class="k">&lt;:</span> <span class="kt">Any:</span> <span class="kt">Manifest</span><span class="o">](</span><span class="n">key</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="n">require</span><span class="o">(</span><span class="n">manifest</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">!=</span> <span class="n">manifest</span><span class="o">[</span><span class="kt">scala.Nothing</span><span class="o">],</span>
+    <span class="s">&quot;Type inference failed; getAs[A]() requires an explicit type argument &quot;</span> <span class="o">+</span>
+    <span class="s">&quot;(e.g. dbObject.getAs[&lt;ReturnType&gt;](\&quot;somegetAKey\&quot;) ) to function correctly.&quot;</span><span class="o">)</span>
 
-  underlying.get(key) match {
-    case null =&gt; None
-    case value =&gt; Some(value.asInstanceOf[A])
-  }
-}</code></pre>
+  <span class="n">underlying</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="kc">null</span> <span class="k">=&gt;</span> <span class="nc">None</span>
+    <span class="k">case</span> <span class="n">value</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 
 <p>This gave me somewhat improved behavior –- at least users are warned at runtime before something breaks.</p>
 
-<div>
-  <pre><code class='scala'>doc.getAs(&quot;balance&quot;)
-/* 
-java.lang.IllegalArgumentException: requirement failed: Type inference failed; getAs[A]() requires an explicit type argument (e.g. dbObject.getAs[&lt;ReturnType&gt;](&quot;somegetAKey&quot;) ) to function correctly.
-*/</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">(</span><span class="s">&quot;balance&quot;</span><span class="o">)</span>
+<span class="cm">/* </span>
+<span class="cm">java.lang.IllegalArgumentException: requirement failed: Type inference failed; getAs[A]() requires an explicit type argument (e.g. dbObject.getAs[&lt;ReturnType&gt;](&quot;somegetAKey&quot;) ) to function correctly.</span>
+<span class="cm">*/</span>
+</code></pre>
 </div>
 
 
@@ -105,45 +105,45 @@ java.lang.IllegalArgumentException: requirement failed: Type inference failed; g
 
 <p>With this in mind, we can morph <code>getAs</code> to work with a type class instead of a standard type argument.</p>
 
-<div>
-  <pre><code class='scala'>def getAs[A : NotNothing](key: String): Option[A] = {
-  underlying.get(key) match {
-    case null =&gt; None
-    case value =&gt; Some(value.asInstanceOf[A])
-  }
-}
+<div class="highlight"><pre><code class="scala"><span class="k">def</span> <span class="n">getAs</span><span class="o">[</span><span class="kt">A</span> <span class="kt">:</span> <span class="kt">NotNothing</span><span class="o">](</span><span class="n">key</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="n">underlying</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="kc">null</span> <span class="k">=&gt;</span> <span class="nc">None</span>
+    <span class="k">case</span> <span class="n">value</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
+  <span class="o">}</span>
+<span class="o">}</span>
 
-sealed trait NotNothing[A]{
-  type B
-}</code></pre>
+<span class="k">sealed</span> <span class="k">trait</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]{</span>
+  <span class="k">type</span> <span class="kt">B</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 
 <p>Our previous unbounded type argument is replaced with the new type class boundary of <code>NotNothing</code> and the runtime <code>Nothing</code> check is removed. We also need concrete instances of our type class, which is where the real magic comes into play.</p>
 
-<div>
-  <pre><code class='scala'>object NotNothing {
-  implicit val nothing = new NotNothing[Nothing]{ type B = Any }
-  implicit def notNothing[A] = new NotNothing[A]{ type B = A }
-}</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="k">object</span> <span class="nc">NotNothing</span> <span class="o">{</span>
+  <span class="k">implicit</span> <span class="k">val</span> <span class="n">nothing</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">Nothing</span><span class="o">]{</span> <span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="nc">Any</span> <span class="o">}</span>
+  <span class="k">implicit</span> <span class="k">def</span> <span class="n">notNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]{</span> <span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="n">A</span> <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 
 <p>Now, any application of <code>Nothing</code> will trigger the ambiguity problem -- the Scala compiler won't figure out how to resolve the type argument. This trick works because <code>Nothing</code> is at the <em>bottom</em> of Scala's type hierarchy. Were I to call <code>getAs("balance")</code>, the Scala compiler would attempt to fill in <code>Nothing</code> as the type argument. However, both implicit conversons for <code>nothing</code> <em>and</em> <code>notNothing[A]</code> will match -- causing ambiguity and compilation fails.</p>
 
-<div>
-  <pre><code class='scala'>doc.getAs[String](&quot;foo&quot;)
-/* res0: Option[String] = Some(bar) */
-doc.getAs[Double](&quot;balance&quot;)
-/* res1: Option[Double] = Some(2.5) */
-doc.getAs(&quot;balance&quot;)
-/* error: ambiguous implicit values:
- both value nothing in object NotNothing of type =&gt; java.lang.Object with com.mongodb.casbah.commons.NotNothing[Nothing]{type B = Any}
- and method notNothing in object NotNothing of type [A]=&gt; java.lang.Object with com.mongodb.casbah.commons.NotNothing[A]{type B = A}
- match expected type com.mongodb.casbah.commons.NotNothing[A]
-              doc.getAs(&quot;balance&quot;) 
-                       ^
-*/</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="s">&quot;foo&quot;</span><span class="o">)</span>
+<span class="cm">/* res0: Option[String] = Some(bar) */</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">Double</span><span class="o">](</span><span class="s">&quot;balance&quot;</span><span class="o">)</span>
+<span class="cm">/* res1: Option[Double] = Some(2.5) */</span>
+<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">(</span><span class="s">&quot;balance&quot;</span><span class="o">)</span>
+<span class="cm">/* error: ambiguous implicit values:</span>
+<span class="cm"> both value nothing in object NotNothing of type =&gt; java.lang.Object with com.mongodb.casbah.commons.NotNothing[Nothing]{type B = Any}</span>
+<span class="cm"> and method notNothing in object NotNothing of type [A]=&gt; java.lang.Object with com.mongodb.casbah.commons.NotNothing[A]{type B = A}</span>
+<span class="cm"> match expected type com.mongodb.casbah.commons.NotNothing[A]</span>
+<span class="cm">              doc.getAs(&quot;balance&quot;) </span>
+<span class="cm">                       ^</span>
+<span class="cm">*/</span>
+</code></pre>
 </div>
 
 
@@ -155,25 +155,25 @@ doc.getAs(&quot;balance&quot;)
 
 <p>While reviewing a draft of this post, <a href="http://twitter.com/djspiewak">Daniel Spiewak</a> noted one more issue with my code as it exists.  Namely, that we don't have a sane way of preventing users from <em>miscasting</em>.  That is to say, if I try to fetch "balance" as a <code>String</code>, this shouldn't be OK.</p>
 
-<div>
-  <pre><code class='scala'>doc.getAs[String](&quot;balance&quot;).getOrElse(null)
-java.lang.ClassCastException: java.lang.Double cannot be cast to java.lang.String</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="s">&quot;balance&quot;</span><span class="o">).</span><span class="n">getOrElse</span><span class="o">(</span><span class="kc">null</span><span class="o">)</span>
+<span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="nc">ClassCastException</span><span class="k">:</span> <span class="kt">java.lang.Double</span> <span class="kt">cannot</span> <span class="kt">be</span> <span class="kt">cast</span> <span class="kt">to</span> <span class="kt">java.lang.String</span>
+</code></pre>
 </div>
 
 
 <p>Daniel rightly points out how bad a runtime <code>ClassCastException</code> is, and has proposed another fix which I'm incorporating.</p>
 
-<div>
-  <pre><code class='scala'>def getAs[A : NotNothing : Manifest](key: String): Option[A] = {
-  underlying.get(key) match {
-    case null =&gt; None
-    case value if manifest[A] &gt;:&gt; Manifest.classType(value.getClass) =&gt;
-      Some(value.asInstanceOf[A])
-    case fail =&gt; 
-      log.warn(&quot;Unable to cast '%s' as '%s'; please check your types.&quot;, Manifest.classType(fail.getClass), manifest[A])
-      None
-  }
-}</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="k">def</span> <span class="n">getAs</span><span class="o">[</span><span class="kt">A</span> <span class="kt">:</span> <span class="kt">NotNothing</span> <span class="kt">:</span> <span class="kt">Manifest</span><span class="o">](</span><span class="n">key</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+  <span class="n">underlying</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="kc">null</span> <span class="k">=&gt;</span> <span class="nc">None</span>
+    <span class="k">case</span> <span class="n">value</span> <span class="k">if</span> <span class="n">manifest</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">&gt;:&gt;</span> <span class="nc">Manifest</span><span class="o">.</span><span class="n">classType</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">getClass</span><span class="o">)</span> <span class="k">=&gt;</span>
+      <span class="nc">Some</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
+    <span class="k">case</span> <span class="n">fail</span> <span class="k">=&gt;</span> 
+      <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="o">(</span><span class="s">&quot;Unable to cast &#39;%s&#39; as &#39;%s&#39;; please check your types.&quot;</span><span class="o">,</span> <span class="nc">Manifest</span><span class="o">.</span><span class="n">classType</span><span class="o">(</span><span class="n">fail</span><span class="o">.</span><span class="n">getClass</span><span class="o">),</span> <span class="n">manifest</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
+      <span class="nc">None</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 

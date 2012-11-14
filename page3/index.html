@@ -30,6 +30,52 @@
   
   
 
+<div class="hentry" id="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes">
+  <h2 class="entry-title">
+    <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">User Configurable Type Filtering with Scala Type Classes</a>
+  </h2>
+  
+  <abbr class="published" title="2011-07-13T00:00:00+00:00">13 Jul 2011</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:</p>
+
+<p><img src="/images/oid_lt_casbah.png" alt="@rit when using &quot;_id&quot; $lt new ObjectId(timestamp) it throws ValidDateOrNumericType, but we might want to select records after id timestamp (from @justthor)" /></p>
+
+<p>The user in question is complaining that when using <a href="http://github.com/mongodb/casbah">Casbah's DSL</a>, it doesn't allow a MongoDB <code>ObjectId</code> as a valid type to the <code>$lt</code> operator.  But as <a href="http://twitter.com/justthor">@justthor</a> points out, it is entirely possible to use <code>ObjectId</code> with the <code>$lt</code> operator since it contains timestamp information (See the <a href="http://www.mongodb.org/display/DOCS/Object+IDs">documentation for ObjectId</a> if you want nitty gritty detail).   When I wrote the code for <code>$lt</code> however, I needed to decide what types were valid and weren't valid; I can't exactly guarantee type safety wih a DSL like Casbah's, but I can enforce type <em>sanity</em>.  Whether I forgot that you can use <code>ObjectId</code> in <code>$lt</code> or just decided that most people wouldn't need to is irrelevant --- I had in this case blocked a user from accomplishing something valid that they needed to.</p>
+
+<p>It is a more than reasonable problem, and my initial reaction was "oh crap, I guess I need to patch that".  But what I forgot is that a few releases back, I rearchitected Casbah to obviate this kind of problem.  Casbah now allows for a user definable (or, if you prefer, "adjustable") type filter on any of its DSL operators.  This is accomplished through a very simple application of Scala Type Classes, a term which gets batted around a lot in the Scala community, but few seem able to understand or articulate its meaning to us lesser mortals.  Over the last few months I've come to understand Type Classes much more deeply than I think I ever expected, and applied these lessons to the design of my code.  As I failed to document the power and usage of these features at the time, I am going to be writing some additional detailed articles about <em>my</em> understanding of Type Classes in the next few weeks, and this is the first of such explanations.</p>
+
+<p>So the question at hand is, how exactly does Casbah allow us to do this magical type filtering that I just mentioned, without patching the driver or creating a new release?  First, let's look at how Casbah used to do things before the introduction of the as-yet unexplained Type Class introduction.</p>
+
+ 
+        <p> <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#typeclasses">typeclasses</a> <a rel="tag" href="/tags/#stupidpettricks">stupidpettricks</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page4/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/page2/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2011/02/28/MongoDB-1_8-MR-Java">
   <h2 class="entry-title">
     <a href="/2011/02/28/MongoDB-1_8-MR-Java/">MapReduce with MongoDB 1.8 and Java</a>
@@ -46,11 +92,11 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
 
 <p>As a reminder (or a primer for those who skipped my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>), I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
 
-<div>
-  <pre><code class='javascript'>{ &quot;_id&quot; : ISODate(&quot;1990-01-10T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;WEDNESDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.92, &quot;bc10Year&quot; : 8.03, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.75, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8, &quot;bc6Month&quot; : 7.78 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-11T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;THURSDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.94, &quot;bc10Year&quot; : 8.04, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.8, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8.01, &quot;bc6Month&quot; : 7.8 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-12T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;FRIDAY&quot;, &quot;bc3Year&quot; : 7.98, &quot;bc5Year&quot; : 7.99, &quot;bc10Year&quot; : 8.1, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.93, &quot;bc3Month&quot; : 7.74, &quot;bc30Year&quot; : 8.17, &quot;bc1Year&quot; : 7.76, &quot;bc7Year&quot; : 8.07, &quot;bc6Month&quot; : 7.8100000000000005 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-16T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;TUESDAY&quot;, &quot;bc3Year&quot; : 8.13, &quot;bc5Year&quot; : 8.11, &quot;bc10Year&quot; : 8.2, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 8.1, &quot;bc3Month&quot; : 7.89, &quot;bc30Year&quot; : 8.25, &quot;bc1Year&quot; : 7.92, &quot;bc7Year&quot; : 8.18, &quot;bc6Month&quot; : 7.99 }</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
+</code></pre>
 </div>
 
 
@@ -104,11 +150,11 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
 
 <p>Now that I've thoroughly confused you, lets dig into examples of each of these behaviors.  I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
 
-<div>
-  <pre><code class='javascript'>{ &quot;_id&quot; : ISODate(&quot;1990-01-10T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;WEDNESDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.92, &quot;bc10Year&quot; : 8.03, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.75, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8, &quot;bc6Month&quot; : 7.78 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-11T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;THURSDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.94, &quot;bc10Year&quot; : 8.04, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.8, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8.01, &quot;bc6Month&quot; : 7.8 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-12T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;FRIDAY&quot;, &quot;bc3Year&quot; : 7.98, &quot;bc5Year&quot; : 7.99, &quot;bc10Year&quot; : 8.1, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.93, &quot;bc3Month&quot; : 7.74, &quot;bc30Year&quot; : 8.17, &quot;bc1Year&quot; : 7.76, &quot;bc7Year&quot; : 8.07, &quot;bc6Month&quot; : 7.8100000000000005 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-16T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;TUESDAY&quot;, &quot;bc3Year&quot; : 8.13, &quot;bc5Year&quot; : 8.11, &quot;bc10Year&quot; : 8.2, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 8.1, &quot;bc3Month&quot; : 7.89, &quot;bc30Year&quot; : 8.25, &quot;bc1Year&quot; : 7.92, &quot;bc7Year&quot; : 8.18, &quot;bc6Month&quot; : 7.99 }</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
+</code></pre>
 </div>
 
 
@@ -125,69 +171,6 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
     
     <li>Meta:
       <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/#disqus_thread" rel="bookmark">permalink</a>
-      <a href="http://blog.evilmonkeylabs.com">atom</a>
-    </li>
-  </ul>
-  <div class="posts">
-    
-    <span align="left">&laquo; <a href="/page4/">Older Posts</a></span>
-    
-    
-      
-        <span align="right">&raquo; <a href="/page2/">Newer Posts</a></span>
-      
-    
-  </div>
-</div>
-
-
-<div class="hentry" id="/2011/01/10/intro-scala-mongo">
-  <h2 class="entry-title">
-    <a href="/2011/01/10/intro-scala-mongo/">Exploring Scala with MongoDB</a>
-  </h2>
-  
-  <abbr class="published" title="2011-01-10T00:00:00+00:00">10 Jan 2011</abbr>
-  <br class="clear" />
-  <div class="entry-content">
-    
-        <p>2010 proved to be a great year for growth and adoption of many fledgling technologies---not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala's adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
-
-<p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
-
-<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more 'friendly' syntax for creating MongoDB Objects, using Scala's Map syntax:</p>
-
-<div>
-  <pre><code class='scala'>import com.mongodb.casbah.Imports._
-
-/** Create an object directly */
-val newObj = MongoDBObject(&quot;foo&quot; -&gt; &quot;bar&quot;,
-                           &quot;x&quot; -&gt; &quot;y&quot;,
-                           &quot;pie&quot; -&gt; 3.14,
-                           &quot;spam&quot; -&gt; &quot;eggs&quot;)
-
-/** Or, use a builder interface */
-val builder = MongoDBObject.newBuilder
-builder += &quot;foo&quot; -&gt; &quot;bar&quot;
-builder += &quot;x&quot; -&gt; &quot;y&quot;
-builder += (&quot;pie&quot; -&gt; 3.14)
-builder += (&quot;spam&quot; -&gt; &quot;eggs&quot;, &quot;mmm&quot; -&gt; &quot;bacon&quot;)
-val newObj = builder.result</code></pre>
-</div>
-
-
-<p>The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.</p>
-
- 
-        <p> <a href="/2011/01/10/intro-scala-mongo/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
-    
-  </div>
-  <ul class="meta">
-    
-    
-      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#casbah">casbah</a></li>
-    
-    <li>Meta:
-      <a href="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/#disqus_thread" rel="bookmark">permalink</a>
       <a href="http://blog.evilmonkeylabs.com">atom</a>
     </li>
   </ul>

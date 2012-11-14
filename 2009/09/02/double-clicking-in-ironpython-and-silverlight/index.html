@@ -37,33 +37,34 @@
 
 <p>I've been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
 
-<div>
-  <pre><code class='python'>CLICK_INTERVAL = 500
+<div class="highlight"><pre><code class="python"> 
+<span class="n">CLICK_INTERVAL</span> <span class="o">=</span> <span class="mi">500</span>
  
-class ClickHandler(object):
-    &quot;&quot;&quot;Attach a Double Click handler to any given UIElement,
-    as by default Silverlight lacks support for double clicking.
-    &quot;&quot;&quot;
-    _lastClickTime = 0
-    _callback = None
+<span class="k">class</span> <span class="nc">ClickHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Attach a Double Click handler to any given UIElement,</span>
+<span class="sd">    as by default Silverlight lacks support for double clicking.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_lastClickTime</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">_callback</span> <span class="o">=</span> <span class="bp">None</span>
  
-    @staticmethod
-    def attachDoubleClickHandler(target, callback):
-        return ClickHandler(target, callback)
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attachDoubleClickHandler</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ClickHandler</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
  
-    def __init__(self, target, callback):
-        target.MouseLeftButtonUp += self.target_MouseLeftButtonUp
-        target.MouseLeftButtonDown += self.target_MouseLeftButtonDown
-        self._callback = callback
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">MouseLeftButtonUp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_MouseLeftButtonUp</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">MouseLeftButtonDown</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_MouseLeftButtonDown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span> <span class="o">=</span> <span class="n">callback</span>
  
-    def target_MouseLeftButtonUp(self, sender, args):
-        self._lastClickTime = DateTime.Now.Ticks / 10000
+    <span class="k">def</span> <span class="nf">target_MouseLeftButtonUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">=</span> <span class="n">DateTime</span><span class="o">.</span><span class="n">Now</span><span class="o">.</span><span class="n">Ticks</span> <span class="o">/</span> <span class="mi">10000</span>
  
-    def target_MouseLeftButtonDown(self, sender, args):
-        now = DateTime.Now.Ticks / 10000
-        if now - self._lastClickTime &lt; CLICK_INTERVAL and \
-          now - self._lastClickTime &gt; 25:
-            self._callback(sender, args)</code></pre>
+    <span class="k">def</span> <span class="nf">target_MouseLeftButtonDown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">DateTime</span><span class="o">.</span><span class="n">Now</span><span class="o">.</span><span class="n">Ticks</span> <span class="o">/</span> <span class="mi">10000</span>
+        <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&lt;</span> <span class="n">CLICK_INTERVAL</span> <span class="ow">and</span> \
+          <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</code></pre>
 </div>
 
 
@@ -74,34 +75,34 @@ class ClickHandler(object):
 
 
 
-<div>
-  <pre><code class='python'>from System import Uri, UriKind
-from System.Windows import Application, UIElement
-from System.Windows.Browser import HtmlPage
+<div class="highlight"><pre><code class="python"><span class="kn">from</span> <span class="nn">System</span> <span class="kn">import</span> <span class="n">Uri</span><span class="p">,</span> <span class="n">UriKind</span>
+<span class="kn">from</span> <span class="nn">System.Windows</span> <span class="kn">import</span> <span class="n">Application</span><span class="p">,</span> <span class="n">UIElement</span>
+<span class="kn">from</span> <span class="nn">System.Windows.Browser</span> <span class="kn">import</span> <span class="n">HtmlPage</span>
  
-from util import ClickHandler
+<span class="kn">from</span> <span class="nn">util</span> <span class="kn">import</span> <span class="n">ClickHandler</span>
  
  
-class Foo(UIElement):
-  &quot;&quot;&quot;Sample UIElement class demonstrating usage of 
-  ClickHandler and it's events.
-  &quot;&quot;&quot;
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">UIElement</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Sample UIElement class demonstrating usage of </span>
+<span class="sd">  ClickHandler and it&#39;s events.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
  
-  def __init__(self):
-    Application.LoadComponent(self, Uri('xaml/widgets/foo.xaml',
-            UriKind.Relative))
-    ClickHandler.attachDoubleClickHandler(self, self.evt_dblClicked)
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">Application</span><span class="o">.</span><span class="n">LoadComponent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uri</span><span class="p">(</span><span class="s">&#39;xaml/widgets/foo.xaml&#39;</span><span class="p">,</span>
+            <span class="n">UriKind</span><span class="o">.</span><span class="n">Relative</span><span class="p">))</span>
+    <span class="n">ClickHandler</span><span class="o">.</span><span class="n">attachDoubleClickHandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evt_dblClicked</span><span class="p">)</span>
  
-  def evt_dblClicked(self, sender, args):
-    &quot;&quot;&quot;Event for double click; this gets passed
-    the original &quot;MouseLeftButtonDown&quot; arguments 
-    which ClickHandler got, so you'll want to match
-    the &quot;MouseButtonEventHandler&quot; delegate arguments.
-    Object sender - the object the mouse click handler is attached to,
-            in this case, should be the same as 'self'
-    System.Windows.Input.MouseButtonEventArgs args - the mouse event arguments
-    &quot;&quot;&quot;
-    HtmlPage.Window.Alert('%s got double clicked!' % sender)</code></pre>
+  <span class="k">def</span> <span class="nf">evt_dblClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event for double click; this gets passed</span>
+<span class="sd">    the original &quot;MouseLeftButtonDown&quot; arguments </span>
+<span class="sd">    which ClickHandler got, so you&#39;ll want to match</span>
+<span class="sd">    the &quot;MouseButtonEventHandler&quot; delegate arguments.</span>
+<span class="sd">    Object sender - the object the mouse click handler is attached to,</span>
+<span class="sd">            in this case, should be the same as &#39;self&#39;</span>
+<span class="sd">    System.Windows.Input.MouseButtonEventArgs args - the mouse event arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">HtmlPage</span><span class="o">.</span><span class="n">Window</span><span class="o">.</span><span class="n">Alert</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> got double clicked!&#39;</span> <span class="o">%</span> <span class="n">sender</span><span class="p">)</span>
+</code></pre>
 </div>
 
 

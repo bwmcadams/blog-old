@@ -30,6 +30,68 @@
   
   
 
+<div class="hentry" id="/2011/01/10/intro-scala-mongo">
+  <h2 class="entry-title">
+    <a href="/2011/01/10/intro-scala-mongo/">Exploring Scala with MongoDB</a>
+  </h2>
+  
+  <abbr class="published" title="2011-01-10T00:00:00+00:00">10 Jan 2011</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>2010 proved to be a great year for growth and adoption of many fledgling technologies---not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala's adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
+
+<p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
+
+<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more 'friendly' syntax for creating MongoDB Objects, using Scala's Map syntax:</p>
+
+<div class="highlight"><pre><code class="scala"> 
+<span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
+
+<span class="cm">/** Create an object directly */</span>
+<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span>
+                           <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">,</span>
+                           <span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">,</span>
+                           <span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">)</span>
+
+<span class="cm">/** Or, use a builder interface */</span>
+<span class="k">val</span> <span class="n">builder</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">.</span><span class="n">newBuilder</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">)</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span>
+</code></pre>
+</div>
+
+
+<p>The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.</p>
+
+ 
+        <p> <a href="/2011/01/10/intro-scala-mongo/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#casbah">casbah</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    
+      
+        <span align="right">&raquo; <a href="/page3/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2009/10/20/talking-to-activedirectory-from-iron-python">
   <h2 class="entry-title">
     <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory from IronPython</a>
@@ -83,33 +145,34 @@
 
 <p>I've been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
 
-<div>
-  <pre><code class='python'>CLICK_INTERVAL = 500
+<div class="highlight"><pre><code class="python"> 
+<span class="n">CLICK_INTERVAL</span> <span class="o">=</span> <span class="mi">500</span>
  
-class ClickHandler(object):
-    &quot;&quot;&quot;Attach a Double Click handler to any given UIElement,
-    as by default Silverlight lacks support for double clicking.
-    &quot;&quot;&quot;
-    _lastClickTime = 0
-    _callback = None
+<span class="k">class</span> <span class="nc">ClickHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Attach a Double Click handler to any given UIElement,</span>
+<span class="sd">    as by default Silverlight lacks support for double clicking.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_lastClickTime</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">_callback</span> <span class="o">=</span> <span class="bp">None</span>
  
-    @staticmethod
-    def attachDoubleClickHandler(target, callback):
-        return ClickHandler(target, callback)
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">attachDoubleClickHandler</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ClickHandler</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
  
-    def __init__(self, target, callback):
-        target.MouseLeftButtonUp += self.target_MouseLeftButtonUp
-        target.MouseLeftButtonDown += self.target_MouseLeftButtonDown
-        self._callback = callback
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">MouseLeftButtonUp</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_MouseLeftButtonUp</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">MouseLeftButtonDown</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_MouseLeftButtonDown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span> <span class="o">=</span> <span class="n">callback</span>
  
-    def target_MouseLeftButtonUp(self, sender, args):
-        self._lastClickTime = DateTime.Now.Ticks / 10000
+    <span class="k">def</span> <span class="nf">target_MouseLeftButtonUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">=</span> <span class="n">DateTime</span><span class="o">.</span><span class="n">Now</span><span class="o">.</span><span class="n">Ticks</span> <span class="o">/</span> <span class="mi">10000</span>
  
-    def target_MouseLeftButtonDown(self, sender, args):
-        now = DateTime.Now.Ticks / 10000
-        if now - self._lastClickTime &lt; CLICK_INTERVAL and \
-          now - self._lastClickTime &gt; 25:
-            self._callback(sender, args)</code></pre>
+    <span class="k">def</span> <span class="nf">target_MouseLeftButtonDown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">DateTime</span><span class="o">.</span><span class="n">Now</span><span class="o">.</span><span class="n">Ticks</span> <span class="o">/</span> <span class="mi">10000</span>
+        <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&lt;</span> <span class="n">CLICK_INTERVAL</span> <span class="ow">and</span> \
+          <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</code></pre>
 </div>
 
 

@@ -48,26 +48,26 @@
 
 
 
-<div>
-  <pre><code class='scala'>/**
- * Trait to provide the $lt (Less Than) method on appropriate callers.
- *
- * Targets (takes a right-hand value of) String, AnyVal (see Scala docs but basically Int, Long, Char, Byte, etc)
- * DBObject and Map[String, Any].
- *
- *
- * @author Brendan W. McAdams &lt;brendan@10gen.com&gt;
- * @see http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D
- */
-trait LessThanOp extends QueryOperator {
-  private val oper = &quot;$lt&quot; 
+<div class="highlight"><pre><code class="scala"><span class="cm">/**</span>
+<span class="cm"> * Trait to provide the $lt (Less Than) method on appropriate callers.</span>
+<span class="cm"> *</span>
+<span class="cm"> * Targets (takes a right-hand value of) String, AnyVal (see Scala docs but basically Int, Long, Char, Byte, etc)</span>
+<span class="cm"> * DBObject and Map[String, Any].</span>
+<span class="cm"> *</span>
+<span class="cm"> *</span>
+<span class="cm"> * @author Brendan W. McAdams &lt;brendan@10gen.com&gt;</span>
+<span class="cm"> * @see http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D</span>
+<span class="cm"> */</span>
+<span class="k">trait</span> <span class="nc">LessThanOp</span> <span class="k">extends</span> <span class="nc">QueryOperator</span> <span class="o">{</span>
+  <span class="k">private</span> <span class="k">val</span> <span class="n">oper</span> <span class="k">=</span> <span class="s">&quot;$lt&quot;</span> 
 
-  def $lt(target: String) = op(oper, target)
-  def $lt(target: java.util.Date) = op(oper, target)
-  def $lt(target: AnyVal) = op(oper, target)
-  def $lt(target: DBObject) = op(oper, target)
-  def $lt(target: Map[String, Any]) = op(oper, target.asDBObject)
-}</code></pre>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">java.util.Date</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">AnyVal</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">DBObject</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">Any</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">.</span><span class="n">asDBObject</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 
@@ -84,29 +84,29 @@ trait LessThanOp extends QueryOperator {
 
 <p>After the conversion to Type Classes, here's what the <code>$lt</code> operator's code looks like today::</p>
 
-<div>
-  <pre><code class='scala'>/**
- * Trait to provide the $lt (Less Than) method on appropriate callers.
- *
- * Targets (takes a right-hand value of) String, Numeric, JDK And Joda Dates, 
- * Array, DBObject (and DBList), Iterable[_] and Tuple1-&gt;22.
- *
- *
- * @author Brendan W. McAdams &lt;brendan@10gen.com&gt;
- * @see http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D
- */
-trait LessThanOp extends QueryOperator {
-  private val oper = &quot;$lt&quot;
+<div class="highlight"><pre><code class="scala"><span class="cm">/**</span>
+<span class="cm"> * Trait to provide the $lt (Less Than) method on appropriate callers.</span>
+<span class="cm"> *</span>
+<span class="cm"> * Targets (takes a right-hand value of) String, Numeric, JDK And Joda Dates, </span>
+<span class="cm"> * Array, DBObject (and DBList), Iterable[_] and Tuple1-&gt;22.</span>
+<span class="cm"> *</span>
+<span class="cm"> *</span>
+<span class="cm"> * @author Brendan W. McAdams &lt;brendan@10gen.com&gt;</span>
+<span class="cm"> * @see http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries-%3C%2C%3C%3D%2C%3E%2C%3E%3D</span>
+<span class="cm"> */</span>
+<span class="k">trait</span> <span class="nc">LessThanOp</span> <span class="k">extends</span> <span class="nc">QueryOperator</span> <span class="o">{</span>
+  <span class="k">private</span> <span class="k">val</span> <span class="n">oper</span> <span class="k">=</span> <span class="s">&quot;$lt&quot;</span>
 
-  def $lt(target: String) = op(oper, target)
-  def $lt(target: DBObject) = op(oper, target)
-  def $lt(target: Array[_]) = op(oper, target.toList)
-  def $lt(target: Tuple1[_]) = op(oper, target.productIterator.toList)
-  def $lt(target: Tuple2[_, _]) = op(oper, target.productIterator.toList)
-  /** SNIP a bunch of individual tuple handling */
-  def $lt(target: Iterable[_]) = op(oper, target.toList)
-  def $lt[T: ValidDateOrNumericType](target: T) = op(oper, target)
-}</code></pre>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">DBObject</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="k">_</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">.</span><span class="n">toList</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">Tuple1</span><span class="o">[</span><span class="k">_</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">.</span><span class="n">productIterator</span><span class="o">.</span><span class="n">toList</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">Tuple2</span><span class="o">[</span><span class="k">_</span>, <span class="k">_</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">.</span><span class="n">productIterator</span><span class="o">.</span><span class="n">toList</span><span class="o">)</span>
+  <span class="cm">/** SNIP a bunch of individual tuple handling */</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">Iterable</span><span class="o">[</span><span class="k">_</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">.</span><span class="n">toList</span><span class="o">)</span>
+  <span class="k">def</span> <span class="nc">$lt</span><span class="o">[</span><span class="kt">T:</span> <span class="kt">ValidDateOrNumericType</span><span class="o">](</span><span class="n">target</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 
@@ -114,8 +114,8 @@ trait LessThanOp extends QueryOperator {
 
 <p>The clever reader may have noticed something new lurking at the bottom of this code::</p>
 
-<div>
-  <pre><code class='scala'>def $lt[T: ValidDateOrNumericType](target: T) = op(oper, target)</code></pre>
+<div class="highlight"><pre><code class="scala">  <span class="k">def</span> <span class="nc">$lt</span><span class="o">[</span><span class="kt">T:</span> <span class="kt">ValidDateOrNumericType</span><span class="o">](</span><span class="n">target</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+</code></pre>
 </div>
 
 
@@ -129,8 +129,8 @@ trait LessThanOp extends QueryOperator {
 
 <p>Context Bounds are a fairly new syntax, recently introduced to the type parameter system in Scala 2.8.  What they give us is a shortcut for a type-dependent implicit argument (they also work with <code>Manifests</code>, which I'll explain in a future post).  When the Scala Compiler parses our code it will actually produce the following statement, which is how we would have said this in versions prior to 2.8::</p>
 
-<div>
-  <pre><code class='scala'>def $lt[T](target: T)(implicit evidence$1: ValidDateOrNumericType[T]) = op(oper, target)</code></pre>
+<div class="highlight"><pre><code class="scala">    <span class="k">def</span> <span class="nc">$lt</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">target</span><span class="k">:</span> <span class="kt">T</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">evidence$1</span><span class="k">:</span> <span class="kt">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">T</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
+</code></pre>
 </div>
 
 
@@ -138,24 +138,24 @@ trait LessThanOp extends QueryOperator {
 
 <p>In this case, <code>ValidDateOrNumericType</code> itself is a completely empty trait (but, as we'll see in my next post can actually become quite powerful with the introduction of some methods!) which is used as a simple filter. The default imports for Casbah's DSL automatically gives you several predefined filter types::</p>
 
-<div>
-  <pre><code class='scala'>implicit object JDKDateDoNOk extends JDKDateOk with ValidDateOrNumericType[java.util.Date]
-implicit object JodaDateTimeDoNOk extends JDKDateOk with ValidDateOrNumericType[org.joda.time.DateTime]
-implicit object BigIntDoNOk extends BigIntOk with ValidDateOrNumericType[BigInt]
-implicit object IntDoNOk extends IntOk with ValidDateOrNumericType[Int]
-implicit object ShortDoNOk extends ShortOk with ValidDateOrNumericType[Short]
-implicit object ByteDoNOk extends ByteOk with ValidDateOrNumericType[Byte]
-implicit object LongDoNOk extends LongOk with ValidDateOrNumericType[Long]
-implicit object FloatDoNOk extends FloatOk with ValidDateOrNumericType[Float]
-implicit object BigDecimalDoNOk extends BigDecimalOk with ValidDateOrNumericType[BigDecimal]
-implicit object DoubleDoNOk extends DoubleOk with ValidDateOrNumericType[Double]</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="k">implicit</span> <span class="k">object</span> <span class="nc">JDKDateDoNOk</span> <span class="k">extends</span> <span class="nc">JDKDateOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">java.util.Date</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">JodaDateTimeDoNOk</span> <span class="k">extends</span> <span class="nc">JDKDateOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">org.joda.time.DateTime</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">BigIntDoNOk</span> <span class="k">extends</span> <span class="nc">BigIntOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">BigInt</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">IntDoNOk</span> <span class="k">extends</span> <span class="nc">IntOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">ShortDoNOk</span> <span class="k">extends</span> <span class="nc">ShortOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Short</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">ByteDoNOk</span> <span class="k">extends</span> <span class="nc">ByteOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">LongDoNOk</span> <span class="k">extends</span> <span class="nc">LongOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Long</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">FloatDoNOk</span> <span class="k">extends</span> <span class="nc">FloatOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Float</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">BigDecimalDoNOk</span> <span class="k">extends</span> <span class="nc">BigDecimalOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">BigDecimal</span><span class="o">]</span>
+<span class="k">implicit</span> <span class="k">object</span> <span class="nc">DoubleDoNOk</span> <span class="k">extends</span> <span class="nc">DoubleOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span>
+</code></pre>
 </div>
 
 
 <p>All one has to do to introduce a new type as valid to <code>$lt</code> is define an implicit instance of <code>ValidDateOrNumeric[&lt;YourType&gt;]</code>.  Circling back to our original problem, the solution to "How do I allow <code>ObjectId</code> in <code>$lt</code>" is quite easy:</p>
 
-<div>
-  <pre><code class='scala'>implicit object ObjectIdOK extends ValidDateOrNumericType[org.bson.types.ObjectId]</code></pre>
+<div class="highlight"><pre><code class="scala"><span class="k">implicit</span> <span class="k">object</span> <span class="nc">ObjectIdOK</span> <span class="k">extends</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">org.bson.</span><span class="k">type</span><span class="kt">s.ObjectId</span><span class="o">]</span>
+</code></pre>
 </div>
 
 

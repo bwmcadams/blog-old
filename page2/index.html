@@ -30,6 +30,62 @@
   
   
 
+<div class="hentry" id="/2012/05/31/Forcing_Compiler_Nothing_checks">
+  <h2 class="entry-title">
+    <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler 'Nothing' Checks</a>
+  </h2>
+  
+  <abbr class="published" title="2012-05-31T00:00:00+00:00">31 May 2012</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is "Some type you'd like to fetch a particular field as". Because of type erasure on the JVM, working with a Mongo Document can be annoying -- the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
+
+<div class="highlight"><pre><code class="scala"><span class="k">val</span> <span class="n">doc</span><span class="k">:</span> <span class="kt">DBObject</span> <span class="o">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span> <span class="s">&quot;balance&quot;</span> <span class="o">-&gt;</span> <span class="mf">2.5</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">balance</span> <span class="k">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;balance&quot;</span><span class="o">)</span> 
+</code></pre>
+</div>
+
+
+<p>We have already hit another issue here -- in Scala, invoking <code>get</code> on a <code>Map</code> returns <code>Option[T]</code> (Where, in this case, <code>T</code> is of type <code>Any</code>). Which means casting has become more complex: to get a <code>Double</code> we also have to unwrap the <code>Option[Any]</code> first. A lazy man's approach might be something hairy like so:</p>
+
+<div class="highlight"><pre><code class="scala"><span class="n">balance</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span>
+</code></pre>
+</div>
+
+
+<p>In the annals of history (when men were <em>real</em> men, and small furry creatures from Alpha Centauri were <em>real</em> small furry creatures from Alpha Centauri), the above became an annoyingly common pattern. A solution was needed - and so <code>getAs[T]</code> was born. The idea was not only to allow a shortcut to casting, but take care of the <code>Option[T]</code> wrapping for you as well. Invoking <code>getAs[Double]</code> will, in this case, return us an <code>Option[Double]</code>.</p>
+
+<p>But not everything is perfect in the land of <code>getAs[T]</code> -- if the type requested doesn't match the actual type, runtime failures occur. Worse, if the user fails to pass a type, the Scala compiler substitutes <code>Nothing</code>, which <em>guarantees</em> a runtime failure. Runtime failures are bad -- but fortunately, <a href="http://twitter.com/milessabin">Miles Sabin</a> &amp; <a href="http://twitter.com/jteigen">Jon-Anders Teigen</a> came up with an awesome solution.</p>
+
+ 
+        <p> <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#effectivescala">effectivescala</a> <a rel="tag" href="/tags/#stupidpettricks">stupidpettricks</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page3/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2012/05/29/Casbah2.3_Released">
   <h2 class="entry-title">
     <a href="/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
@@ -91,16 +147,16 @@
 
 <p>In typical C-like languages (such as C, C++, and Java) we are restricted in our syntax should we wish to capture a value when running many branching blocks such as if-else statements, switch statements and even for/foreach constructs. When we find ourselves wanting to set the value of a variable within each possible condition or iteration, we need to declare a mutable variable before the block.  We then mutate this variable within each condition or iteration.  Take this example from Java:</p>
 
-<div>
-  <pre><code class='java'>boolean valid = false;
+<div class="highlight"><pre><code class="java"><span class="kt">boolean</span> <span class="n">valid</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
 
-String status = null;
-if (valid) {
-    status = &quot;VALIDATED&quot;;
-} 
-else {
-    status = &quot;INVALID&quot;;
-}</code></pre>
+<span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">valid</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;VALIDATED&quot;</span><span class="o">;</span>
+<span class="o">}</span> 
+<span class="k">else</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;INVALID&quot;</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre>
 </div>
 
 
@@ -117,52 +173,6 @@ else {
     
     <li>Meta:
       <a href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/#disqus_thread" rel="bookmark">permalink</a>
-      <a href="http://blog.evilmonkeylabs.com">atom</a>
-    </li>
-  </ul>
-  <div class="posts">
-    
-    <span align="left">&laquo; <a href="/page3/">Older Posts</a></span>
-    
-    
-      
-        <span align="right">&raquo; <a href="/">Newer Posts</a></span>
-      
-    
-  </div>
-</div>
-
-
-<div class="hentry" id="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes">
-  <h2 class="entry-title">
-    <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">User Configurable Type Filtering with Scala Type Classes</a>
-  </h2>
-  
-  <abbr class="published" title="2011-07-13T00:00:00+00:00">13 Jul 2011</abbr>
-  <br class="clear" />
-  <div class="entry-content">
-    
-        <p>When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:</p>
-
-<p><img src="/images/oid_lt_casbah.png" alt="@rit when using &quot;_id&quot; $lt new ObjectId(timestamp) it throws ValidDateOrNumericType, but we might want to select records after id timestamp (from @justthor)" /></p>
-
-<p>The user in question is complaining that when using <a href="http://github.com/mongodb/casbah">Casbah's DSL</a>, it doesn't allow a MongoDB <code>ObjectId</code> as a valid type to the <code>$lt</code> operator.  But as <a href="http://twitter.com/justthor">@justthor</a> points out, it is entirely possible to use <code>ObjectId</code> with the <code>$lt</code> operator since it contains timestamp information (See the <a href="http://www.mongodb.org/display/DOCS/Object+IDs">documentation for ObjectId</a> if you want nitty gritty detail).   When I wrote the code for <code>$lt</code> however, I needed to decide what types were valid and weren't valid; I can't exactly guarantee type safety wih a DSL like Casbah's, but I can enforce type <em>sanity</em>.  Whether I forgot that you can use <code>ObjectId</code> in <code>$lt</code> or just decided that most people wouldn't need to is irrelevant --- I had in this case blocked a user from accomplishing something valid that they needed to.</p>
-
-<p>It is a more than reasonable problem, and my initial reaction was "oh crap, I guess I need to patch that".  But what I forgot is that a few releases back, I rearchitected Casbah to obviate this kind of problem.  Casbah now allows for a user definable (or, if you prefer, "adjustable") type filter on any of its DSL operators.  This is accomplished through a very simple application of Scala Type Classes, a term which gets batted around a lot in the Scala community, but few seem able to understand or articulate its meaning to us lesser mortals.  Over the last few months I've come to understand Type Classes much more deeply than I think I ever expected, and applied these lessons to the design of my code.  As I failed to document the power and usage of these features at the time, I am going to be writing some additional detailed articles about <em>my</em> understanding of Type Classes in the next few weeks, and this is the first of such explanations.</p>
-
-<p>So the question at hand is, how exactly does Casbah allow us to do this magical type filtering that I just mentioned, without patching the driver or creating a new release?  First, let's look at how Casbah used to do things before the introduction of the as-yet unexplained Type Class introduction.</p>
-
- 
-        <p> <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
-    
-  </div>
-  <ul class="meta">
-    
-    
-      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#typeclasses">typeclasses</a> <a rel="tag" href="/tags/#stupidpettricks">stupidpettricks</a></li>
-    
-    <li>Meta:
-      <a href="http://blog.evilmonkeylabs.com/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/#disqus_thread" rel="bookmark">permalink</a>
       <a href="http://blog.evilmonkeylabs.com">atom</a>
     </li>
   </ul>

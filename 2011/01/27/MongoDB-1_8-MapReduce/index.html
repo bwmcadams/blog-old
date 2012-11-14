@@ -45,11 +45,11 @@
 
 <p>Now that I've thoroughly confused you, lets dig into examples of each of these behaviors.  I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
 
-<div>
-  <pre><code class='javascript'>{ &quot;_id&quot; : ISODate(&quot;1990-01-10T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;WEDNESDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.92, &quot;bc10Year&quot; : 8.03, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.75, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8, &quot;bc6Month&quot; : 7.78 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-11T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;THURSDAY&quot;, &quot;bc3Year&quot; : 7.95, &quot;bc5Year&quot; : 7.94, &quot;bc10Year&quot; : 8.04, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.91, &quot;bc3Month&quot; : 7.8, &quot;bc30Year&quot; : 8.11, &quot;bc1Year&quot; : 7.77, &quot;bc7Year&quot; : 8.01, &quot;bc6Month&quot; : 7.8 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-12T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;FRIDAY&quot;, &quot;bc3Year&quot; : 7.98, &quot;bc5Year&quot; : 7.99, &quot;bc10Year&quot; : 8.1, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 7.93, &quot;bc3Month&quot; : 7.74, &quot;bc30Year&quot; : 8.17, &quot;bc1Year&quot; : 7.76, &quot;bc7Year&quot; : 8.07, &quot;bc6Month&quot; : 7.8100000000000005 }
-{ &quot;_id&quot; : ISODate(&quot;1990-01-16T00:00:00Z&quot;), &quot;dayOfWeek&quot; : &quot;TUESDAY&quot;, &quot;bc3Year&quot; : 8.13, &quot;bc5Year&quot; : 8.11, &quot;bc10Year&quot; : 8.2, &quot;bc20Year&quot; : null, &quot;bc1Month&quot; : null, &quot;bc2Year&quot; : 8.1, &quot;bc3Month&quot; : 7.89, &quot;bc30Year&quot; : 8.25, &quot;bc1Year&quot; : 7.92, &quot;bc7Year&quot; : 8.18, &quot;bc6Month&quot; : 7.99 }</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
+</code></pre>
 </div>
 
 
@@ -60,252 +60,252 @@
 
 <p>The map function I'm using extracts the year from the date, and the 10 year benchmark value:</p>
 
-<div>
-  <pre><code class='javascript'>function m() { 
-    key = typeof( this._id ) == &quot;number&quot; ? this._id : this._id.getYear() + 1900; 
-    emit( key, { count: 1, sum: this.bc10Year } ) ;
-}</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="kd">function</span> <span class="nx">m</span><span class="p">()</span> <span class="p">{</span> 
+    <span class="nx">key</span> <span class="o">=</span> <span class="k">typeof</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span> <span class="o">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">.</span><span class="nx">getYear</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1900</span><span class="p">;</span> 
+    <span class="nx">emit</span><span class="p">(</span> <span class="nx">key</span><span class="p">,</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">sum</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">bc10Year</span> <span class="p">}</span> <span class="p">)</span> <span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
 </div>
 
 
 <p>While the reduce function aggregates the data by year, creating a set that can be averaged.  Remember that MongoDB reduce tasks have to be able to be called repeatedly, so the output is crafted to match the input: something that becomes even more important when we say, ask MongoDB to re-reduce our output with the old data.</p>
 
-<div>
-  <pre><code class='javascript'>function r( year, values ) { 
-  var n = { count: 0, sum: 0 } 
-  for ( var i = 0; i &lt; values.length; i++ ){ 
-      n.sum += values[i].sum; 
-      n.count += values[i].count; 
-  } 
+<div class="highlight"><pre><code class="javascript"><span class="kd">function</span> <span class="nx">r</span><span class="p">(</span> <span class="nx">year</span><span class="p">,</span> <span class="nx">values</span> <span class="p">)</span> <span class="p">{</span> 
+  <span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">sum</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span> 
+  <span class="k">for</span> <span class="p">(</span> <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">values</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">){</span> 
+      <span class="nx">n</span><span class="p">.</span><span class="nx">sum</span> <span class="o">+=</span> <span class="nx">values</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">sum</span><span class="p">;</span> 
+      <span class="nx">n</span><span class="p">.</span><span class="nx">count</span> <span class="o">+=</span> <span class="nx">values</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">count</span><span class="p">;</span> 
+  <span class="p">}</span> 
    
-  return n; 
-}</code></pre>
+  <span class="k">return</span> <span class="nx">n</span><span class="p">;</span> 
+<span class="p">}</span> 
+</code></pre>
 </div>
 
 
 <p>We'll round it all out out with a quick and dirty finalize function which can calculate the current average.  Note that I'm keeping all the intermediate data around for demonstrating "reduce" mode.</p>
 
-<div>
-  <pre><code class='javascript'>function f( year, value ){
-  value.avg = value.sum / value.count;
-  return value;
-}</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="kd">function</span> <span class="nx">f</span><span class="p">(</span> <span class="nx">year</span><span class="p">,</span> <span class="nx">value</span> <span class="p">){</span>
+  <span class="nx">value</span><span class="p">.</span><span class="nx">avg</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">sum</span> <span class="o">/</span> <span class="nx">value</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
 </div>
 
 
 <p>First, a quick look at "inline" mode (I'll leave plain old name a collection as an exercise to you, my humble reader).</p>
 
-<div>
-  <pre><code class='javascript'>&gt; res = db.runCommand(
-...   { 
-...     &quot;mapreduce&quot;: &quot;yield_historical.in&quot;,
-...     &quot;map&quot;: m,
-...     &quot;reduce&quot;: r,
-...     &quot;finalize&quot;: f,
-...     &quot;query&quot; : { &quot;_id&quot; : { &quot;$gt&quot; : new Date(2000, 0, 1) } },
-...     &quot;verbose&quot; : true , 
-...     &quot;out&quot; : { &quot;inline&quot; : 1 }
-...   }
-... )
-{
-    &quot;results&quot; : [
-        {
-            &quot;_id&quot; : 1990,
-            &quot;value&quot; : 8.552400000000002
-        },
-        /* ... */
-        {
-            &quot;_id&quot; : 2010,
-            &quot;value&quot; : 3.3255026455026435
-        }
-    ],
-    &quot;timeMillis&quot; : 218,
-    &quot;timing&quot; : {
-        &quot;mapTime&quot; : NumberLong(168),
-        &quot;emitLoop&quot; : 215,
-        &quot;total&quot; : 218
-    },
-    &quot;counts&quot; : {
-        &quot;input&quot; : 2690,
-        &quot;emit&quot; : 2690,
-        &quot;output&quot; : 11
-    },
-    &quot;ok&quot; : 1
-}</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
+<span class="p">...</span>   <span class="p">{</span> 
+<span class="p">...</span>     <span class="s2">&quot;mapreduce&quot;</span><span class="o">:</span> <span class="s2">&quot;yield_historical.in&quot;</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;map&quot;</span><span class="o">:</span> <span class="nx">m</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;reduce&quot;</span><span class="o">:</span> <span class="nx">r</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;finalize&quot;</span><span class="o">:</span> <span class="nx">f</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$gt&quot;</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+<span class="p">...</span>     <span class="s2">&quot;verbose&quot;</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">,</span> 
+<span class="p">...</span>     <span class="s2">&quot;out&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;inline&quot;</span> <span class="o">:</span> <span class="mi">1</span> <span class="p">}</span>
+<span class="p">...</span>   <span class="p">}</span>
+<span class="p">...</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="s2">&quot;results&quot;</span> <span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1990</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="mf">8.552400000000002</span>
+        <span class="p">},</span>
+        <span class="cm">/* ... */</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2010</span><span class="p">,</span>
+            <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="mf">3.3255026455026435</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">218</span><span class="p">,</span>
+    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">168</span><span class="p">),</span>
+        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">215</span><span class="p">,</span>
+        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">218</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">11</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</code></pre>
 </div>
 
 
 <p>To demonstrate "merge" and "reduce" mode, I'm going to use queries to break out the data a bit.  Lets look first at "merge", by first running MapReduce against the first half of the data, and then merge in the second half.</p>
 
-<div>
-  <pre><code class='javascript'>&gt; res = db.runCommand(
-...   { 
-...     &quot;mapreduce&quot;: &quot;yield_historical.in&quot;,
-...     &quot;map&quot;: m,
-...     &quot;reduce&quot;: r,
-...     &quot;finalize&quot;: f,
-...     &quot;query&quot; : { &quot;_id&quot; : { &quot;$lt&quot; : new Date(2000, 0, 1) } },
-...     &quot;verbose&quot; : true , 
-...     &quot;out&quot; : &quot;yield_historical.merged&quot;,
-...   }
-... )
-{
-    &quot;result&quot; : &quot;yield_historical.merged&quot;,
-    &quot;timeMillis&quot; : 223,
-    &quot;timing&quot; : {
-        &quot;mapTime&quot; : NumberLong(166),
-        &quot;emitLoop&quot; : 217,
-        &quot;total&quot; : 223
-    },
-    &quot;counts&quot; : {
-        &quot;input&quot; : 2503,
-        &quot;emit&quot; : 2503,
-        &quot;output&quot; : 10
-    },
-    &quot;ok&quot; : 1
-}
-&gt; db.yield_historical.merged.find({}, {&quot;value.avg&quot;: 1})
-{ &quot;_id&quot; : 1990, &quot;value&quot; : { &quot;avg&quot; : 8.552400000000002 } }
-{ &quot;_id&quot; : 1991, &quot;value&quot; : { &quot;avg&quot; : 7.8623600000000025 } }
-{ &quot;_id&quot; : 1992, &quot;value&quot; : { &quot;avg&quot; : 7.008844621513946 } }
-{ &quot;_id&quot; : 1993, &quot;value&quot; : { &quot;avg&quot; : 5.866279999999999 } }
-{ &quot;_id&quot; : 1994, &quot;value&quot; : { &quot;avg&quot; : 7.085180722891565 } }
-{ &quot;_id&quot; : 1995, &quot;value&quot; : { &quot;avg&quot; : 6.573920000000002 } }
-{ &quot;_id&quot; : 1996, &quot;value&quot; : { &quot;avg&quot; : 6.443531746031743 } }
-{ &quot;_id&quot; : 1997, &quot;value&quot; : { &quot;avg&quot; : 6.353959999999992 } }
-{ &quot;_id&quot; : 1998, &quot;value&quot; : { &quot;avg&quot; : 5.262879999999994 } }
-{ &quot;_id&quot; : 1999, &quot;value&quot; : { &quot;avg&quot; : 5.646135458167332 } }
-&gt;</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
+<span class="p">...</span>   <span class="p">{</span> 
+<span class="p">...</span>     <span class="s2">&quot;mapreduce&quot;</span><span class="o">:</span> <span class="s2">&quot;yield_historical.in&quot;</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;map&quot;</span><span class="o">:</span> <span class="nx">m</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;reduce&quot;</span><span class="o">:</span> <span class="nx">r</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;finalize&quot;</span><span class="o">:</span> <span class="nx">f</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$lt&quot;</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+<span class="p">...</span>     <span class="s2">&quot;verbose&quot;</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">,</span> 
+<span class="p">...</span>     <span class="s2">&quot;out&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span><span class="p">,</span>
+<span class="p">...</span>   <span class="p">}</span>
+<span class="p">...</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">223</span><span class="p">,</span>
+    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">166</span><span class="p">),</span>
+        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">217</span><span class="p">,</span>
+        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">223</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2503</span><span class="p">,</span>
+        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2503</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">10</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">merged</span><span class="p">.</span><span class="nx">find</span><span class="p">({},</span> <span class="p">{</span><span class="s2">&quot;value.avg&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1990</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">8.552400000000002</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1991</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">7.8623600000000025</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1992</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">7.008844621513946</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1993</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.866279999999999</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1994</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">7.085180722891565</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1995</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">6.573920000000002</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1996</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">6.443531746031743</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1997</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">6.353959999999992</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1998</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.262879999999994</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1999</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.646135458167332</span> <span class="p">}</span> <span class="p">}</span>
+<span class="o">&gt;</span> 
+</code></pre>
 </div>
 
 
 <p>That gives us our first half of the data; we ran that with a normal named collection output.  Lets merge in the second half:</p>
 
-<div>
-  <pre><code class='javascript'>&gt; res = db.runCommand(
-...   { 
-...     &quot;mapreduce&quot;: &quot;yield_historical.in&quot;,
-...     &quot;map&quot;: m,
-...     &quot;reduce&quot;: r,
-...     &quot;finalize&quot;: f,
-...     &quot;query&quot; : { &quot;_id&quot; : { &quot;$gt&quot; : new Date(2000, 0, 1) } },
-...     &quot;verbose&quot; : true , 
-...     &quot;out&quot; : { &quot;merge&quot; : &quot;yield_historical.merged&quot; },
-...   }
-... )
-{
-    &quot;result&quot; : &quot;yield_historical.merged&quot;,
-    &quot;timeMillis&quot; : 242,
-    &quot;timing&quot; : {
-        &quot;mapTime&quot; : NumberLong(173),
-        &quot;emitLoop&quot; : 236,
-        &quot;total&quot; : 242
-    },
-    &quot;counts&quot; : {
-        &quot;input&quot; : 2690,
-        &quot;emit&quot; : 2690,
-        &quot;output&quot; : 21
-    },
-    &quot;ok&quot; : 1
-}
+<div class="highlight"><pre><code class="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
+<span class="p">...</span>   <span class="p">{</span> 
+<span class="p">...</span>     <span class="s2">&quot;mapreduce&quot;</span><span class="o">:</span> <span class="s2">&quot;yield_historical.in&quot;</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;map&quot;</span><span class="o">:</span> <span class="nx">m</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;reduce&quot;</span><span class="o">:</span> <span class="nx">r</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;finalize&quot;</span><span class="o">:</span> <span class="nx">f</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$gt&quot;</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">}</span> <span class="p">},</span>
+<span class="p">...</span>     <span class="s2">&quot;verbose&quot;</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">,</span> 
+<span class="p">...</span>     <span class="s2">&quot;out&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;merge&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span> <span class="p">},</span>
+<span class="p">...</span>   <span class="p">}</span>
+<span class="p">...</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">242</span><span class="p">,</span>
+    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">173</span><span class="p">),</span>
+        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">236</span><span class="p">,</span>
+        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">242</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">21</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
 
-&gt; db.yield_historical.merged.find({&quot;_id&quot;: {$gt: 1998}}, {&quot;value.avg&quot;: 1}) 
-{ &quot;_id&quot; : 1999, &quot;value&quot; : { &quot;avg&quot; : 5.646135458167332 } }
-{ &quot;_id&quot; : 2000, &quot;value&quot; : { &quot;avg&quot; : 6.030278884462145 } }
-{ &quot;_id&quot; : 2001, &quot;value&quot; : { &quot;avg&quot; : 5.020685483870969 } }
-{ &quot;_id&quot; : 2002, &quot;value&quot; : { &quot;avg&quot; : 4.61308 } }
-{ &quot;_id&quot; : 2003, &quot;value&quot; : { &quot;avg&quot; : 4.013879999999999 } }
-{ &quot;_id&quot; : 2004, &quot;value&quot; : { &quot;avg&quot; : 4.271320000000004 } }
-{ &quot;_id&quot; : 2005, &quot;value&quot; : { &quot;avg&quot; : 4.288880000000001 } }
-{ &quot;_id&quot; : 2006, &quot;value&quot; : { &quot;avg&quot; : 4.7949999999999955 } }
-{ &quot;_id&quot; : 2007, &quot;value&quot; : { &quot;avg&quot; : 4.634661354581674 } }
-{ &quot;_id&quot; : 2008, &quot;value&quot; : { &quot;avg&quot; : 3.6642629482071714 } }
-{ &quot;_id&quot; : 2009, &quot;value&quot; : { &quot;avg&quot; : 3.2641200000000037 } }
-{ &quot;_id&quot; : 2010, &quot;value&quot; : { &quot;avg&quot; : 3.3255026455026435 } }</code></pre>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">merged</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="nx">$gt</span><span class="o">:</span> <span class="mi">1998</span><span class="p">}},</span> <span class="p">{</span><span class="s2">&quot;value.avg&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">})</span> 
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1999</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.646135458167332</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2000</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">6.030278884462145</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870969</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2002</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">4.61308</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2003</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">4.013879999999999</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2004</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">4.271320000000004</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2005</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">4.288880000000001</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2006</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">4.7949999999999955</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2007</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">4.634661354581674</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2008</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.6642629482071714</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2009</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.2641200000000037</span> <span class="p">}</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2010</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.3255026455026435</span> <span class="p">}</span> <span class="p">}</span>
+</code></pre>
 </div>
 
 
 <p>To close out, lets take "reduce" mode for a quick spin.  We'll select a half of a year for the first part, and then reduce in the second half.</p>
 
-<div>
-  <pre><code class='javascript'>&gt; res = db.runCommand(
-...   { 
-...     &quot;mapreduce&quot;: &quot;yield_historical.in&quot;,
-...     &quot;map&quot;: m,
-...     &quot;reduce&quot;: r,
-...     &quot;finalize&quot;: f,
-...     &quot;query&quot; : { &quot;_id&quot; : { 
-...         &quot;$gte&quot;: new Date(2001, 0, 1),
-...         &quot;$lte&quot; : new Date(2001, 5, 1) 
-...     } },
-...     &quot;verbose&quot; : true , 
-...     &quot;out&quot; : &quot;yield_historical.reduced&quot;,
-...   }
-... )
-{
-    &quot;result&quot; : &quot;yield_historical.reduced&quot;,
-    &quot;timeMillis&quot; : 21,
-    &quot;timing&quot; : {
-        &quot;mapTime&quot; : NumberLong(6),
-        &quot;emitLoop&quot; : 17,
-        &quot;total&quot; : 21
-    },
-    &quot;counts&quot; : {
-        &quot;input&quot; : 105,
-        &quot;emit&quot; : 105,
-        &quot;output&quot; : 1
-    },
-    &quot;ok&quot; : 1
-}
-&gt; db.yield_historical.reduced.find()
-{ &quot;_id&quot; : 2001, &quot;value&quot; : { &quot;count&quot; : 105, &quot;sum&quot; : 539.5599999999998, &quot;avg&quot; : 5.138666666666665 } }</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
+<span class="p">...</span>   <span class="p">{</span> 
+<span class="p">...</span>     <span class="s2">&quot;mapreduce&quot;</span><span class="o">:</span> <span class="s2">&quot;yield_historical.in&quot;</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;map&quot;</span><span class="o">:</span> <span class="nx">m</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;reduce&quot;</span><span class="o">:</span> <span class="nx">r</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;finalize&quot;</span><span class="o">:</span> <span class="nx">f</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="p">{</span> 
+<span class="p">...</span>         <span class="s2">&quot;$gte&quot;</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="mi">2001</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="p">...</span>         <span class="s2">&quot;$lte&quot;</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="mi">2001</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+<span class="p">...</span>     <span class="p">}</span> <span class="p">},</span>
+<span class="p">...</span>     <span class="s2">&quot;verbose&quot;</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">,</span> 
+<span class="p">...</span>     <span class="s2">&quot;out&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span><span class="p">,</span>
+<span class="p">...</span>   <span class="p">}</span>
+<span class="p">...</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">21</span><span class="p">,</span>
+    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">17</span><span class="p">,</span>
+        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">21</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span>
+        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">539.5599999999998</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.138666666666665</span> <span class="p">}</span> <span class="p">}</span>
+</code></pre>
 </div>
 
 
 <p>That handles the first half... Let's grab the second:</p>
 
-<div>
-  <pre><code class='javascript'>&gt; res = db.runCommand(              
-...   { 
-...     &quot;mapreduce&quot;: &quot;yield_historical.in&quot;,
-...     &quot;map&quot;: m,
-...     &quot;reduce&quot;: r,
-...     &quot;finalize&quot;: f,
-...     &quot;query&quot; : { &quot;_id&quot; : { 
-...         &quot;$gt&quot;: new Date(2001, 5, 1),
-...         &quot;$lte&quot; : new Date(2001, 11, 31) 
-...     } },
-...     &quot;verbose&quot; : true , 
-...     &quot;out&quot; : { &quot;reduce&quot; : &quot;yield_historical.reduced&quot; },
-...   }
-... )
-{
-    &quot;result&quot; : &quot;yield_historical.reduced&quot;,
-    &quot;timeMillis&quot; : 26,
-    &quot;timing&quot; : {
-        &quot;mapTime&quot; : NumberLong(9),
-        &quot;emitLoop&quot; : 22,
-        &quot;total&quot; : 26
-    },
-    &quot;counts&quot; : {
-        &quot;input&quot; : 143,
-        &quot;emit&quot; : 143,
-        &quot;output&quot; : 1
-    },
-    &quot;ok&quot; : 1
-}
-&gt; db.yield_historical.reduced.find()
-{ &quot;_id&quot; : 2001, &quot;value&quot; : { &quot;count&quot; : 248, &quot;sum&quot; : 1245.1299999999997, &quot;avg&quot; : 5.020685483870967 } }</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>              
+<span class="p">...</span>   <span class="p">{</span> 
+<span class="p">...</span>     <span class="s2">&quot;mapreduce&quot;</span><span class="o">:</span> <span class="s2">&quot;yield_historical.in&quot;</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;map&quot;</span><span class="o">:</span> <span class="nx">m</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;reduce&quot;</span><span class="o">:</span> <span class="nx">r</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;finalize&quot;</span><span class="o">:</span> <span class="nx">f</span><span class="p">,</span>
+<span class="p">...</span>     <span class="s2">&quot;query&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="p">{</span> 
+<span class="p">...</span>         <span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="mi">2001</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="p">...</span>         <span class="s2">&quot;$lte&quot;</span> <span class="o">:</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="mi">2001</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span> 
+<span class="p">...</span>     <span class="p">}</span> <span class="p">},</span>
+<span class="p">...</span>     <span class="s2">&quot;verbose&quot;</span> <span class="o">:</span> <span class="kc">true</span> <span class="p">,</span> 
+<span class="p">...</span>     <span class="s2">&quot;out&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;reduce&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span> <span class="p">},</span>
+<span class="p">...</span>   <span class="p">}</span>
+<span class="p">...</span> <span class="p">)</span>
+<span class="p">{</span>
+    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">26</span><span class="p">,</span>
+    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span>
+        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">22</span><span class="p">,</span>
+        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">26</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">143</span><span class="p">,</span>
+        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">143</span><span class="p">,</span>
+        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1299999999997</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870967</span> <span class="p">}</span> <span class="p">}</span>
+</code></pre>
 </div>
 
 
 <p>Of course, this does us no good if the results don't add up.  A quick comparison between the 'merged' output and the 'reduced' output validates our code:</p>
 
-<div>
-  <pre><code class='javascript'>&gt; db.yield_historical.reduced.find({_id: 2001})
-{ &quot;_id&quot; : 2001, &quot;value&quot; : { &quot;count&quot; : 248, &quot;sum&quot; : 1245.1299999999997, &quot;avg&quot; : 5.020685483870967 } }
-&gt; db.yield_historical.merged.find({_id: 2001}) 
-{ &quot;_id&quot; : 2001, &quot;value&quot; : { &quot;count&quot; : 248, &quot;sum&quot; : 1245.1300000000003, &quot;avg&quot; : 5.020685483870969 } }</code></pre>
+<div class="highlight"><pre><code class="javascript"><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="mi">2001</span><span class="p">})</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1299999999997</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870967</span> <span class="p">}</span> <span class="p">}</span>
+<span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">merged</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="mi">2001</span><span class="p">})</span> 
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1300000000003</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870969</span> <span class="p">}</span> <span class="p">}</span>
+</code></pre>
 </div>
 
 
