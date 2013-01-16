@@ -1,13 +1,12 @@
 ---
 title: And Now For Something Completely Different!
 tags: administrativa
-layout: post employment omg!ponies!
+layout: post 
 ---
 I write this it is at the end of two very long years working with 10gen (The MongoDB Company), a company of less than 20 people when I joined that is now approaching 200. Although my role has been fungible during my time here, my primary focus has been to improve Scala integration for MongoDB, and evangelize it around the world.  In this pursuit I've worn out an entire US Passport, as well as my favorite pair of Doc Martens.
 
-In addition to writing code, I've trained new users (customers and colleagues alike), given presentations to audiences large &amp; small, and helped companies to better deploy MongoDB in their applications – in over 50 cities and 15 countries[^armenia] I've spent a quarter of my time at 10gen working out of a London office that didn't exist when I first arrived, traveling and helping build a MongoDB following in Europe.
+In addition to writing code, I've trained new users (customers and colleagues alike), given presentations to audiences large &amp; small, and helped companies to better deploy MongoDB in their applications – in over 50 cities and 15 countries (Those who know me now will expect a whinging anecdote about the time they sent me to Armenia…) I've spent a quarter of my time at 10gen working out of a London office that didn't exist when I first arrived, traveling and helping build a MongoDB following in Europe.
 
-[^armenia] Those who know me now will expect a whinging anecdote about the time they sent me to Armenia…
 
 Most excitingly I've had the opportunity to have met, and in some cases had the pleasure of working with, some of the most interesting and talented individuals I've ever encountered. Engineers, Developer Evangelists, Community Managers, Systems Administrators, and one self-described "Markitect" (Which is how [Jared Rosoff](http://twitter.com/forjared) once described his job to me; a cross between Marketing and Software Architecture). People like [Meghan Gill](http://twitter.com/meghanpgill) (and her growing team), have helped create and grow the Open Source community around MongoDB – Meghan's the one you can blame for the MongoDB mugs that are multiplying like tribbles around the globe.
 
