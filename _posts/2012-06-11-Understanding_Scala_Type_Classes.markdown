@@ -82,7 +82,7 @@ It is important to note that a Type Class in Scala is typically *stateless*. It 
 
 The normal way of providing a typeclass is to create a static implicit object of a trait implementation of `TypeClass[A]` in scope. I prefer to declare the base trait separately from the implicit object to encourage easier reusage.
 
-For providing [Ordering[BankAccount]](http://www.scala-lang.org/archives/downloads/distrib/files/nightly/docs/library/scala/math/Ordering.html), we need to implement an abstract method `def compare(x: T, y: T): Int` which compares two instances of `T` (Where, in this case, `T` represents `BankAccount`) and returns an `Int` signifying their order against one another. Negative represents that `x < y`, positive that `x > y` and zero if `x == y`.
+For providing [Ordering\[BankAccount\]](http://www.scala-lang.org/archives/downloads/distrib/files/nightly/docs/library/scala/math/Ordering.html), we need to implement an abstract method `def compare(x: T, y: T): Int` which compares two instances of `T` (Where, in this case, `T` represents `BankAccount`) and returns an `Int` signifying their order against one another. Negative represents that `x < y`, positive that `x > y` and zero if `x == y`.
 
 Let's take a look at how our `Ordering` instance for sorting a `BankAccount` by `accountNumber` might look.
 

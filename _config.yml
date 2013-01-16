@@ -24,7 +24,7 @@ destination: ./_site
 plugins:     ./_plugins
 
 future:      true
-lsi:         true
+lsi:        true 
 pygments:    true
 markdown:    rdiscount
 permalink:   pretty
