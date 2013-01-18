@@ -72,7 +72,7 @@ With the previous example, we were very specific in our setup code – hardcodin
 import akka.routing.{FromConfig, RoundRobinRouter}
 
 
-object SimpleFileConfiggedRouterSetu extends App {
+object SimpleFileConfiggedRouterSetup extends App {
   val system = ActorSystem("SimpleSystem")
   val simpleRouted = system.actorOf(Props[SimpleActor].withRouter(FromConfig()),
                                     name = "simpleRoutedActor")
@@ -92,7 +92,7 @@ deployment {
 }
 {% endhighlight %}
 
-Now we have an instance of `RoundRobinRouter`, spinning up and managing 5 identical copies of our `SampleProcessingActor` – and we can swap out the router type or even raise & lower the number of routees easily from our configuration. From our standpoint as a programmer, the `ActorRef` we get back from our router initialization is fairly transparent – messages we send to it get routed automatically to a routee, and replies can come back from those actors as well. This behavior is a boon for us, as it means we can begin sending messages to the router without worrying about any special instructions. 
+Now we have an instance of `RoundRobinRouter`, spinning up and managing 5 identical copies of our `SimpleActor` – and we can swap out the router type or even raise & lower the number of routees easily from our configuration. From our standpoint as a programmer, the `ActorRef` we get back from our router initialization is fairly transparent – messages we send to it get routed automatically to a routee, and replies can come back from those actors as well. This behavior is a boon for us, as it means we can begin sending messages to the router without worrying about any special instructions. 
 
 Great! We now have a system for distributing our load. If we were feeling particularly adventurous, we could even combine routers with remote actors... but that's a different post, for another day.
 
