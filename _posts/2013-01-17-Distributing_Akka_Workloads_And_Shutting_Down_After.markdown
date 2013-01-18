@@ -188,49 +188,54 @@ Here's a rough sketch of an "Overwatch" actor, who asks for Akka to watch two ot
 class SystemKillingRouterOverwatch extends Actor {
   val log = Logging(context.system, this)
 
-  // Setup watching of our other two actors
-  override def preStart() {
-    context.watch(RoutedPoisonerWithShutdown.router)
-    context.watch(RoutedPoisonerWithShutdown.simpleActor)
-  }
+  val simpleRouter = context.actorOf(Props[SimpleActor].withRouter(FromConfig()),
+                                     name = "simpleRoutedActor")
+
+  val simpleActor = context.actorOf(Props[SimpleActor], name = "simpleActor")
+
+  // Setup our other two actors, so we supervise
+  context.watch(simpleRouter)
+  context.watch(simpleActor)
 
   def receive = {
     case Terminated(corpse) =>
-      if (corpse == RoutedPoisonerWithShutdown.router) {
+      if (corpse == simpleRouter) {
         log.warning("Received termination notification for '" + corpse + "'," +
-                    "is in our watch list. Terminating ActorSystem.")
+          "is in our watch list. Terminating ActorSystem.")
         RoutedPoisonerWithShutdown.system.shutdown()
       } else {
         log.info("Received termination notification for '" + corpse + "'," +
-                 "which is not in our deathwatch list.".format(corpse))
+          "which is not in our deathwatch list.".format(corpse))
       }
   }
 
+{% endhighlight %}
+
+During the startup of the Actor , we setup our other two actors (automatically making us their supervisor) and ask for Akka to `watch()` them. In the case that we see a `Terminated` message, which will contain an `ActorRef`, we compare the `corpse`'s body; if it is the Router, we shutdown the `ActorSystem`. If not, we can keep on going.
+
+Within the `SystemKillingRouterOverwatch`, below `receive()`, we've also added code to run through the test routines, which are just a tweak of what we've been building already, including poisoning an extra Actor to test termination:
+
+{% highlight scala linenos %}
+def receive = // ... 
+
+simpleRouter ! Broadcast(Message("I will not buy this record, it is scratched!"))
+
+simpleActor ! Message("If there's any more stock film of women applauding, I'll clear the court.")
+
+simpleActor ! PoisonPill
+
+for (n <- 1 until 10) simpleRouter ! Message("Hello, Akka #%d!".format(n))
+simpleRouter ! Broadcast(PoisonPill)
+simpleRouter ! Message("Hello? You're looking a little green around the gills...") // never gets read
 }
 {% endhighlight %}
 
-During the startup of the Actor (via the `preStart()` lifecycle method), we grab the references for two other actors and ask for Akka to `watch()` them. In the case that we see a `Terminated` message, which will contain an `ActorRef`, we compare the `corpse`'s body; if it is the Router, we shutdown the `ActorSystem`. If not, we can keep on going.
-
-The body of `RoutedPoisonerWithShutdown` is just a tweak of what we've been building already, including poisoning an extra Actor to test termination, and setting up our overwatch:
-
+The body of our `main` method is now just a startup of our `ActorSystem` and the overwatch actor 
 {% highlight scala linenos %}
+
 object RoutedPoisonerWithShutdown extends App {
   val system = ActorSystem("SimpleSystem")
-  val router = system.actorOf(Props[SimpleActor].withRouter(FromConfig()),
-                              name = "simpleRoutedActor")
-  val simpleActor = system.actorOf(Props[SimpleActor], name = "simpleActor")
-  // Start him after the others so their refs are available and he can grab 'em (lazy code)
-  val overwatch = system.actorOf(Props[SystemKillingRouterOverwatch])
-
-  router ! Broadcast(Message("I will not buy this record, it is scratched!"))
-
-  simpleActor ! Message("If there's any more stock film of women applauding, I'll clear the court.")
-
-  simpleActor ! PoisonPill
-
-  for (n <- 1 until 10)  router ! Message("Hello, Akka #%d!".format(n))
-  router ! Broadcast(PoisonPill)
-  router ! Message("Hello? You're looking a little green around the gills...") // never gets read
+  val overwatch = system.actorOf(Props[SystemKillingRouterOverwatch], name="overwatch")
 
 }
 {% endhighlight %}

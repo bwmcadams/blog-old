@@ -20,7 +20,7 @@ server:      false
 server_port: 4000
 
 source:      .
-destination: ./_site
+destination: ../blog.generated/
 plugins:     ./_plugins
 
 future:      true
