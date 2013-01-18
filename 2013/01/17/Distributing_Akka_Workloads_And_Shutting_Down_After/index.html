@@ -218,49 +218,53 @@
 <div class="highlight"><pre><code class="scala"><span class="k">class</span> <span class="nc">SystemKillingRouterOverwatch</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="o">{</span>
   <span class="k">val</span> <span class="n">log</span> <span class="k">=</span> <span class="nc">Logging</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="n">system</span><span class="o">,</span> <span class="k">this</span><span class="o">)</span>
 
-  <span class="c1">// Setup watching of our other two actors</span>
-  <span class="k">override</span> <span class="k">def</span> <span class="n">preStart</span><span class="o">()</span> <span class="o">{</span>
-    <span class="n">context</span><span class="o">.</span><span class="n">watch</span><span class="o">(</span><span class="nc">RoutedPoisonerWithShutdown</span><span class="o">.</span><span class="n">router</span><span class="o">)</span>
-    <span class="n">context</span><span class="o">.</span><span class="n">watch</span><span class="o">(</span><span class="nc">RoutedPoisonerWithShutdown</span><span class="o">.</span><span class="n">simpleActor</span><span class="o">)</span>
-  <span class="o">}</span>
+  <span class="k">val</span> <span class="n">simpleRouter</span> <span class="k">=</span> <span class="n">context</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SimpleActor</span><span class="o">].</span><span class="n">withRouter</span><span class="o">(</span><span class="nc">FromConfig</span><span class="o">()),</span>
+                                     <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;simpleRoutedActor&quot;</span><span class="o">)</span>
+
+  <span class="k">val</span> <span class="n">simpleActor</span> <span class="k">=</span> <span class="n">context</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SimpleActor</span><span class="o">],</span> <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;simpleActor&quot;</span><span class="o">)</span>
+
+  <span class="c1">// Setup our other two actors, so we supervise</span>
+  <span class="n">context</span><span class="o">.</span><span class="n">watch</span><span class="o">(</span><span class="n">simpleRouter</span><span class="o">)</span>
+  <span class="n">context</span><span class="o">.</span><span class="n">watch</span><span class="o">(</span><span class="n">simpleActor</span><span class="o">)</span>
 
   <span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="o">{</span>
     <span class="k">case</span> <span class="nc">Terminated</span><span class="o">(</span><span class="n">corpse</span><span class="o">)</span> <span class="k">=&gt;</span>
-      <span class="k">if</span> <span class="o">(</span><span class="n">corpse</span> <span class="o">==</span> <span class="nc">RoutedPoisonerWithShutdown</span><span class="o">.</span><span class="n">router</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">if</span> <span class="o">(</span><span class="n">corpse</span> <span class="o">==</span> <span class="n">simpleRouter</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="o">(</span><span class="s">&quot;Received termination notification for &#39;&quot;</span> <span class="o">+</span> <span class="n">corpse</span> <span class="o">+</span> <span class="s">&quot;&#39;,&quot;</span> <span class="o">+</span>
-                    <span class="s">&quot;is in our watch list. Terminating ActorSystem.&quot;</span><span class="o">)</span>
+          <span class="s">&quot;is in our watch list. Terminating ActorSystem.&quot;</span><span class="o">)</span>
         <span class="nc">RoutedPoisonerWithShutdown</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">shutdown</span><span class="o">()</span>
       <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
         <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="o">(</span><span class="s">&quot;Received termination notification for &#39;&quot;</span> <span class="o">+</span> <span class="n">corpse</span> <span class="o">+</span> <span class="s">&quot;&#39;,&quot;</span> <span class="o">+</span>
-                 <span class="s">&quot;which is not in our deathwatch list.&quot;</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">corpse</span><span class="o">))</span>
+          <span class="s">&quot;which is not in our deathwatch list.&quot;</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">corpse</span><span class="o">))</span>
       <span class="o">}</span>
   <span class="o">}</span>
+</code></pre></div>
 
+
+<p>During the startup of the Actor , we setup our other two actors (automatically making us their supervisor) and ask for Akka to <code>watch()</code> them. In the case that we see a <code>Terminated</code> message, which will contain an <code>ActorRef</code>, we compare the <code>corpse</code>'s body; if it is the Router, we shutdown the <code>ActorSystem</code>. If not, we can keep on going.</p>
+
+<p>Within the <code>SystemKillingRouterOverwatch</code>, below <code>receive()</code>, we've also added code to run through the test routines, which are just a tweak of what we've been building already, including poisoning an extra Actor to test termination:</p>
+
+<div class="highlight"><pre><code class="scala"><span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="c1">// ... </span>
+
+<span class="n">simpleRouter</span> <span class="o">!</span> <span class="nc">Broadcast</span><span class="o">(</span><span class="nc">Message</span><span class="o">(</span><span class="s">&quot;I will not buy this record, it is scratched!&quot;</span><span class="o">))</span>
+
+<span class="n">simpleActor</span> <span class="o">!</span> <span class="nc">Message</span><span class="o">(</span><span class="s">&quot;If there&#39;s any more stock film of women applauding, I&#39;ll clear the court.&quot;</span><span class="o">)</span>
+
+<span class="n">simpleActor</span> <span class="o">!</span> <span class="nc">PoisonPill</span>
+
+<span class="k">for</span> <span class="o">(</span><span class="n">n</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="mi">10</span><span class="o">)</span> <span class="n">simpleRouter</span> <span class="o">!</span> <span class="nc">Message</span><span class="o">(</span><span class="s">&quot;Hello, Akka #%d!&quot;</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">n</span><span class="o">))</span>
+<span class="n">simpleRouter</span> <span class="o">!</span> <span class="nc">Broadcast</span><span class="o">(</span><span class="nc">PoisonPill</span><span class="o">)</span>
+<span class="n">simpleRouter</span> <span class="o">!</span> <span class="nc">Message</span><span class="o">(</span><span class="s">&quot;Hello? You&#39;re looking a little green around the gills...&quot;</span><span class="o">)</span> <span class="c1">// never gets read</span>
 <span class="o">}</span>
 </code></pre></div>
 
 
-<p>During the startup of the Actor (via the <code>preStart()</code> lifecycle method), we grab the references for two other actors and ask for Akka to <code>watch()</code> them. In the case that we see a <code>Terminated</code> message, which will contain an <code>ActorRef</code>, we compare the <code>corpse</code>'s body; if it is the Router, we shutdown the <code>ActorSystem</code>. If not, we can keep on going.</p>
-
-<p>The body of <code>RoutedPoisonerWithShutdown</code> is just a tweak of what we've been building already, including poisoning an extra Actor to test termination, and setting up our overwatch:</p>
+<p>The body of our <code>main</code> method is now just a startup of our <code>ActorSystem</code> and the overwatch actor</p>
 
 <div class="highlight"><pre><code class="scala"><span class="k">object</span> <span class="nc">RoutedPoisonerWithShutdown</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
   <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;SimpleSystem&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">router</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SimpleActor</span><span class="o">].</span><span class="n">withRouter</span><span class="o">(</span><span class="nc">FromConfig</span><span class="o">()),</span>
-                              <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;simpleRoutedActor&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="n">simpleActor</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SimpleActor</span><span class="o">],</span> <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;simpleActor&quot;</span><span class="o">)</span>
-  <span class="c1">// Start him after the others so their refs are available and he can grab &#39;em (lazy code)</span>
-  <span class="k">val</span> <span class="n">overwatch</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SystemKillingRouterOverwatch</span><span class="o">])</span>
-
-  <span class="n">router</span> <span class="o">!</span> <span class="nc">Broadcast</span><span class="o">(</span><span class="nc">Message</span><span class="o">(</span><span class="s">&quot;I will not buy this record, it is scratched!&quot;</span><span class="o">))</span>
-
-  <span class="n">simpleActor</span> <span class="o">!</span> <span class="nc">Message</span><span class="o">(</span><span class="s">&quot;If there&#39;s any more stock film of women applauding, I&#39;ll clear the court.&quot;</span><span class="o">)</span>
-
-  <span class="n">simpleActor</span> <span class="o">!</span> <span class="nc">PoisonPill</span>
-
-  <span class="k">for</span> <span class="o">(</span><span class="n">n</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="mi">10</span><span class="o">)</span>  <span class="n">router</span> <span class="o">!</span> <span class="nc">Message</span><span class="o">(</span><span class="s">&quot;Hello, Akka #%d!&quot;</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="n">n</span><span class="o">))</span>
-  <span class="n">router</span> <span class="o">!</span> <span class="nc">Broadcast</span><span class="o">(</span><span class="nc">PoisonPill</span><span class="o">)</span>
-  <span class="n">router</span> <span class="o">!</span> <span class="nc">Message</span><span class="o">(</span><span class="s">&quot;Hello? You&#39;re looking a little green around the gills...&quot;</span><span class="o">)</span> <span class="c1">// never gets read</span>
+  <span class="k">val</span> <span class="n">overwatch</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SystemKillingRouterOverwatch</span><span class="o">],</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;overwatch&quot;</span><span class="o">)</span>
 
 <span class="o">}</span>
 </code></pre></div>
