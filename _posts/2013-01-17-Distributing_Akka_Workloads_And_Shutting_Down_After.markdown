@@ -48,7 +48,7 @@ The `RoundRobinRouter` and `SmallestMailboxRouter` are well suited for our needs
 import akka.routing.RoundRobinRouter
 
 
-object SimpleRoutedMain extends App {
+object SimpleRouterSetup extends App {
   val system = ActorSystem("SimpleSystem")
   val simpleRouted = system.actorOf(Props[SimpleActor].withRouter(
                         RoundRobinRouter(nrOfInstances = 10)
@@ -58,7 +58,7 @@ object SimpleRoutedMain extends App {
 }
 {% endhighlight %}
 
-Note the addition of a call to the `withRouter()` method on our `Props[ActorName]` declaration. Where a normal `Props[ActorName]` call sets up a single Actor, `withRouter()` will return us a Router with `nrOfInstances` child actors.  Here, we've setup a `RoundRobinRouter` with 10 routees; if we look at the output of running this new `SimpleRoutedMain`, we'll see our log entries have several different actor IDs in them:
+Note the addition of a call to the `withRouter()` method on our `Props[ActorName]` declaration. Where a normal `Props[ActorName]` call sets up a single Actor, `withRouter()` will return us a Router with `nrOfInstances` child actors.  Here, we've setup a `RoundRobinRouter` with 10 routees; if we look at the output of running this new `SimpleRouterSetup`, we'll see our log entries have several different actor IDs in them:
 
 {% highlight text %}
 [INFO] [01/17/2013 15:32:51.897] [SimpleSystem-akka.actor.default-dispatcher-7] [akka://SimpleSystem/user/simpleRoutedActor/$f] Got a valid message: Hello, Akka #6!
@@ -72,7 +72,7 @@ With the previous example, we were very specific in our setup code – hardcodin
 import akka.routing.{FromConfig, RoundRobinRouter}
 
 
-object SimpleFileConfiggedRoutedMain extends App {
+object SimpleFileConfiggedRouterSetu extends App {
   val system = ActorSystem("SimpleSystem")
   val simpleRouted = system.actorOf(Props[SimpleActor].withRouter(FromConfig()),
                                     name = "simpleRoutedActor")
