@@ -4,7 +4,7 @@
  <title>Evil Monkey Labs</title>
  <link href="http://blog.evilmonkeylabs.com" rel="self"/>
  <link href="http://blog.evilmonkeylabs.com"/>
- <updated>2013-01-17T17:59:53-08:00</updated>
+ <updated>2013-01-17T18:02:32-08:00</updated>
  <id>http://blog.evilmonkeylabs.com/</id>
  
  <author>
@@ -88,7 +88,7 @@
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;akka.routing.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;FromConfig&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;RoundRobinRouter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
 
-&lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SimpleFileConfiggedRouterSetu&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SimpleFileConfiggedRouterSetup&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ActorSystem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;SimpleSystem&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simpleRouted&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;actorOf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;Props&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;SimpleActor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;withRouter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;FromConfig&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()),&lt;/span&gt;
                                     &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;simpleRoutedActor&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
@@ -109,7 +109,7 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Now we have an instance of &lt;code&gt;RoundRobinRouter&lt;/code&gt;, spinning up and managing 5 identical copies of our &lt;code&gt;SampleProcessingActor&lt;/code&gt; – and we can swap out the router type or even raise &amp;amp; lower the number of routees easily from our configuration. From our standpoint as a programmer, the &lt;code&gt;ActorRef&lt;/code&gt; we get back from our router initialization is fairly transparent – messages we send to it get routed automatically to a routee, and replies can come back from those actors as well. This behavior is a boon for us, as it means we can begin sending messages to the router without worrying about any special instructions.&lt;/p&gt;
+&lt;p&gt;Now we have an instance of &lt;code&gt;RoundRobinRouter&lt;/code&gt;, spinning up and managing 5 identical copies of our &lt;code&gt;SimpleActor&lt;/code&gt; – and we can swap out the router type or even raise &amp;amp; lower the number of routees easily from our configuration. From our standpoint as a programmer, the &lt;code&gt;ActorRef&lt;/code&gt; we get back from our router initialization is fairly transparent – messages we send to it get routed automatically to a routee, and replies can come back from those actors as well. This behavior is a boon for us, as it means we can begin sending messages to the router without worrying about any special instructions.&lt;/p&gt;
 
 &lt;p&gt;Great! We now have a system for distributing our load. If we were feeling particularly adventurous, we could even combine routers with remote actors... but that's a different post, for another day.&lt;/p&gt;
 

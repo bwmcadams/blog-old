@@ -102,7 +102,7 @@
 <div class="highlight"><pre><code class="scala"><span class="k">import</span> <span class="nn">akka.routing.</span><span class="o">{</span><span class="nc">FromConfig</span><span class="o">,</span> <span class="nc">RoundRobinRouter</span><span class="o">}</span>
 
 
-<span class="k">object</span> <span class="nc">SimpleFileConfiggedRouterSetu</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
+<span class="k">object</span> <span class="nc">SimpleFileConfiggedRouterSetup</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
   <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;SimpleSystem&quot;</span><span class="o">)</span>
   <span class="k">val</span> <span class="n">simpleRouted</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SimpleActor</span><span class="o">].</span><span class="n">withRouter</span><span class="o">(</span><span class="nc">FromConfig</span><span class="o">()),</span>
                                     <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;simpleRoutedActor&quot;</span><span class="o">)</span>
@@ -123,7 +123,7 @@
 </code></pre></div>
 
 
-<p>Now we have an instance of <code>RoundRobinRouter</code>, spinning up and managing 5 identical copies of our <code>SampleProcessingActor</code> – and we can swap out the router type or even raise &amp; lower the number of routees easily from our configuration. From our standpoint as a programmer, the <code>ActorRef</code> we get back from our router initialization is fairly transparent – messages we send to it get routed automatically to a routee, and replies can come back from those actors as well. This behavior is a boon for us, as it means we can begin sending messages to the router without worrying about any special instructions.</p>
+<p>Now we have an instance of <code>RoundRobinRouter</code>, spinning up and managing 5 identical copies of our <code>SimpleActor</code> – and we can swap out the router type or even raise &amp; lower the number of routees easily from our configuration. From our standpoint as a programmer, the <code>ActorRef</code> we get back from our router initialization is fairly transparent – messages we send to it get routed automatically to a routee, and replies can come back from those actors as well. This behavior is a boon for us, as it means we can begin sending messages to the router without worrying about any special instructions.</p>
 
 <p>Great! We now have a system for distributing our load. If we were feeling particularly adventurous, we could even combine routers with remote actors... but that's a different post, for another day.</p>
 
