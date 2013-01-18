@@ -4,7 +4,7 @@
  <title>Evil Monkey Labs</title>
  <link href="http://blog.evilmonkeylabs.com" rel="self"/>
  <link href="http://blog.evilmonkeylabs.com"/>
- <updated>2013-01-17T17:41:33-08:00</updated>
+ <updated>2013-01-17T17:59:53-08:00</updated>
  <id>http://blog.evilmonkeylabs.com/</id>
  
  <author>
@@ -64,7 +64,7 @@
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;akka.routing.RoundRobinRouter&lt;/span&gt;
 
 
-&lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SimpleRoutedMain&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SimpleRouterSetup&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ActorSystem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;SimpleSystem&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simpleRouted&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;actorOf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;Props&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;SimpleActor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;withRouter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;
                         &lt;span class=&quot;nc&quot;&gt;RoundRobinRouter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nrOfInstances&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
@@ -75,7 +75,7 @@
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Note the addition of a call to the &lt;code&gt;withRouter()&lt;/code&gt; method on our &lt;code&gt;Props[ActorName]&lt;/code&gt; declaration. Where a normal &lt;code&gt;Props[ActorName]&lt;/code&gt; call sets up a single Actor, &lt;code&gt;withRouter()&lt;/code&gt; will return us a Router with &lt;code&gt;nrOfInstances&lt;/code&gt; child actors.  Here, we've setup a &lt;code&gt;RoundRobinRouter&lt;/code&gt; with 10 routees; if we look at the output of running this new &lt;code&gt;SimpleRoutedMain&lt;/code&gt;, we'll see our log entries have several different actor IDs in them:&lt;/p&gt;
+&lt;p&gt;Note the addition of a call to the &lt;code&gt;withRouter()&lt;/code&gt; method on our &lt;code&gt;Props[ActorName]&lt;/code&gt; declaration. Where a normal &lt;code&gt;Props[ActorName]&lt;/code&gt; call sets up a single Actor, &lt;code&gt;withRouter()&lt;/code&gt; will return us a Router with &lt;code&gt;nrOfInstances&lt;/code&gt; child actors.  Here, we've setup a &lt;code&gt;RoundRobinRouter&lt;/code&gt; with 10 routees; if we look at the output of running this new &lt;code&gt;SimpleRouterSetup&lt;/code&gt;, we'll see our log entries have several different actor IDs in them:&lt;/p&gt;
 
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;text&quot;&gt;[INFO] [01/17/2013 15:32:51.897] [SimpleSystem-akka.actor.default-dispatcher-7] [akka://SimpleSystem/user/simpleRoutedActor/$f] Got a valid message: Hello, Akka #6!
 [INFO] [01/17/2013 15:32:51.900] [SimpleSystem-akka.actor.default-dispatcher-8] [akka://SimpleSystem/user/simpleRoutedActor/$e] Got a valid message: Hello, Akka #5!
@@ -88,7 +88,7 @@
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;scala&quot;&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;akka.routing.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;FromConfig&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;RoundRobinRouter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
 
-&lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SimpleFileConfiggedRoutedMain&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;object&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SimpleFileConfiggedRouterSetu&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;App&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ActorSystem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;SimpleSystem&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
   &lt;span class=&quot;k&quot;&gt;val&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;simpleRouted&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;system&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;actorOf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;Props&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;SimpleActor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;withRouter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nc&quot;&gt;FromConfig&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()),&lt;/span&gt;
                                     &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;simpleRoutedActor&amp;quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;

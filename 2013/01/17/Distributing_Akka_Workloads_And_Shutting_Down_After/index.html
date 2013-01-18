@@ -78,7 +78,7 @@
 <div class="highlight"><pre><code class="scala"><span class="k">import</span> <span class="nn">akka.routing.RoundRobinRouter</span>
 
 
-<span class="k">object</span> <span class="nc">SimpleRoutedMain</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
+<span class="k">object</span> <span class="nc">SimpleRouterSetup</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
   <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;SimpleSystem&quot;</span><span class="o">)</span>
   <span class="k">val</span> <span class="n">simpleRouted</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SimpleActor</span><span class="o">].</span><span class="n">withRouter</span><span class="o">(</span>
                         <span class="nc">RoundRobinRouter</span><span class="o">(</span><span class="n">nrOfInstances</span> <span class="k">=</span> <span class="mi">10</span><span class="o">)</span>
@@ -89,7 +89,7 @@
 </code></pre></div>
 
 
-<p>Note the addition of a call to the <code>withRouter()</code> method on our <code>Props[ActorName]</code> declaration. Where a normal <code>Props[ActorName]</code> call sets up a single Actor, <code>withRouter()</code> will return us a Router with <code>nrOfInstances</code> child actors.  Here, we've setup a <code>RoundRobinRouter</code> with 10 routees; if we look at the output of running this new <code>SimpleRoutedMain</code>, we'll see our log entries have several different actor IDs in them:</p>
+<p>Note the addition of a call to the <code>withRouter()</code> method on our <code>Props[ActorName]</code> declaration. Where a normal <code>Props[ActorName]</code> call sets up a single Actor, <code>withRouter()</code> will return us a Router with <code>nrOfInstances</code> child actors.  Here, we've setup a <code>RoundRobinRouter</code> with 10 routees; if we look at the output of running this new <code>SimpleRouterSetup</code>, we'll see our log entries have several different actor IDs in them:</p>
 
 <div class="highlight"><pre><code class="text">[INFO] [01/17/2013 15:32:51.897] [SimpleSystem-akka.actor.default-dispatcher-7] [akka://SimpleSystem/user/simpleRoutedActor/$f] Got a valid message: Hello, Akka #6!
 [INFO] [01/17/2013 15:32:51.900] [SimpleSystem-akka.actor.default-dispatcher-8] [akka://SimpleSystem/user/simpleRoutedActor/$e] Got a valid message: Hello, Akka #5!
@@ -102,7 +102,7 @@
 <div class="highlight"><pre><code class="scala"><span class="k">import</span> <span class="nn">akka.routing.</span><span class="o">{</span><span class="nc">FromConfig</span><span class="o">,</span> <span class="nc">RoundRobinRouter</span><span class="o">}</span>
 
 
-<span class="k">object</span> <span class="nc">SimpleFileConfiggedRoutedMain</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
+<span class="k">object</span> <span class="nc">SimpleFileConfiggedRouterSetu</span> <span class="k">extends</span> <span class="nc">App</span> <span class="o">{</span>
   <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;SimpleSystem&quot;</span><span class="o">)</span>
   <span class="k">val</span> <span class="n">simpleRouted</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">[</span><span class="kt">SimpleActor</span><span class="o">].</span><span class="n">withRouter</span><span class="o">(</span><span class="nc">FromConfig</span><span class="o">()),</span>
                                     <span class="n">name</span> <span class="k">=</span> <span class="s">&quot;simpleRoutedActor&quot;</span><span class="o">)</span>
