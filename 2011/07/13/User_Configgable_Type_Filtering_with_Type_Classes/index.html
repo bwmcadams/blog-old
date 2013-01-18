@@ -30,7 +30,7 @@
     <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">User Configurable Type Filtering with Scala Type Classes</a>
   </h2>
   
-  <abbr class="published" title="2011-07-13T00:00:00+00:00">13 Jul 2011</abbr>
+  <abbr class="published" title="2011-07-13T00:00:00-07:00">13 Jul 2011</abbr>
   <br class="clear" />
   <div class="entry-content">
     <p>When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:</p>
@@ -67,8 +67,7 @@
   <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">DBObject</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
   <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">Any</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">.</span><span class="n">asDBObject</span><span class="o">)</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>The <code>op</code> method is just a helper function which assists the DSL in constructing a valid MongoDB query under the covers; it's not particularly relevant to this discussion so let's leave it aside for now.  What <em>is</em> important is to note that this is a very naive approach to the DSL game --- it is neither type safe or type sane.  It has some very basic support for handling "special" types like <code>String</code>, <code>java.util.Date</code>, <code>DBObject</code> and <code>Map[String, Any]</code> but blindly allows anything which is <code>AnyVal</code> through.  There are, in my opinion, three problems here:</p>
@@ -106,8 +105,7 @@
   <span class="k">def</span> <span class="nc">$lt</span><span class="o">(</span><span class="n">target</span><span class="k">:</span> <span class="kt">Iterable</span><span class="o">[</span><span class="k">_</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">.</span><span class="n">toList</span><span class="o">)</span>
   <span class="k">def</span> <span class="nc">$lt</span><span class="o">[</span><span class="kt">T:</span> <span class="kt">ValidDateOrNumericType</span><span class="o">](</span><span class="n">target</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>You should, at this point, notice a fairly stark contrast between the old code and the new.  While we still have specific allowances for <code>DBObject</code>, and have included allowances for things that are <code>Iterable</code> or <code>Array</code>-like, the explicit support for Dates, Numbers and Booleans (Primitive Numbers and Booleans being part of <code>AnyVal</code>) is gone.  Or are they?</p>
@@ -115,8 +113,7 @@
 <p>The clever reader may have noticed something new lurking at the bottom of this code::</p>
 
 <div class="highlight"><pre><code class="scala">  <span class="k">def</span> <span class="nc">$lt</span><span class="o">[</span><span class="kt">T:</span> <span class="kt">ValidDateOrNumericType</span><span class="o">](</span><span class="n">target</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>This specific method is the pivot point of our new filter system: it is what allows users to independently define what types, beyond the hardcoded ones above, are and are not allowed to pass into the <code>$lt</code> operator.</p>
@@ -130,8 +127,7 @@
 <p>Context Bounds are a fairly new syntax, recently introduced to the type parameter system in Scala 2.8.  What they give us is a shortcut for a type-dependent implicit argument (they also work with <code>Manifests</code>, which I'll explain in a future post).  When the Scala Compiler parses our code it will actually produce the following statement, which is how we would have said this in versions prior to 2.8::</p>
 
 <div class="highlight"><pre><code class="scala">    <span class="k">def</span> <span class="nc">$lt</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">target</span><span class="k">:</span> <span class="kt">T</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">evidence$1</span><span class="k">:</span> <span class="kt">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">T</span><span class="o">])</span> <span class="k">=</span> <span class="n">op</span><span class="o">(</span><span class="n">oper</span><span class="o">,</span> <span class="n">target</span><span class="o">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>What the Context Boundary syntax says is that we want to accept a generic type <code>T</code>, as long as there is an <em>implicit</em> instance of <code>ValidDateOrNumericType[T]</code> available.  With this simple statement, what we say is quite literally as long as an implicit instance of <code>ValidDateOrNumericType</code> is available for type <code>T</code>, it is a valid type for this method.  This means that you, as a user, can quickly change what type are and aren't allowed into this <code>$lt</code> method merely by adjusting the implicit scope.  Powerful, no?</p>
@@ -148,15 +144,13 @@
 <span class="k">implicit</span> <span class="k">object</span> <span class="nc">FloatDoNOk</span> <span class="k">extends</span> <span class="nc">FloatOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Float</span><span class="o">]</span>
 <span class="k">implicit</span> <span class="k">object</span> <span class="nc">BigDecimalDoNOk</span> <span class="k">extends</span> <span class="nc">BigDecimalOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">BigDecimal</span><span class="o">]</span>
 <span class="k">implicit</span> <span class="k">object</span> <span class="nc">DoubleDoNOk</span> <span class="k">extends</span> <span class="nc">DoubleOk</span> <span class="k">with</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>All one has to do to introduce a new type as valid to <code>$lt</code> is define an implicit instance of <code>ValidDateOrNumeric[&lt;YourType&gt;]</code>.  Circling back to our original problem, the solution to "How do I allow <code>ObjectId</code> in <code>$lt</code>" is quite easy:</p>
 
 <div class="highlight"><pre><code class="scala"><span class="k">implicit</span> <span class="k">object</span> <span class="nc">ObjectIdOK</span> <span class="k">extends</span> <span class="nc">ValidDateOrNumericType</span><span class="o">[</span><span class="kt">org.bson.</span><span class="k">type</span><span class="kt">s.ObjectId</span><span class="o">]</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>As long as that is in scope of your code when you invoke your query statement (such as <code>"_id" $lt new ObjectId(timestamp)</code>) it will construct a valid query to send to MongoDB.</p>
@@ -206,20 +200,25 @@
           <h3 class='sidebar-title'>Blogroll</h3>
           <div class='static-body'>
             <ul>
+              <li><a href="http://blog.typesafe.com/" title="Typesafe Blog">The Typesafe Blog</a></li>
+              <li><a href="http://letitcrash.com/" title="Akka Blog">Let It Crash - The Akka Team Blog</a></li>
               <li><a href="http://blog.10gen.com/" title="10gen Blog">The 10Gen Blog on MongoDB and NoSQL</a></li>
               <li><a href="http://snailinaturtleneck.com/blog/" title="Snail In A Turtleneck">Snail In a Turtleneck - Kristina Chodorow (Maintainer of PHP &amp; Perl for MongoDB)</a></li>
-              <li><a href="http://kylebanker.com/blog/" title="Hwaet!">Hwaet! - Kyle Banker (Maintainer of Ruby for MongoDB)</a></li>
-              <li><a href="http://worldairmaillinks.com" title="World Airmail Links">World Airmail Links</a></li>
             </ul>
          </div>
         <h3 class='sidebar-title'>Projects &amp; Sites I've Worked On</h3>
         <div class='static-body'>
           <ul>
             <li><a href="http://github.com/bwmcadams/" title="GitHub">GitHub Profile</a></li>
+            <li><a href="http://typesafe.com" title="Typesafe">Typesafe</a> <div class="sidebar_tiny">My current employer, Typesafe, is responsible for sponsoring and supporting the Scala programming language, as well as the Akka and Play! frameworks for Scala &amp; Java. As part of the Professional Services team I teach classes on Akka, Play and Scala. Additionally, engage in consulting services to assist customers deploying our products.</div></li>
+            <li><a href="http://scala-lang.org" title="Scala">The Scala Programming Language</a></li>
+            <li><a href="http://akka.io" title="Akka">Akka</a></li>
+            <li><a href="http://playframework.org" title="Play!">Play! Framework</a></li>
             <li><a href="http://mongodb.org/" title="MongoDB">MongoDB</a> 
-            <div class="sidebar_tiny">I work fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
+            <div class="sidebar_tiny">I previously worked fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
             </li>
-            <li><a href="http://api.mongodb.org/scala/casbah/latest/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created &amp; maintain.</div></li>
+            <li><a href="http://github.com/bwmcadams/hammersmith" title="Hammersmith">Hammersmith</a> <div class="sidebar_tiny">An open source next generation driver for MongoDB, designed for asynchronous, high performance operation. Work in progress, unafiliated with 10gen.</div></li>
+            <li><a href="http://github.com/mongodb/casbah/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created, and maintained through December 2012.</div></li>
             <li><a href="http://sluggy.com/" title="Sluggy Freelance">Sluggy Freelance</a> <div class="sidebar_tiny">(I wrote &amp; maintain the current code running the site. [Python+Pylons+MongoDB])</div></li>
             <li><a href="http://userfriendly.org/" title="UserFriendly">UserFriendly</a> <div class="sidebar_tiny">(Once upon a time I built the CMS which runs their site. [Perl+mod_perl])</div></li>
             <li><a href="http://bitbucket.org/namlook/mongokit/">MongoKit</a> <div class="sidebar_tiny">(I've contributed Pylons support and a few other useful hacks.)</div></li>
@@ -230,35 +229,19 @@
           <div class='static-body'>
             <ul>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/coolfeatures">MongoDB Cool Features @ MongoSV 12/10</a>
+                    <a href="http://www.bigdataspain.org/en-2012/conference/the-promise-and-peril-of-abundance-making-big-data-small/brendan-mcadams">Big Data Spain '12 - The Promise &amp; Peril of Big Data's Abundance</a>
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/hadoop">The Hadoop Plugin for MongoDB @ MongoSV 12/10</a> 
+                    <a href="http://vimeo.com/53402471">Reaktor Dev Day '12 - Asynchronous &amp; Nonblocking Scala</a> 
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongodc2010/schemadesign">Schema Design with MongoDB @ MongoDC 11/10</a>
+                    <a href="http://video.javazone.no/talk/49386440">JavaZone '12 - MongoDB and the JVM: Bringing NoSQL and the Java/Scala Platforms Together</a>
                 </li>
+                <br/>
                 <li>
-                    MongoDB + Scala @ NY Scala 8/10
-                    <ul>
-                      <li>
-                        <a href="http://www.slideshare.net/bwmcadams/scalany-mongodb-aug10">Slides</a>
-                      </li>
-                      <li>
-                        <a href="http://vimeo.com/14090025">Video</a>
-                      </li>
-                    </ul>
-                </li>
-                <li>
-                    Migrating Sluggy.com from MySQL to MongoDB @ Mongo NY 5/10
-                    <ul>
-                      <li>
-                        <a href="http://www.scribd.com/doc/31748635/From-MySQL-to-MongoDB-at-Sluggy-com">Slides</a> 
-                      </li>
-                      <li>
-                        <a href="http://blip.tv/file/3704023">Video</a>
-                        </li>
-                     </ul>
+                  <a href="http://marakana.com/s/post/1088/video_evolution_of_casbah_a_mongodb_driver_for_scala">The Evolution of Casbah: A MongoDB Driver for Scala (AKA: WTF Is a Monad?)</a>
                 </li>
            </ul>
 
@@ -315,7 +298,7 @@
       <li>made with <a href="http://github.com/vilcans/scribbish-jekyll">scribbish-jekyll</a></li>
     </ul>
     <div id="copyright">
-      Copyright &copy; 2009-2011 Brendan W. McAdams.<br>
+      Copyright &copy; 2009-2013 Brendan W. McAdams.<br>
       <span id="disclaimer">
         Views expressed herein are my own. They in no way reflect the views or opinions of my employer (past, current or future), affiliated projects, publisher, or, in many cases, a sane or rational individual.
       </span>

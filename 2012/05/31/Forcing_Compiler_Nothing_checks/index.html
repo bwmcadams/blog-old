@@ -30,7 +30,7 @@
     <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler 'Nothing' Checks</a>
   </h2>
   
-  <abbr class="published" title="2012-05-31T00:00:00+00:00">31 May 2012</abbr>
+  <abbr class="published" title="2012-05-31T00:00:00-07:00">31 May 2012</abbr>
   <br class="clear" />
   <div class="entry-content">
     <p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is "Some type you'd like to fetch a particular field as". Because of type erasure on the JVM, working with a Mongo Document can be annoying -- the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
@@ -38,15 +38,13 @@
 <div class="highlight"><pre><code class="scala"><span class="k">val</span> <span class="n">doc</span><span class="k">:</span> <span class="kt">DBObject</span> <span class="o">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span> <span class="s">&quot;balance&quot;</span> <span class="o">-&gt;</span> <span class="mf">2.5</span><span class="o">)</span>
 
 <span class="k">val</span> <span class="n">balance</span> <span class="k">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;balance&quot;</span><span class="o">)</span> 
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>We have already hit another issue here -- in Scala, invoking <code>get</code> on a <code>Map</code> returns <code>Option[T]</code> (Where, in this case, <code>T</code> is of type <code>Any</code>). Which means casting has become more complex: to get a <code>Double</code> we also have to unwrap the <code>Option[Any]</code> first. A lazy man's approach might be something hairy like so:</p>
 
 <div class="highlight"><pre><code class="scala"><span class="n">balance</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>In the annals of history (when men were <em>real</em> men, and small furry creatures from Alpha Centauri were <em>real</em> small furry creatures from Alpha Centauri), the above became an annoyingly common pattern. A solution was needed - and so <code>getAs[T]</code> was born. The idea was not only to allow a shortcut to casting, but take care of the <code>Option[T]</code> wrapping for you as well. Invoking <code>getAs[Double]</code> will, in this case, return us an <code>Option[Double]</code>.</p>
@@ -69,8 +67,7 @@
 <span class="cm">   an explicit type is declared */</span> 
 <span class="k">val</span> <span class="n">bal</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="n">getAs</span><span class="o">(</span><span class="n">doc</span><span class="o">,</span> <span class="s">&quot;balance&quot;</span><span class="o">)</span>
 <span class="cm">/* bal: Option[Double] = Some(2.5) */</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>We get back an option of <code>Nothing</code>, which is less than ideal (The REPL appears to be somewhat more forgiving in some of this behavior than the actual runtime is). My reaction to this early on was quite strong –– I wanted to <em>require</em> that the user pass their type argument. Unfortunately, the best I could do within Casbah was attempt to detect the compiler substituted <code>Nothing</code> and warn the user at runtime. Less than ideal, I know.</p>
@@ -85,8 +82,7 @@
     <span class="k">case</span> <span class="n">value</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
   <span class="o">}</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>This gave me somewhat improved behavior –- at least users are warned at runtime before something breaks.</p>
@@ -95,8 +91,7 @@
 <span class="cm">/* </span>
 <span class="cm">java.lang.IllegalArgumentException: requirement failed: Type inference failed; getAs[A]() requires an explicit type argument (e.g. dbObject.getAs[&lt;ReturnType&gt;](&quot;somegetAKey&quot;) ) to function correctly.</span>
 <span class="cm">*/</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Great -- we prevent people from utterly failing to pass a type to <code>getAs</code> by throwing an exception at runtime. A bit like closing the barn doors after the horses escaped, and somewhat counter to the point of compiled languages. Fortunately, Miles Sabin knows a lot of great compiler tricks and Jon-Anders has superpowers (which he uses for good, not evil). Using some of Miles' tricks, Jon-Anders has fixed Casbah (as of 2.3.0+) to make <code>getAs[T]</code> fail utterly at <em>compile time</em> when no type is passed.</p>
@@ -115,8 +110,7 @@
 <span class="k">sealed</span> <span class="k">trait</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]{</span>
   <span class="k">type</span> <span class="kt">B</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Our previous unbounded type argument is replaced with the new type class boundary of <code>NotNothing</code> and the runtime <code>Nothing</code> check is removed. We also need concrete instances of our type class, which is where the real magic comes into play.</p>
@@ -125,8 +119,7 @@
   <span class="k">implicit</span> <span class="k">val</span> <span class="n">nothing</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">Nothing</span><span class="o">]{</span> <span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="nc">Any</span> <span class="o">}</span>
   <span class="k">implicit</span> <span class="k">def</span> <span class="n">notNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]{</span> <span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="n">A</span> <span class="o">}</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Now, any application of <code>Nothing</code> will trigger the ambiguity problem -- the Scala compiler won't figure out how to resolve the type argument. This trick works because <code>Nothing</code> is at the <em>bottom</em> of Scala's type hierarchy. Were I to call <code>getAs("balance")</code>, the Scala compiler would attempt to fill in <code>Nothing</code> as the type argument. However, both implicit conversons for <code>nothing</code> <em>and</em> <code>notNothing[A]</code> will match -- causing ambiguity and compilation fails.</p>
@@ -143,8 +136,7 @@
 <span class="cm">              doc.getAs(&quot;balance&quot;) </span>
 <span class="cm">                       ^</span>
 <span class="cm">*/</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>A vast improvement in behavior, especially if we use the <a href="http://suereth.blogspot.com/2011/03/annotate-your-type-classes.html"><code>@implicitNotFound</code> annotation</a> to provide clear error messages.</p>
@@ -157,8 +149,7 @@
 
 <div class="highlight"><pre><code class="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">String</span><span class="o">](</span><span class="s">&quot;balance&quot;</span><span class="o">).</span><span class="n">getOrElse</span><span class="o">(</span><span class="kc">null</span><span class="o">)</span>
 <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="nc">ClassCastException</span><span class="k">:</span> <span class="kt">java.lang.Double</span> <span class="kt">cannot</span> <span class="kt">be</span> <span class="kt">cast</span> <span class="kt">to</span> <span class="kt">java.lang.String</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Daniel rightly points out how bad a runtime <code>ClassCastException</code> is, and has proposed another fix which I'm incorporating.</p>
@@ -173,8 +164,7 @@
       <span class="nc">None</span>
   <span class="o">}</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Now, when you ask for a type that doesn't match what the Document contains, you will receive <code>None</code> and a warning in your log such as <code>Unable to cast 'java.lang.Double' as 'java.lang.String'; please check your types.</code>.</p>
@@ -222,20 +212,25 @@
           <h3 class='sidebar-title'>Blogroll</h3>
           <div class='static-body'>
             <ul>
+              <li><a href="http://blog.typesafe.com/" title="Typesafe Blog">The Typesafe Blog</a></li>
+              <li><a href="http://letitcrash.com/" title="Akka Blog">Let It Crash - The Akka Team Blog</a></li>
               <li><a href="http://blog.10gen.com/" title="10gen Blog">The 10Gen Blog on MongoDB and NoSQL</a></li>
               <li><a href="http://snailinaturtleneck.com/blog/" title="Snail In A Turtleneck">Snail In a Turtleneck - Kristina Chodorow (Maintainer of PHP &amp; Perl for MongoDB)</a></li>
-              <li><a href="http://kylebanker.com/blog/" title="Hwaet!">Hwaet! - Kyle Banker (Maintainer of Ruby for MongoDB)</a></li>
-              <li><a href="http://worldairmaillinks.com" title="World Airmail Links">World Airmail Links</a></li>
             </ul>
          </div>
         <h3 class='sidebar-title'>Projects &amp; Sites I've Worked On</h3>
         <div class='static-body'>
           <ul>
             <li><a href="http://github.com/bwmcadams/" title="GitHub">GitHub Profile</a></li>
+            <li><a href="http://typesafe.com" title="Typesafe">Typesafe</a> <div class="sidebar_tiny">My current employer, Typesafe, is responsible for sponsoring and supporting the Scala programming language, as well as the Akka and Play! frameworks for Scala &amp; Java. As part of the Professional Services team I teach classes on Akka, Play and Scala. Additionally, engage in consulting services to assist customers deploying our products.</div></li>
+            <li><a href="http://scala-lang.org" title="Scala">The Scala Programming Language</a></li>
+            <li><a href="http://akka.io" title="Akka">Akka</a></li>
+            <li><a href="http://playframework.org" title="Play!">Play! Framework</a></li>
             <li><a href="http://mongodb.org/" title="MongoDB">MongoDB</a> 
-            <div class="sidebar_tiny">I work fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
+            <div class="sidebar_tiny">I previously worked fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
             </li>
-            <li><a href="http://api.mongodb.org/scala/casbah/latest/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created &amp; maintain.</div></li>
+            <li><a href="http://github.com/bwmcadams/hammersmith" title="Hammersmith">Hammersmith</a> <div class="sidebar_tiny">An open source next generation driver for MongoDB, designed for asynchronous, high performance operation. Work in progress, unafiliated with 10gen.</div></li>
+            <li><a href="http://github.com/mongodb/casbah/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created, and maintained through December 2012.</div></li>
             <li><a href="http://sluggy.com/" title="Sluggy Freelance">Sluggy Freelance</a> <div class="sidebar_tiny">(I wrote &amp; maintain the current code running the site. [Python+Pylons+MongoDB])</div></li>
             <li><a href="http://userfriendly.org/" title="UserFriendly">UserFriendly</a> <div class="sidebar_tiny">(Once upon a time I built the CMS which runs their site. [Perl+mod_perl])</div></li>
             <li><a href="http://bitbucket.org/namlook/mongokit/">MongoKit</a> <div class="sidebar_tiny">(I've contributed Pylons support and a few other useful hacks.)</div></li>
@@ -246,35 +241,19 @@
           <div class='static-body'>
             <ul>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/coolfeatures">MongoDB Cool Features @ MongoSV 12/10</a>
+                    <a href="http://www.bigdataspain.org/en-2012/conference/the-promise-and-peril-of-abundance-making-big-data-small/brendan-mcadams">Big Data Spain '12 - The Promise &amp; Peril of Big Data's Abundance</a>
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/hadoop">The Hadoop Plugin for MongoDB @ MongoSV 12/10</a> 
+                    <a href="http://vimeo.com/53402471">Reaktor Dev Day '12 - Asynchronous &amp; Nonblocking Scala</a> 
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongodc2010/schemadesign">Schema Design with MongoDB @ MongoDC 11/10</a>
+                    <a href="http://video.javazone.no/talk/49386440">JavaZone '12 - MongoDB and the JVM: Bringing NoSQL and the Java/Scala Platforms Together</a>
                 </li>
+                <br/>
                 <li>
-                    MongoDB + Scala @ NY Scala 8/10
-                    <ul>
-                      <li>
-                        <a href="http://www.slideshare.net/bwmcadams/scalany-mongodb-aug10">Slides</a>
-                      </li>
-                      <li>
-                        <a href="http://vimeo.com/14090025">Video</a>
-                      </li>
-                    </ul>
-                </li>
-                <li>
-                    Migrating Sluggy.com from MySQL to MongoDB @ Mongo NY 5/10
-                    <ul>
-                      <li>
-                        <a href="http://www.scribd.com/doc/31748635/From-MySQL-to-MongoDB-at-Sluggy-com">Slides</a> 
-                      </li>
-                      <li>
-                        <a href="http://blip.tv/file/3704023">Video</a>
-                        </li>
-                     </ul>
+                  <a href="http://marakana.com/s/post/1088/video_evolution_of_casbah_a_mongodb_driver_for_scala">The Evolution of Casbah: A MongoDB Driver for Scala (AKA: WTF Is a Monad?)</a>
                 </li>
            </ul>
 
@@ -331,7 +310,7 @@
       <li>made with <a href="http://github.com/vilcans/scribbish-jekyll">scribbish-jekyll</a></li>
     </ul>
     <div id="copyright">
-      Copyright &copy; 2009-2011 Brendan W. McAdams.<br>
+      Copyright &copy; 2009-2013 Brendan W. McAdams.<br>
       <span id="disclaimer">
         Views expressed herein are my own. They in no way reflect the views or opinions of my employer (past, current or future), affiliated projects, publisher, or, in many cases, a sane or rational individual.
       </span>

@@ -30,12 +30,66 @@
   
   
 
+<div class="hentry" id="/2011/08/05/ScalaPythonJavaCaptureBlockResult">
+  <h2 class="entry-title">
+    <a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/">Immutability and Clever Variable Usage in the Land of Blocks and Branches</a>
+  </h2>
+  
+  <abbr class="published" title="2011-08-05T00:00:00-07:00">05 Aug 2011</abbr>
+  <br class="clear" />
+  <div class="entry-content">
+    
+        <p>Last night, I found myself unconciously refactoring some Scala code (I don't recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don't seem entirely aware of one of my favorite features.  What I'm talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
+
+<p>In typical C-like languages (such as C, C++, and Java) we are restricted in our syntax should we wish to capture a value when running many branching blocks such as if-else statements, switch statements and even for/foreach constructs. When we find ourselves wanting to set the value of a variable within each possible condition or iteration, we need to declare a mutable variable before the block.  We then mutate this variable within each condition or iteration.  Take this example from Java:</p>
+
+<div class="highlight"><pre><code class="java"><span class="kt">boolean</span> <span class="n">valid</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+
+<span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">valid</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;VALIDATED&quot;</span><span class="o">;</span>
+<span class="o">}</span> 
+<span class="k">else</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;INVALID&quot;</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div>
+
+
+
+
+ 
+        <p> <a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
+    
+  </div>
+  <ul class="meta">
+    
+    
+      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#scala">scala</a> <a rel="tag" href="/tags/#effectivescala">effectivescala</a> <a rel="tag" href="/tags/#bestpractices">bestpractices</a> <a rel="tag" href="/tags/#python">python</a></li>
+    
+    <li>Meta:
+      <a href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/#disqus_thread" rel="bookmark">permalink</a>
+      <a href="http://blog.evilmonkeylabs.com">atom</a>
+    </li>
+  </ul>
+  <div class="posts">
+    
+    <span align="left">&laquo; <a href="/page4/">Older Posts</a></span>
+    
+    
+      
+        <span align="right">&raquo; <a href="/page2/">Newer Posts</a></span>
+      
+    
+  </div>
+</div>
+
+
 <div class="hentry" id="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes">
   <h2 class="entry-title">
     <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">User Configurable Type Filtering with Scala Type Classes</a>
   </h2>
   
-  <abbr class="published" title="2011-07-13T00:00:00+00:00">13 Jul 2011</abbr>
+  <abbr class="published" title="2011-07-13T00:00:00-07:00">13 Jul 2011</abbr>
   <br class="clear" />
   <div class="entry-content">
     
@@ -81,7 +135,7 @@
     <a href="/2011/02/28/MongoDB-1_8-MR-Java/">MapReduce with MongoDB 1.8 and Java</a>
   </h2>
   
-  <abbr class="published" title="2011-02-28T00:00:00+00:00">28 Feb 2011</abbr>
+  <abbr class="published" title="2011-02-28T00:00:00-08:00">28 Feb 2011</abbr>
   <br class="clear" />
   <div class="entry-content">
     
@@ -96,8 +150,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 
@@ -128,64 +181,6 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   </div>
 </div>
 
-
-<div class="hentry" id="/2011/01/27/MongoDB-1_8-MapReduce">
-  <h2 class="entry-title">
-    <a href="/2011/01/27/MongoDB-1_8-MapReduce/">A Look At MongoDB 1.8's MapReduce Changes</a>
-  </h2>
-  
-  <abbr class="published" title="2011-01-27T00:00:00+00:00">27 Jan 2011</abbr>
-  <br class="clear" />
-  <div class="entry-content">
-    
-        <p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last 'beta' release of what will become MongoDB 1.8.  As part of the release, I've been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
-
-<p>If you aren't new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn't possible to safely clean these up–--they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they've been replaced with an even better system for saving the results of MapReduce jobs!</p>
-
-<p>While the <em>out</em> argument is now a required parameter in MapReduce jobs, it has a number of options for controlling what MongoDB does with results.  If you're running a truly one-off job where you don't need to keep the results later, MongoDB now supports returning results "inline".  Be careful here though: your results are being returned in a single document and are subject to the document size limitations of MongoDB (16MB per document in 1.8).  To use inline results, set the value of <em>out</em> to a document <code>{inline: 1}</code>.  The result object will contain an additional key <em>results</em> which contains the MapReduce output; the <em>result</em> field will be omitted.</p>
-
-<p>As with previous versions of MongoDB, you can specify a collection name (as a string) in the <em>out</em> argument.  If the named collection already exists MongoDB will replace it entirely with the MapReduce results. Along with the inline mode, MongoDB 1.8 introduces support for "merge" and "reduce" output modes; instead of replacing the target collection MongoDB can be instructed to reconcile the MapReduce results with the existing data.  To use these modes, set the value of <em>out</em> to a document with a key of either "merge" or "reduce" and a value of the collection to save to.</p>
-
-<p>The difference in "merge" and "reduce" has to do with MongoDB does when it encounters duplicate keys in both the existing collection and the MapReduce results.  In "merge" mode, MongoDB will simply overwrite the existing key with the new one from the MapReduce output.  In "reduce" mode, MongoDB will run the reduce function again with both the new and old data, saving those results to the collection (you remembered to make your reduce function idempotent, right?). <strong>UPDATE</strong>: If you specified a "finalize" function, MongoDB will re-run this after the "reduce" runs.</p>
-
-<p>Now that I've thoroughly confused you, lets dig into examples of each of these behaviors.  I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here's a quick snippet of it:</p>
-
-<div class="highlight"><pre><code class="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
-<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
-</code></pre>
-</div>
-
-
-
-
- 
-        <p> <a href="/2011/01/27/MongoDB-1_8-MapReduce/#more" class="more-link"><span class="readmore">Read the rest of this entry  »</span></a></p>
-    
-  </div>
-  <ul class="meta">
-    
-    
-      <li>Tags: <a rel="tag" href="/tags/#tech">tech</a> <a rel="tag" href="/tags/#mongodb">mongodb</a> <a rel="tag" href="/tags/#mapreduce">mapreduce</a></li>
-    
-    <li>Meta:
-      <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/#disqus_thread" rel="bookmark">permalink</a>
-      <a href="http://blog.evilmonkeylabs.com">atom</a>
-    </li>
-  </ul>
-  <div class="posts">
-    
-    <span align="left">&laquo; <a href="/page4/">Older Posts</a></span>
-    
-    
-      
-        <span align="right">&raquo; <a href="/page2/">Newer Posts</a></span>
-      
-    
-  </div>
-</div>
-
 </ul>
 
 </div>
@@ -198,20 +193,25 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
           <h3 class='sidebar-title'>Blogroll</h3>
           <div class='static-body'>
             <ul>
+              <li><a href="http://blog.typesafe.com/" title="Typesafe Blog">The Typesafe Blog</a></li>
+              <li><a href="http://letitcrash.com/" title="Akka Blog">Let It Crash - The Akka Team Blog</a></li>
               <li><a href="http://blog.10gen.com/" title="10gen Blog">The 10Gen Blog on MongoDB and NoSQL</a></li>
               <li><a href="http://snailinaturtleneck.com/blog/" title="Snail In A Turtleneck">Snail In a Turtleneck - Kristina Chodorow (Maintainer of PHP &amp; Perl for MongoDB)</a></li>
-              <li><a href="http://kylebanker.com/blog/" title="Hwaet!">Hwaet! - Kyle Banker (Maintainer of Ruby for MongoDB)</a></li>
-              <li><a href="http://worldairmaillinks.com" title="World Airmail Links">World Airmail Links</a></li>
             </ul>
          </div>
         <h3 class='sidebar-title'>Projects &amp; Sites I've Worked On</h3>
         <div class='static-body'>
           <ul>
             <li><a href="http://github.com/bwmcadams/" title="GitHub">GitHub Profile</a></li>
+            <li><a href="http://typesafe.com" title="Typesafe">Typesafe</a> <div class="sidebar_tiny">My current employer, Typesafe, is responsible for sponsoring and supporting the Scala programming language, as well as the Akka and Play! frameworks for Scala &amp; Java. As part of the Professional Services team I teach classes on Akka, Play and Scala. Additionally, engage in consulting services to assist customers deploying our products.</div></li>
+            <li><a href="http://scala-lang.org" title="Scala">The Scala Programming Language</a></li>
+            <li><a href="http://akka.io" title="Akka">Akka</a></li>
+            <li><a href="http://playframework.org" title="Play!">Play! Framework</a></li>
             <li><a href="http://mongodb.org/" title="MongoDB">MongoDB</a> 
-            <div class="sidebar_tiny">I work fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
+            <div class="sidebar_tiny">I previously worked fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
             </li>
-            <li><a href="http://api.mongodb.org/scala/casbah/latest/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created &amp; maintain.</div></li>
+            <li><a href="http://github.com/bwmcadams/hammersmith" title="Hammersmith">Hammersmith</a> <div class="sidebar_tiny">An open source next generation driver for MongoDB, designed for asynchronous, high performance operation. Work in progress, unafiliated with 10gen.</div></li>
+            <li><a href="http://github.com/mongodb/casbah/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created, and maintained through December 2012.</div></li>
             <li><a href="http://sluggy.com/" title="Sluggy Freelance">Sluggy Freelance</a> <div class="sidebar_tiny">(I wrote &amp; maintain the current code running the site. [Python+Pylons+MongoDB])</div></li>
             <li><a href="http://userfriendly.org/" title="UserFriendly">UserFriendly</a> <div class="sidebar_tiny">(Once upon a time I built the CMS which runs their site. [Perl+mod_perl])</div></li>
             <li><a href="http://bitbucket.org/namlook/mongokit/">MongoKit</a> <div class="sidebar_tiny">(I've contributed Pylons support and a few other useful hacks.)</div></li>
@@ -222,35 +222,19 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
           <div class='static-body'>
             <ul>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/coolfeatures">MongoDB Cool Features @ MongoSV 12/10</a>
+                    <a href="http://www.bigdataspain.org/en-2012/conference/the-promise-and-peril-of-abundance-making-big-data-small/brendan-mcadams">Big Data Spain '12 - The Promise &amp; Peril of Big Data's Abundance</a>
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/hadoop">The Hadoop Plugin for MongoDB @ MongoSV 12/10</a> 
+                    <a href="http://vimeo.com/53402471">Reaktor Dev Day '12 - Asynchronous &amp; Nonblocking Scala</a> 
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongodc2010/schemadesign">Schema Design with MongoDB @ MongoDC 11/10</a>
+                    <a href="http://video.javazone.no/talk/49386440">JavaZone '12 - MongoDB and the JVM: Bringing NoSQL and the Java/Scala Platforms Together</a>
                 </li>
+                <br/>
                 <li>
-                    MongoDB + Scala @ NY Scala 8/10
-                    <ul>
-                      <li>
-                        <a href="http://www.slideshare.net/bwmcadams/scalany-mongodb-aug10">Slides</a>
-                      </li>
-                      <li>
-                        <a href="http://vimeo.com/14090025">Video</a>
-                      </li>
-                    </ul>
-                </li>
-                <li>
-                    Migrating Sluggy.com from MySQL to MongoDB @ Mongo NY 5/10
-                    <ul>
-                      <li>
-                        <a href="http://www.scribd.com/doc/31748635/From-MySQL-to-MongoDB-at-Sluggy-com">Slides</a> 
-                      </li>
-                      <li>
-                        <a href="http://blip.tv/file/3704023">Video</a>
-                        </li>
-                     </ul>
+                  <a href="http://marakana.com/s/post/1088/video_evolution_of_casbah_a_mongodb_driver_for_scala">The Evolution of Casbah: A MongoDB Driver for Scala (AKA: WTF Is a Monad?)</a>
                 </li>
            </ul>
 
@@ -307,7 +291,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
       <li>made with <a href="http://github.com/vilcans/scribbish-jekyll">scribbish-jekyll</a></li>
     </ul>
     <div id="copyright">
-      Copyright &copy; 2009-2011 Brendan W. McAdams.<br>
+      Copyright &copy; 2009-2013 Brendan W. McAdams.<br>
       <span id="disclaimer">
         Views expressed herein are my own. They in no way reflect the views or opinions of my employer (past, current or future), affiliated projects, publisher, or, in many cases, a sane or rational individual.
       </span>

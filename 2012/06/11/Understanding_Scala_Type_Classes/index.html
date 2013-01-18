@@ -30,7 +30,7 @@
     <a href="/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala's Type Classes</a>
   </h2>
   
-  <abbr class="published" title="2012-06-11T00:00:00+00:00">11 Jun 2012</abbr>
+  <abbr class="published" title="2012-06-11T00:00:00-07:00">11 Jun 2012</abbr>
   <br class="clear" />
   <div class="entry-content">
     <p>Over the last year or so, I have found myself making more and more use of Scala's Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
@@ -61,8 +61,7 @@
     <span class="o">)</span>
                               
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>We can easily populate collections with instances of these accounts as well.</p>
@@ -77,8 +76,7 @@
                                     <span class="mf">834567.00</span><span class="o">))</span>
 
 <span class="n">println</span><span class="o">(</span><span class="s">&quot;Bank Accounts: &quot;</span> <span class="o">+</span> <span class="n">accounts</span><span class="o">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Given collections of instances of these bank accounts in each language, we'd like to easily sort them –– given an arbitrary set of requirements.  Now, neither Scala or Java can "automatically" figure out how to sort these, instead requiring assistance from us (the developer).</p>
@@ -86,8 +84,7 @@
 <div class="highlight"><pre><code class="scala"><span class="k">val</span> <span class="n">sortedAccounts</span> <span class="k">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">sorted</span>
 
 <span class="n">println</span><span class="o">(</span><span class="s">&quot;* Sorted Accounts: &quot;</span> <span class="o">+</span> <span class="n">sortedAccounts</span><span class="o">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>It is unfortunately not <em>quite</em> that easy, as the above code will fail to compile asking for a missing argument:</p>
@@ -96,8 +93,7 @@
 <span class="kt">val</span> <span class="kt">sortedAccounts</span> <span class="o">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">sorted</span>
                                     <span class="o">^</span>
 <span class="n">one</span> <span class="n">error</span> <span class="n">found</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Like in Java, we need to provide Scala information about how to sort a class of type <code>BankAccount</code>.  In Java however, we would need to use inheritance and actually change the structure of <code>BankAccount</code> by implementing the <code>Comparable</code> interface.  Personally, I've never been a fan of that approach -- changing a class directly can lead to behavioral oddities. It also has two major limitations that I've run into in the past.</p>
@@ -128,8 +124,7 @@
 <span class="o">}</span>
 
 <span class="k">implicit</span> <span class="k">object</span> <span class="nc">BankAccountNumberSort</span> <span class="k">extends</span> <span class="nc">BankAccountNumberOrder</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Now with an implicit instance of <code>Ordering[BankAccount]</code> in scope, our sort can succeed. Running our code should produce expected results:</p>
@@ -137,8 +132,7 @@
 <div class="highlight"><pre><code class="scala"><span class="nc">Bank</span> <span class="nc">Accounts</span><span class="k">:</span> <span class="kt">List</span><span class="o">({</span> <span class="kt">Acct</span> <span class="k">#</span> <span class="err">1000893</span><span class="o">,</span> <span class="kt">Held</span> <span class="kt">by</span> <span class="kt">McAdams</span><span class="o">,</span> <span class="kt">Brendan</span> <span class="kt">W.</span> <span class="kt">with</span> <span class="kt">a</span> <span class="kt">balance</span> <span class="kt">of</span> <span class="kt">$</span> <span class="err">1234</span><span class="kt">.</span><span class="err">56</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000256</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smith</span><span class="o">,</span> <span class="nc">John</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$10000291</span><span class="o">.</span><span class="mi">83</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000012</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Doe</span><span class="o">,</span> <span class="nc">Jane</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$</span>   <span class="mf">45.28</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">4002158</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smithee</span><span class="o">,</span> <span class="nc">Alan</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$834567</span><span class="o">.</span><span class="mi">00</span><span class="o">})</span>
 
 <span class="nc">Sorted</span> <span class="nc">Accounts</span><span class="k">:</span> <span class="kt">List</span><span class="o">({</span> <span class="kt">Acct</span> <span class="k">#</span> <span class="err">1000012</span><span class="o">,</span> <span class="kt">Held</span> <span class="kt">by</span> <span class="kt">Doe</span><span class="o">,</span> <span class="kt">Jane</span>  <span class="kt">with</span> <span class="kt">a</span> <span class="kt">balance</span> <span class="kt">of</span> <span class="kt">$</span>   <span class="err">45</span><span class="kt">.</span><span class="err">28</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000256</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smith</span><span class="o">,</span> <span class="nc">John</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$10000291</span><span class="o">.</span><span class="mi">83</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">1000893</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">McAdams</span><span class="o">,</span> <span class="nc">Brendan</span> <span class="n">W</span><span class="o">.</span> <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$</span> <span class="mf">1234.56</span><span class="o">},</span> <span class="o">{</span> <span class="nc">Acct</span> <span class="k">#</span> <span class="mi">4002158</span><span class="o">,</span> <span class="nc">Held</span> <span class="n">by</span> <span class="nc">Smithee</span><span class="o">,</span> <span class="nc">Alan</span>  <span class="k">with</span> <span class="n">a</span> <span class="n">balance</span> <span class="n">of</span> <span class="n">$834567</span><span class="o">.</span><span class="mi">00</span><span class="o">})</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>The big benefit here (in my eyes) is that we didn't need to modify our <code>BankAccount</code> class at all to provide this behavior. <em>Even if <code>BankAccount</code> was a sealed third party class</em> we can provide sorting information for it. This is far superior to an inheritance based solution such as Java's. And if we wanted later to sort by <code>balance</code> instead of <code>accountNumber</code> we can explicitly pass a different instance to sort:</p>
@@ -156,8 +150,7 @@
 <span class="k">val</span> <span class="n">sortedByBalance</span> <span class="k">=</span> <span class="n">accounts</span><span class="o">.</span><span class="n">sorted</span><span class="o">(</span><span class="nc">BankAccountBalanceOrder</span><span class="o">)</span>
 
 <span class="n">println</span><span class="o">(</span><span class="s">&quot;$ Sorted By Balance: &quot;</span> <span class="o">+</span> <span class="n">sortedByBalance</span><span class="o">)</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Complete control is passed to us from an externally controlled system. I'll save the details for a future post, but we can even use a type class to define what it means if I say <code>brendansAccount - johnsAccount</code> using an instance of <code>scala.math.Numeric[BankAccount]</code>.</p>
@@ -209,20 +202,25 @@
           <h3 class='sidebar-title'>Blogroll</h3>
           <div class='static-body'>
             <ul>
+              <li><a href="http://blog.typesafe.com/" title="Typesafe Blog">The Typesafe Blog</a></li>
+              <li><a href="http://letitcrash.com/" title="Akka Blog">Let It Crash - The Akka Team Blog</a></li>
               <li><a href="http://blog.10gen.com/" title="10gen Blog">The 10Gen Blog on MongoDB and NoSQL</a></li>
               <li><a href="http://snailinaturtleneck.com/blog/" title="Snail In A Turtleneck">Snail In a Turtleneck - Kristina Chodorow (Maintainer of PHP &amp; Perl for MongoDB)</a></li>
-              <li><a href="http://kylebanker.com/blog/" title="Hwaet!">Hwaet! - Kyle Banker (Maintainer of Ruby for MongoDB)</a></li>
-              <li><a href="http://worldairmaillinks.com" title="World Airmail Links">World Airmail Links</a></li>
             </ul>
          </div>
         <h3 class='sidebar-title'>Projects &amp; Sites I've Worked On</h3>
         <div class='static-body'>
           <ul>
             <li><a href="http://github.com/bwmcadams/" title="GitHub">GitHub Profile</a></li>
+            <li><a href="http://typesafe.com" title="Typesafe">Typesafe</a> <div class="sidebar_tiny">My current employer, Typesafe, is responsible for sponsoring and supporting the Scala programming language, as well as the Akka and Play! frameworks for Scala &amp; Java. As part of the Professional Services team I teach classes on Akka, Play and Scala. Additionally, engage in consulting services to assist customers deploying our products.</div></li>
+            <li><a href="http://scala-lang.org" title="Scala">The Scala Programming Language</a></li>
+            <li><a href="http://akka.io" title="Akka">Akka</a></li>
+            <li><a href="http://playframework.org" title="Play!">Play! Framework</a></li>
             <li><a href="http://mongodb.org/" title="MongoDB">MongoDB</a> 
-            <div class="sidebar_tiny">I work fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
+            <div class="sidebar_tiny">I previously worked fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
             </li>
-            <li><a href="http://api.mongodb.org/scala/casbah/latest/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created &amp; maintain.</div></li>
+            <li><a href="http://github.com/bwmcadams/hammersmith" title="Hammersmith">Hammersmith</a> <div class="sidebar_tiny">An open source next generation driver for MongoDB, designed for asynchronous, high performance operation. Work in progress, unafiliated with 10gen.</div></li>
+            <li><a href="http://github.com/mongodb/casbah/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created, and maintained through December 2012.</div></li>
             <li><a href="http://sluggy.com/" title="Sluggy Freelance">Sluggy Freelance</a> <div class="sidebar_tiny">(I wrote &amp; maintain the current code running the site. [Python+Pylons+MongoDB])</div></li>
             <li><a href="http://userfriendly.org/" title="UserFriendly">UserFriendly</a> <div class="sidebar_tiny">(Once upon a time I built the CMS which runs their site. [Perl+mod_perl])</div></li>
             <li><a href="http://bitbucket.org/namlook/mongokit/">MongoKit</a> <div class="sidebar_tiny">(I've contributed Pylons support and a few other useful hacks.)</div></li>
@@ -233,35 +231,19 @@
           <div class='static-body'>
             <ul>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/coolfeatures">MongoDB Cool Features @ MongoSV 12/10</a>
+                    <a href="http://www.bigdataspain.org/en-2012/conference/the-promise-and-peril-of-abundance-making-big-data-small/brendan-mcadams">Big Data Spain '12 - The Promise &amp; Peril of Big Data's Abundance</a>
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/hadoop">The Hadoop Plugin for MongoDB @ MongoSV 12/10</a> 
+                    <a href="http://vimeo.com/53402471">Reaktor Dev Day '12 - Asynchronous &amp; Nonblocking Scala</a> 
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongodc2010/schemadesign">Schema Design with MongoDB @ MongoDC 11/10</a>
+                    <a href="http://video.javazone.no/talk/49386440">JavaZone '12 - MongoDB and the JVM: Bringing NoSQL and the Java/Scala Platforms Together</a>
                 </li>
+                <br/>
                 <li>
-                    MongoDB + Scala @ NY Scala 8/10
-                    <ul>
-                      <li>
-                        <a href="http://www.slideshare.net/bwmcadams/scalany-mongodb-aug10">Slides</a>
-                      </li>
-                      <li>
-                        <a href="http://vimeo.com/14090025">Video</a>
-                      </li>
-                    </ul>
-                </li>
-                <li>
-                    Migrating Sluggy.com from MySQL to MongoDB @ Mongo NY 5/10
-                    <ul>
-                      <li>
-                        <a href="http://www.scribd.com/doc/31748635/From-MySQL-to-MongoDB-at-Sluggy-com">Slides</a> 
-                      </li>
-                      <li>
-                        <a href="http://blip.tv/file/3704023">Video</a>
-                        </li>
-                     </ul>
+                  <a href="http://marakana.com/s/post/1088/video_evolution_of_casbah_a_mongodb_driver_for_scala">The Evolution of Casbah: A MongoDB Driver for Scala (AKA: WTF Is a Monad?)</a>
                 </li>
            </ul>
 
@@ -318,7 +300,7 @@
       <li>made with <a href="http://github.com/vilcans/scribbish-jekyll">scribbish-jekyll</a></li>
     </ul>
     <div id="copyright">
-      Copyright &copy; 2009-2011 Brendan W. McAdams.<br>
+      Copyright &copy; 2009-2013 Brendan W. McAdams.<br>
       <span id="disclaimer">
         Views expressed herein are my own. They in no way reflect the views or opinions of my employer (past, current or future), affiliated projects, publisher, or, in many cases, a sane or rational individual.
       </span>

@@ -30,7 +30,7 @@
     <a href="/2011/01/27/MongoDB-1_8-MapReduce/">A Look At MongoDB 1.8's MapReduce Changes</a>
   </h2>
   
-  <abbr class="published" title="2011-01-27T00:00:00+00:00">27 Jan 2011</abbr>
+  <abbr class="published" title="2011-01-27T00:00:00-08:00">27 Jan 2011</abbr>
   <br class="clear" />
   <div class="entry-content">
     <p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last 'beta' release of what will become MongoDB 1.8.  As part of the release, I've been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
@@ -49,8 +49,7 @@
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 
@@ -64,8 +63,7 @@
     <span class="nx">key</span> <span class="o">=</span> <span class="k">typeof</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span> <span class="o">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">.</span><span class="nx">getYear</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1900</span><span class="p">;</span> 
     <span class="nx">emit</span><span class="p">(</span> <span class="nx">key</span><span class="p">,</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">sum</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">bc10Year</span> <span class="p">}</span> <span class="p">)</span> <span class="p">;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>While the reduce function aggregates the data by year, creating a set that can be averaged.  Remember that MongoDB reduce tasks have to be able to be called repeatedly, so the output is crafted to match the input: something that becomes even more important when we say, ask MongoDB to re-reduce our output with the old data.</p>
@@ -79,8 +77,7 @@
    
   <span class="k">return</span> <span class="nx">n</span><span class="p">;</span> 
 <span class="p">}</span> 
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>We'll round it all out out with a quick and dirty finalize function which can calculate the current average.  Note that I'm keeping all the intermediate data around for demonstrating "reduce" mode.</p>
@@ -89,8 +86,7 @@
   <span class="nx">value</span><span class="p">.</span><span class="nx">avg</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">sum</span> <span class="o">/</span> <span class="nx">value</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>First, a quick look at "inline" mode (I'll leave plain old name a collection as an exercise to you, my humble reader).</p>
@@ -131,8 +127,7 @@
     <span class="p">},</span>
     <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>To demonstrate "merge" and "reduce" mode, I'm going to use queries to break out the data a bit.  Lets look first at "merge", by first running MapReduce against the first half of the data, and then merge in the second half.</p>
@@ -175,8 +170,7 @@
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1998</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.262879999999994</span> <span class="p">}</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1999</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.646135458167332</span> <span class="p">}</span> <span class="p">}</span>
 <span class="o">&gt;</span> 
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>That gives us our first half of the data; we ran that with a normal named collection output.  Lets merge in the second half:</p>
@@ -221,8 +215,7 @@
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2008</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.6642629482071714</span> <span class="p">}</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2009</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.2641200000000037</span> <span class="p">}</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2010</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.3255026455026435</span> <span class="p">}</span> <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>To close out, lets take "reduce" mode for a quick spin.  We'll select a half of a year for the first part, and then reduce in the second half.</p>
@@ -258,8 +251,7 @@
 <span class="p">}</span>
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">539.5599999999998</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.138666666666665</span> <span class="p">}</span> <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>That handles the first half... Let's grab the second:</p>
@@ -295,8 +287,7 @@
 <span class="p">}</span>
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1299999999997</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870967</span> <span class="p">}</span> <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>Of course, this does us no good if the results don't add up.  A quick comparison between the 'merged' output and the 'reduced' output validates our code:</p>
@@ -305,8 +296,7 @@
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1299999999997</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870967</span> <span class="p">}</span> <span class="p">}</span>
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">merged</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="mi">2001</span><span class="p">})</span> 
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1300000000003</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870969</span> <span class="p">}</span> <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div>
 
 
 <p>There are some minor differences at a decimal level since we are working with floating point numbers here, but the results are the same.</p>
@@ -356,20 +346,25 @@
           <h3 class='sidebar-title'>Blogroll</h3>
           <div class='static-body'>
             <ul>
+              <li><a href="http://blog.typesafe.com/" title="Typesafe Blog">The Typesafe Blog</a></li>
+              <li><a href="http://letitcrash.com/" title="Akka Blog">Let It Crash - The Akka Team Blog</a></li>
               <li><a href="http://blog.10gen.com/" title="10gen Blog">The 10Gen Blog on MongoDB and NoSQL</a></li>
               <li><a href="http://snailinaturtleneck.com/blog/" title="Snail In A Turtleneck">Snail In a Turtleneck - Kristina Chodorow (Maintainer of PHP &amp; Perl for MongoDB)</a></li>
-              <li><a href="http://kylebanker.com/blog/" title="Hwaet!">Hwaet! - Kyle Banker (Maintainer of Ruby for MongoDB)</a></li>
-              <li><a href="http://worldairmaillinks.com" title="World Airmail Links">World Airmail Links</a></li>
             </ul>
          </div>
         <h3 class='sidebar-title'>Projects &amp; Sites I've Worked On</h3>
         <div class='static-body'>
           <ul>
             <li><a href="http://github.com/bwmcadams/" title="GitHub">GitHub Profile</a></li>
+            <li><a href="http://typesafe.com" title="Typesafe">Typesafe</a> <div class="sidebar_tiny">My current employer, Typesafe, is responsible for sponsoring and supporting the Scala programming language, as well as the Akka and Play! frameworks for Scala &amp; Java. As part of the Professional Services team I teach classes on Akka, Play and Scala. Additionally, engage in consulting services to assist customers deploying our products.</div></li>
+            <li><a href="http://scala-lang.org" title="Scala">The Scala Programming Language</a></li>
+            <li><a href="http://akka.io" title="Akka">Akka</a></li>
+            <li><a href="http://playframework.org" title="Play!">Play! Framework</a></li>
             <li><a href="http://mongodb.org/" title="MongoDB">MongoDB</a> 
-            <div class="sidebar_tiny">I work fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
+            <div class="sidebar_tiny">I previously worked fulltime on MongoDB at <a href="http://10gen.com">10gen</a>, maintaining JVM tools such as the <a href="http://github.com/mongodb/mongo-java-driver">Java Driver</a>, <a href="http://github.com/mongodb/casbah">Casbah (Scala Driver)</a> and <a href="http://github.com/mongodb/mongo-hadoop">Hadoop Integration</a>.</div> 
             </li>
-            <li><a href="http://api.mongodb.org/scala/casbah/latest/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created &amp; maintain.</div></li>
+            <li><a href="http://github.com/bwmcadams/hammersmith" title="Hammersmith">Hammersmith</a> <div class="sidebar_tiny">An open source next generation driver for MongoDB, designed for asynchronous, high performance operation. Work in progress, unafiliated with 10gen.</div></li>
+            <li><a href="http://github.com/mongodb/casbah/" title="Casbah">Casbah</a> <div class="sidebar_tiny">An open source Scala driver for MongoDB that I created, and maintained through December 2012.</div></li>
             <li><a href="http://sluggy.com/" title="Sluggy Freelance">Sluggy Freelance</a> <div class="sidebar_tiny">(I wrote &amp; maintain the current code running the site. [Python+Pylons+MongoDB])</div></li>
             <li><a href="http://userfriendly.org/" title="UserFriendly">UserFriendly</a> <div class="sidebar_tiny">(Once upon a time I built the CMS which runs their site. [Perl+mod_perl])</div></li>
             <li><a href="http://bitbucket.org/namlook/mongokit/">MongoKit</a> <div class="sidebar_tiny">(I've contributed Pylons support and a few other useful hacks.)</div></li>
@@ -380,35 +375,19 @@
           <div class='static-body'>
             <ul>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/coolfeatures">MongoDB Cool Features @ MongoSV 12/10</a>
+                    <a href="http://www.bigdataspain.org/en-2012/conference/the-promise-and-peril-of-abundance-making-big-data-small/brendan-mcadams">Big Data Spain '12 - The Promise &amp; Peril of Big Data's Abundance</a>
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongosv2010/hadoop">The Hadoop Plugin for MongoDB @ MongoSV 12/10</a> 
+                    <a href="http://vimeo.com/53402471">Reaktor Dev Day '12 - Asynchronous &amp; Nonblocking Scala</a> 
                 </li>
+                <br/>
                 <li>
-                    <a href="http://www.10gen.com/video/mongodc2010/schemadesign">Schema Design with MongoDB @ MongoDC 11/10</a>
+                    <a href="http://video.javazone.no/talk/49386440">JavaZone '12 - MongoDB and the JVM: Bringing NoSQL and the Java/Scala Platforms Together</a>
                 </li>
+                <br/>
                 <li>
-                    MongoDB + Scala @ NY Scala 8/10
-                    <ul>
-                      <li>
-                        <a href="http://www.slideshare.net/bwmcadams/scalany-mongodb-aug10">Slides</a>
-                      </li>
-                      <li>
-                        <a href="http://vimeo.com/14090025">Video</a>
-                      </li>
-                    </ul>
-                </li>
-                <li>
-                    Migrating Sluggy.com from MySQL to MongoDB @ Mongo NY 5/10
-                    <ul>
-                      <li>
-                        <a href="http://www.scribd.com/doc/31748635/From-MySQL-to-MongoDB-at-Sluggy-com">Slides</a> 
-                      </li>
-                      <li>
-                        <a href="http://blip.tv/file/3704023">Video</a>
-                        </li>
-                     </ul>
+                  <a href="http://marakana.com/s/post/1088/video_evolution_of_casbah_a_mongodb_driver_for_scala">The Evolution of Casbah: A MongoDB Driver for Scala (AKA: WTF Is a Monad?)</a>
                 </li>
            </ul>
 
@@ -465,7 +444,7 @@
       <li>made with <a href="http://github.com/vilcans/scribbish-jekyll">scribbish-jekyll</a></li>
     </ul>
     <div id="copyright">
-      Copyright &copy; 2009-2011 Brendan W. McAdams.<br>
+      Copyright &copy; 2009-2013 Brendan W. McAdams.<br>
       <span id="disclaimer">
         Views expressed herein are my own. They in no way reflect the views or opinions of my employer (past, current or future), affiliated projects, publisher, or, in many cases, a sane or rational individual.
       </span>
