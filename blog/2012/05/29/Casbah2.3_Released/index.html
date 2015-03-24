@@ -1,0 +1,286 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Casbah 2.3.0-RC1 Released - Evil Monkey Labs</title>
+  <meta name="author" content="Brendan McAdams">
+
+  
+  <meta name="description" content="Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as "org.mongodb" % "casbah" % "2.3.0-RC1". My release &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2012/05/29/Casbah2.3_Released/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+   <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:200,300,400,500,600,700,900' rel='stylesheet' type='text/css'>
+
+
+
+
+  
+
+  <style>html{background: url(/images/background.png) no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}</style>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+</hgroup>
+
+</header>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Casbah 2.3.0-RC1 Released</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-29T00:00:00-07:00" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as  <code>"org.mongodb" % "casbah" % "2.3.0-RC1"</code>. My <a href="http://notes.implicit.ly/post/24009446396/casbah-2-3-0rc1">release announcement</a> to <a href="http://implicit.ly">implicit.ly</a> contains the details on all of the bugs fixed – I will also be posting another set of blog entries shortly outlining the specific improvements to the code and demoing fetaures.</p>
+
+<p>It has been just about a year since the last major release of Casbah, which was version <strong>2.1.5-1</strong>.  A number of factors led to the delay in getting a major update out the door, for which I apologize.  Amongst other things I have spent much of the last year since Casbah&rsquo;s prior release on the road doing training, consulting and evangelization of MongoDB to users around the globe; I had less time for code among all these things than I expected!  Additionally, after releasing the <strong>2.1.x</strong> series of Casbah I embarked on what quickly morphed from Casbah <strong>2.2.0</strong> to <strong>3.0.0</strong> – a major refactoring and cleanup of 2+ years of API cruft and &ldquo;I&rsquo;m Gonna Learn Me Some Scala!&rdquo; detritus.  In all the excitement to release a perfect release to end all releases, I did a poor job of making it easy to backport and maintain a compatibility series for <strong>2.x</strong> users – a harsh lesson in the importance of creating small, bite sized git commits that can be cherry picked.</p>
+
+<h2>So What Happened to Casbah 3.0? And 2.2?</h2>
+
+<p>Casbah <strong>2.2.x</strong> is dead – <strong>3.0.x</strong> is certainly not!  When the work following <strong>2.1.x</strong> was begun, I had published a number of early snapshots as Casbah <em>2.2.0-SNAPSHOT</em>.  During this development cycle I found a lot of the aforementioned detritus such as overloaded methods (Casbah was begun as a Scala 2.7.x project and I never fully moved its core APIs over to use named and default arguments - some of these are corrected in Casbah <strong>2.3.0</strong> but in the interest of backwards compatibility with prior releases of 2.x, not completely). As I worked on coding improvements around these things the API drifted further and further away from compatibility and I chose to kill off the <strong>2.2.x</strong> series, planning the next release of Casbah as <strong>3.0.0</strong>.  In addition to that, I intended Casbah <strong>3.0.0</strong> to coincide with MongoDB <strong>2.2.0</strong> which will have additional features such as the New Aggregation Framework.  As MongoDB 2.2 hasn&rsquo;t been released yet, it became clear I needed to provide an updated Casbah release with many of the improvements but without many of the API breakages introduced in <strong>3.0</strong> - including a vastly improved build of the Casbah Query DSL which has stronger type safety and compiler checks thanks to the inimitable <a href="http://twitter.com/jteigen">Jon-Anders Teigen</a>.</p>
+
+<p>Casbah <strong>3.0</strong> is still very much alive and in development, with <strong>2.3.0</strong> representing a backporting of many of the changes and improvements from <strong>3.0</strong>.  Because of the abandonment of the original <strong>2.2</strong> development series, I felt it was saner to kill <strong>2.2.x</strong> dead and bring the backports into a <strong>2.3.x</strong> series. You can, if you wish, think of this as <em>Casbah 2.3 - The Search for Casbah 2.2</em> (The long rumored sequel to Spaceballs has been said to be called <em>Spaceballs 3: The Search for Spaceballs 2</em>).</p>
+
+<p>I will continue to support and improve Casbah <strong>2.3.x</strong> moving forward as well as completing Casbah <strong>3.0</strong> (still intended to coincide with the release of MongoDB 2.2). If you have any questions, please don&rsquo;t hesitate to contact me!</p>
+
+<p><em>Later tonight or tomorrow I will post an entry or two detailing all of the wonderful changes in Casbah 2.3.0 and how to take advantage of them.</em></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-29T00:00:00-07:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/blog/2012/05/29/Casbah2.3_Released/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/blog/2012/05/29/Casbah2.3_Released/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/08/05/ScalaPythonJavaCaptureBlockResult/" title="Previous Post: Immutability and Clever Variable Usage in the Land of Blocks and Branches">&laquo; Immutability and Clever Variable Usage in the Land of Blocks and Branches</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/" title="Next Post: Forcing Scala Compiler 'Nothing' Checks">Forcing Scala Compiler &#8216;Nothing&#8217; Checks &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section id="titles">
+  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <h3 id="site_subtitle">Code and random ramblings.</h3>
+</section>
+
+<section id="menu">
+  <ul>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+  </ul>
+</section>
+
+<section id="social">
+  
+
+  
+
+  
+
+  
+    <a href="https://github.com/bwmcadams" title="bwmcadams"><i class="fa fa-github fa-2x"></i></a>
+  
+
+  
+
+  
+    <a href="https://twitter.com/rit" title="rit"><i class="fa fa-twitter fa-2x"></i></a>
+  
+</section>
+
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - And Shutting Down Afterwards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/14/mongodb-community-call-for-postcards/">MongoDB Community – Call for Postcards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/06/and-now-for-something-completely-different/">And Now For Something Completely Different!</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Brendan McAdams -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bwmcadams';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

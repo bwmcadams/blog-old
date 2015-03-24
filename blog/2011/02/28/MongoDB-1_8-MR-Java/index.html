@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>MapReduce with MongoDB 1.8 and Java - Evil Monkey Labs</title>
+  <meta name="author" content="Brendan McAdams">
+
+  
+  <meta name="description" content="In my last post, I introduced the
+new MapReduce features introduced in MongoDB 1.8, which is now available as a release candidate. Most importantly &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+   <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:200,300,400,500,600,700,900' rel='stylesheet' type='text/css'>
+
+
+
+
+  
+
+  <style>html{background: url(/images/background.png) no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}</style>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+</hgroup>
+
+</header>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">MapReduce With MongoDB 1.8 and Java</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-02-28T00:00:00-08:00" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the
+new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://www.mongodb.org/display/DOCS/1.8+Release+Notes">available as a release candidate</a>.  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the <em>merge</em> and <em>reduce</em> output modes.</p>
+
+<p>As I write this, we are prepping new releases of our <a href="http://www.mongodb.org/display/DOCS/Java+Language+Center">Java Driver</a> (v2.5) and our <a href="http://api.mongodb.org/scala/casbah">Scala Driver, Casbah</a> (v2.1) which are intended to support MongoDB 1.8&rsquo;s new features including incremental MapReduce.  Since I implemented the APIs for the new MapReduce output in both drivers, I thought I&rsquo;d demonstrate the application of these new output features to the previous dataset.  This post is focused on the Java API, but a Scala one will likely follow.</p>
+
+<p>As a reminder (or a primer for those who skipped my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>), I&rsquo;ve been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here&rsquo;s a quick snippet of it:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
+<span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span></code></pre></div>
+
+
+
+
+<!--more-->
+
+
+<p>The map function I&rsquo;m using extracts the year from the date, and the 10 year benchmark value:</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">m</span><span class="p">()</span> <span class="p">{</span> 
+    <span class="nx">key</span> <span class="o">=</span> <span class="k">typeof</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span> <span class="o">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">.</span><span class="nx">getYear</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1900</span><span class="p">;</span> 
+    <span class="nx">emit</span><span class="p">(</span> <span class="nx">key</span><span class="p">,</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">sum</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">bc10Year</span> <span class="p">}</span> <span class="p">)</span> <span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+
+
+<p>&hellip; while the reduce function aggregates the data by year, creating a set that can be averaged.  Remember that MongoDB reduce tasks have to be able to be called repeatedly, so the output is crafted to match the input: something that becomes even more important when we say, ask MongoDB to re-reduce our output with the old data.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">r</span><span class="p">(</span> <span class="nx">year</span><span class="p">,</span> <span class="nx">values</span> <span class="p">)</span> <span class="p">{</span> 
+  <span class="kd">var</span> <span class="nx">n</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">sum</span><span class="o">:</span> <span class="mi">0</span> <span class="p">}</span> 
+  <span class="k">for</span> <span class="p">(</span> <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">values</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">){</span> 
+      <span class="nx">n</span><span class="p">.</span><span class="nx">sum</span> <span class="o">+=</span> <span class="nx">values</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">sum</span><span class="p">;</span> 
+      <span class="nx">n</span><span class="p">.</span><span class="nx">count</span> <span class="o">+=</span> <span class="nx">values</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">count</span><span class="p">;</span> 
+  <span class="p">}</span> 
+   
+  <span class="k">return</span> <span class="nx">n</span><span class="p">;</span> 
+<span class="p">}</span></code></pre></div>
+
+
+<p>We&rsquo;ll round it all out out with a quick and dirty finalize function which can calculate the current average.  Note that I&rsquo;m keeping all the intermediate data around for demonstrating &ldquo;reduce&rdquo; mode.</p>
+
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">f</span><span class="p">(</span> <span class="nx">year</span><span class="p">,</span> <span class="nx">value</span> <span class="p">){</span>
+  <span class="nx">value</span><span class="p">.</span><span class="nx">avg</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">sum</span> <span class="o">/</span> <span class="nx">value</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+<span class="p">}</span></code></pre></div>
+
+
+<p>First, we&rsquo;ll need to stick these functions into some Java strings to pass around for our testing:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">String</span> <span class="n">m</span> <span class="o">=</span> <span class="s">&quot;function() { key = typeof( this._id ) == \&quot;number\&quot; ? this._id : this._id.getYear() + 1900;&quot;</span> <span class="o">+</span>
+                   <span class="s">&quot;emit( key, { count: 1, sum: this.bc10Year } );&quot;</span><span class="o">;</span>
+
+        <span class="n">String</span> <span class="n">r</span> <span class="o">=</span> <span class="s">&quot;function( year, values ) { var n = { count: 0, sum: 0};&quot;</span> <span class="o">+</span>
+                   <span class="s">&quot; for ( var i = 0; i &lt; values.length; i ++ ) { n.sum += values[i].sum; &quot;</span> <span class="o">+</span> 
+                   <span class="s">&quot; n.count += values[i].count; } return n; }&quot;</span><span class="o">;</span>
+
+        <span class="n">String</span> <span class="n">f</span> <span class="o">=</span> <span class="s">&quot;function( year, value ) { value.avg = value.sum / value.count; return value; }&quot;</span><span class="o">;</span></code></pre></div>
+
+
+<p>The Java API now allows you to pass an optional <strong><a href="http://api.mongodb.org/java/2.5-pre-/com/mongodb/MapReduceCommand.OutputType.html">MapReduceCommand.OutputType</a></strong> value, which controls the type of output received.  If one is not specifed, the output collection is assumed to be <strong>REPLACE</strong> &mdash; namely, the standard mode in which the named collection is replaced completely with the output of the MapReduce job.  Looking at <strong>INLINE</strong> as our example, we can call the new method in collection.  Feel free to set the output collection name to <em>null</em> or a throwaway value; it is ignored by the Java driver in Inline output mode.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">MapReduceOutput</span> <span class="n">out</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="na">mapReduce</span><span class="o">(</span><span class="n">m</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> <span class="n">MapReduceCommand</span><span class="o">.</span><span class="na">OutputType</span><span class="o">.</span><span class="na">INLINE</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+
+<span class="k">for</span> <span class="o">(</span> <span class="n">DBObject</span> <span class="n">obj</span> <span class="o">:</span> <span class="n">out</span><span class="o">.</span><span class="na">results</span><span class="o">()</span> <span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span> <span class="n">obj</span> <span class="o">);</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>Which should output each DBObject in the results to the screen.  The new MapReduceOutput code detects the result set type from MongoDB and provides it in <code>results()</code> as a <code>Iterable&lt;DBObject&gt;</code>&mdash;whether the results are <strong>INLINE</strong> or stored in a collection.  Note that I did not specify the <code>finalize</code> function here, as the interface on <strong>DBCollection</strong> doesn&rsquo;t accept it as a parameter.  Alternately, we could construct a <strong><a href="http://api.mongodb.org/java/2.5-pre-/com/mongodb/MapReduceCommand.html">MapReduceCommand</a></strong> instance, which allows us to set <code>finalize</code>:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">MapReduceCommand</span> <span class="n">cmd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MapReduceCommand</span><span class="o">(</span> <span class="n">coll</span><span class="o">,</span> <span class="n">m</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="kc">null</span><span class="o">,</span> 
+                                             <span class="n">MapReduceCommand</span><span class="o">.</span><span class="na">OutputType</span><span class="o">.</span><span class="na">INLINE</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+
+<span class="n">cmd</span><span class="o">.</span><span class="na">setFinalize</span><span class="o">(</span><span class="n">f</span><span class="o">);</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="na">mapReduce</span><span class="o">(</span><span class="n">cmd</span><span class="o">);</span>
+
+<span class="k">for</span> <span class="o">(</span> <span class="n">DBObject</span> <span class="n">obj</span> <span class="o">:</span> <span class="n">out</span><span class="o">.</span><span class="na">results</span><span class="o">()</span> <span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span> <span class="n">obj</span> <span class="o">);</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>Using the <strong>MERGE</strong> and <strong>REDUCE</strong> Output Modes follows much the same pattern.  I&rsquo;ll leave figuring out <strong>MERGE</strong> as an exercise for the reader (it should be easy if you read my last post) but here&rsquo;s how we would handle a <strong>REDUCE</strong> on two halves of the same year.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">cmd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MapReduceCommand</span><span class="o">(</span> <span class="n">coll</span><span class="o">,</span> <span class="n">m</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="s">&quot;yield_historical.out&quot;</span><span class="o">,</span> 
+                            <span class="n">MapReduceCommand</span><span class="o">.</span><span class="na">OutputType</span><span class="o">.</span><span class="na">REDUCE</span><span class="o">,</span> 
+                            <span class="k">new</span> <span class="nf">BasicDBObject</span><span class="o">(</span><span class="s">&quot;_id&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">BasicDBObject</span><span class="o">(</span>
+                                                        <span class="s">&quot;$gte&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">(</span> <span class="mi">101</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">1</span> <span class="o">)</span>
+                                                     <span class="o">).</span><span class="na">append</span><span class="o">(</span>
+                                                        <span class="s">&quot;$lte&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">(</span> <span class="mi">101</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">1</span> <span class="o">)</span>
+                                                     <span class="o">)</span>
+                                            <span class="o">)</span>
+                           <span class="o">);</span>
+
+<span class="n">cmd</span><span class="o">.</span><span class="na">setFinalize</span><span class="o">(</span><span class="n">f</span><span class="o">);</span>
+
+<span class="cm">/** Ignore output of first half... */</span>
+<span class="n">coll</span><span class="o">.</span><span class="na">mapReduce</span><span class="o">(</span><span class="n">cmd</span><span class="o">);</span>
+
+<span class="cm">/** Reduce in second half */</span>
+<span class="n">cmd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MapReduceCommand</span><span class="o">(</span> <span class="n">coll</span><span class="o">,</span> <span class="n">m</span><span class="o">,</span> <span class="n">r</span><span class="o">,</span> <span class="s">&quot;yield_historical.out&quot;</span><span class="o">,</span> 
+                            <span class="n">MapReduceCommand</span><span class="o">.</span><span class="na">OutputType</span><span class="o">.</span><span class="na">REDUCE</span><span class="o">,</span> 
+                            <span class="k">new</span> <span class="nf">BasicDBObject</span><span class="o">(</span><span class="s">&quot;_id&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">BasicDBObject</span><span class="o">(</span>
+                                                        <span class="s">&quot;$gt&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">(</span> <span class="mi">101</span><span class="o">,</span> <span class="mi">5</span><span class="o">,</span> <span class="mi">1</span> <span class="o">)</span>
+                                                     <span class="o">).</span><span class="na">append</span><span class="o">(</span>
+                                                        <span class="s">&quot;$lte&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">(</span> <span class="mi">101</span><span class="o">,</span> <span class="mi">11</span><span class="o">,</span> <span class="mi">31</span> <span class="o">)</span>
+                                                     <span class="o">)</span>
+                                             <span class="o">)</span>
+                           <span class="o">);</span>
+
+<span class="n">cmd</span><span class="o">.</span><span class="na">setFinalize</span><span class="o">(</span><span class="n">f</span><span class="o">);</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="n">coll</span><span class="o">.</span><span class="na">mapReduce</span><span class="o">(</span><span class="n">cmd</span><span class="o">);</span>
+
+<span class="k">for</span> <span class="o">(</span> <span class="n">DBObject</span> <span class="n">obj</span> <span class="o">:</span> <span class="n">out</span><span class="o">.</span><span class="na">results</span><span class="o">()</span> <span class="o">)</span> <span class="o">{</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span> <span class="n">obj</span> <span class="o">);</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>That&rsquo;s it! Go forth, and MapReduce&hellip;</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-02-28T00:00:00-08:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2011/01/27/MongoDB-1_8-MapReduce/" title="Previous Post: A Look At MongoDB 1.8's MapReduce Changes">&laquo; A Look At MongoDB 1.8&#8217;s MapReduce Changes</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/" title="Next Post: User Configurable Type Filtering with Scala Type Classes">User Configurable Type Filtering with Scala Type Classes &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section id="titles">
+  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <h3 id="site_subtitle">Code and random ramblings.</h3>
+</section>
+
+<section id="menu">
+  <ul>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+  </ul>
+</section>
+
+<section id="social">
+  
+
+  
+
+  
+
+  
+    <a href="https://github.com/bwmcadams" title="bwmcadams"><i class="fa fa-github fa-2x"></i></a>
+  
+
+  
+
+  
+    <a href="https://twitter.com/rit" title="rit"><i class="fa fa-twitter fa-2x"></i></a>
+  
+</section>
+
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - And Shutting Down Afterwards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/14/mongodb-community-call-for-postcards/">MongoDB Community – Call for Postcards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/06/and-now-for-something-completely-different/">And Now For Something Completely Different!</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Brendan McAdams -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'bwmcadams';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
