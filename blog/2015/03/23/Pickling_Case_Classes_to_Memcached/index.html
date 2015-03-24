@@ -78,9 +78,9 @@
 
 <div class="entry-content"><p>Recently, I&rsquo;ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I&rsquo;ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site&hellip; from Perl, PHP, and Python.</p>
 
-<p>Today, I&rsquo;m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I&rsquo;m discovering all sorts of new fun that I haven&rsquo;t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I&rsquo;ve found a powerful combination.</p>
+<p>Today, I&rsquo;m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I&rsquo;m discovering all sorts of new fun that I haven&rsquo;t dealt with in Scala yet. One of these is using Memcached, and specifically serializing/deserializing Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I&rsquo;ve found a powerful combination.</p>
 
-<p>So far, I&rsquo;m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus&hellip; I&rsquo;m actually serialising case classes that are fetched from Slick.</p>
+<p>So far, I&rsquo;m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus&hellip; I&rsquo;m actually serializing case classes that are fetched from Slick.</p>
 
 <!--more-->
 
@@ -132,7 +132,7 @@
 <span class="lineno">3</span> <span class="k">import</span> <span class="nn">scala.pickling.binary._</span></code></pre></div>
 
 
-<p> While I import <code>binary</code> support from Pickling, it is worth noting that there&rsquo;s also JSON Support built in as outlined in [the docs]](<a href="https://github.com/scala/pickling">https://github.com/scala/pickling</a>).</p>
+<p> While I import <code>binary</code> support from Pickling, it is worth noting that there&rsquo;s also JSON Support built in as outlined in <a href="https://github.com/scala/pickling">the docs</a>.</p>
 
 <p> With the <code>scala.pickling.Defaults._</code> import comes a few implicits, which let us &ldquo;pickle&rdquo; (aka serialize) arbitrary objects:</p>
 
@@ -171,7 +171,7 @@
 
 <p>Suffice to say, I&rsquo;m quite happy with the simplicity.</p>
 
-<p>* It&rsquo;s been mentioned to me as well that <a href="https://github.com/scodec/scodec">scodec</a> is a great solution for serialisation too, but I haven&rsquo;t yet gone down that road.</p>
+<p>* It&rsquo;s been mentioned to me as well that <a href="https://github.com/scodec/scodec">scodec</a> is a great solution for serialization too, but I haven&rsquo;t yet gone down that road.</p>
 </div>
 
 
