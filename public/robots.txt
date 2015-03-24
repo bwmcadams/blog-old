@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: 
-
-Sitemap: http://blog.evilmonkeylabs.com/sitemap.xml 
