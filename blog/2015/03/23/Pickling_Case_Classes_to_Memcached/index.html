@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Pickling Case Classes to Memcached with Scala - Evil Monkey Labs</title>
+  <meta name="author" content="Brendan McAdams">
+
+  
+  <meta name="description" content="Recently, I&rsquo;ve been working on a rewrite of Sluggy Freelance - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+   <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:200,300,400,500,600,700,900' rel='stylesheet' type='text/css'>
+
+
+
+
+  
+
+  <style>html{background: url(/images/background.png) no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}</style>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+</hgroup>
+
+</header>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Pickling Case Classes to Memcached With Scala</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-23T00:00:00-07:00" pubdate data-updated="true"></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Recently, I&rsquo;ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I&rsquo;ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site&hellip; from Perl, PHP, and Python.</p>
+
+<p>Today, I&rsquo;m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I&rsquo;m discovering all sorts of new fun that I haven&rsquo;t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I&rsquo;ve found a powerful combination.</p>
+
+<p>So far, I&rsquo;m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus&hellip; I&rsquo;m actually serialising case classes that are fetched from Slick.</p>
+
+<!--more-->
+
+
+<p>Here&rsquo;s the navigation structure:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">case</span> <span class="k">class</span> <span class="nc">NavigationStruct</span><span class="o">(</span>
+<span class="lineno">2</span>   <span class="n">book</span><span class="k">:</span> <span class="kt">Book</span><span class="o">,</span>
+<span class="lineno">3</span>   <span class="n">allBooks</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">Book</span><span class="o">],</span>
+<span class="lineno">4</span>   <span class="n">section</span><span class="k">:</span> <span class="kt">Section</span><span class="o">,</span>
+<span class="lineno">5</span>   <span class="n">currentSections</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">Section</span><span class="o">],</span>
+<span class="lineno">6</span>   <span class="n">chapter</span><span class="k">:</span> <span class="kt">Chapter</span><span class="o">,</span>
+<span class="lineno">7</span>   <span class="n">currentChapters</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">Chapter</span><span class="o">]</span>
+<span class="lineno">8</span> <span class="o">)</span></code></pre></div>
+
+
+<p>We&rsquo;ll leave the content of <code>Book</code>, <code>Section</code>, and <code>Chapter</code> out, but suffice to say they are standard case classes made up of a variety of primitive fields and a few Joda <code>LocalDate</code>s for good measure.</p>
+
+<p>Here are my imports, setting up memcached and pickling:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">import</span> <span class="nn">scala.pickling._</span>
+<span class="lineno">2</span> <span class="k">import</span> <span class="nn">scala.pickling.Defaults._</span>
+<span class="lineno">3</span> <span class="k">import</span> <span class="nn">scala.pickling.binary._</span>
+<span class="lineno">4</span> 
+<span class="lineno">5</span> <span class="k">import</span> <span class="nn">shade.memcached._</span>
+<span class="lineno">6</span> <span class="c1">// shade uses futures so you&#39;ll need the execution context</span>
+<span class="lineno">7</span> <span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.</span><span class="o">{</span><span class="n">global</span> <span class="k">=&gt;</span> <span class="n">ec</span><span class="o">}</span></code></pre></div>
+
+
+<p>* It&rsquo;s been mentioned to me as well that <a href="https://github.com/scodec/scodec">scodec</a> is a great solution for serialisation too, but I haven&rsquo;t yet gone down that road.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-23T00:00:00-07:00" pubdate data-updated="true"></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/" title="Previous Post: Distributing Akka Workloads - And Shutting Down Afterwards">&laquo; Distributing Akka Workloads - And Shutting Down Afterwards</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section id="titles">
+  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <h3 id="site_subtitle">Code and related ramblings.</h3>
+</section>
+
+<section id="menu">
+  <ul>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+  </ul>
+</section>
+
+<section id="social">
+  
+
+  
+
+  
+
+  
+    <a href="https://github.com/bwmcadams" title="bwmcadams"><i class="fa fa-github fa-2x"></i></a>
+  
+
+  
+
+  
+    <a href="https://twitter.com/rit" title="rit"><i class="fa fa-twitter fa-2x"></i></a>
+  
+</section>
+
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - And Shutting Down Afterwards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/14/mongodb-community-call-for-postcards/">MongoDB Community – Call for Postcards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/06/and-now-for-something-completely-different/">And Now For Something Completely Different!</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Brendan McAdams -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
