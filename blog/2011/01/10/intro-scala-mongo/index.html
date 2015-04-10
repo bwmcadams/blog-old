@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Exploring Scala with MongoDB - Evil Monkey Labs</title>
+  <title>Exploring Scala With MongoDB - Evil Monkey Labs</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="Exploring Scala With MongoDB 2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, &hellip;">
+  <meta name="description" content="2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, MongoDB and Scala. Scala is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,140 +18,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2011/01/10/intro-scala-mongo">
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2011/01/10/intro-scala-mongo/">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/styles.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <script src="/javascripts/jquery.sidr.min.js"></script>
-  <script src="/javascripts/ah-blue.js"></script>
-  
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
   
 
-</head> 
+</head>
 
 <body   >
-  <div class="aux-container">
-    <a id="nav-toggle" href="#sidr"></a>
-    <a id="search-toggle"></a>
-</div>
+  <header role="banner"><hgroup>
+  <h1><a href="/">Evil Monkey Labs</a></h1>
+  
+    <h2>Code and random ramblings.</h2>
+  
+</hgroup>
 
-<header class="header-container clearfix">
-        <a href="/"><img src="/images/ah-frame.svg" onerror="this.onerror=null; this.src='ah-frame.png'"></a>
 </header>
-
-  <div class="main-container">
-    <div class="main wrapper clearfix">
-    	
-    	<aside>
-			
-			  	<div class="search-container">
-					<form action="http://google.com/search" method="get">
-						<fieldset role="search">
-							<input type="hidden" name="q" value="site:blog.alexharr.is" />
-							<input class="search-field" type="text" name="q" results="0" placeholder=""/>
-							<input class="submit" type="submit" value=""/>
-						</fieldset>
-					</form>
-				</div>
-			
-		  <div id="main-nav">
-    <nav>
-        <ul>
-        	<li>
-        		
-					<h3>Recent Posts</h3>
-<ul>
-	
-    <li>
-    	<a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached With Scala</a>
-    </li>
-    
-    <li>
-    	<a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - and Shutting Down Afterwards</a>
-    </li>
-    
-    <li>
-    	<a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
-    </li>
-    
-    <li>
-    	<a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
-    </li>
-    
-    <li>
-    	<a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
-    </li>
-    
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="blog.evilmonkeylabs.com">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
 </ul>
 
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  
-  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
-  
-  <script type="text/javascript">
-    $(document).ready(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'bwmcadams',
-            count: 5,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
-
-
-
-
-				
-        	</li>
-        	<li>
-        		<ul>
-                    <li>Projects - <a href="http://www.alexharr.is" target="_blank">alexharr.is</a>
-        			<li>Github - <a href="http://www.github.com/alexharris" target="_blank">github.com/alexharris</a></li>
-                    <li>Twitter - <a href="http://www.twitter.com/alexharris6" target="_blank">@alexharris6</a></li>
-                    <li>Email - <a href="mailto:alexharris6@gmail.com" target="_blank">alexharris6 at gmail</a></li>
-        		</ul>
-        	</li>
-        </ul>
-    </nav>
-</div>
-		</aside>
-		
+</nav>
+  <div id="main">
+    <div id="content">
       <div>
-<article>
-	<header>
-  <div class="article-tags">
-      
-
-
-  </div>
+<article class="hentry" role="article">
   
-    <h1>
-      Exploring Scala With MongoDB
-    </h1>
-  
-</header>
+  <header>
+    
+      <h1 class="entry-title">Exploring Scala With MongoDB</h1>
+    
+    
+      <p class="meta">
+        
 
-  <section><p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
+
+
+
+<time class='entry-date' datetime='2011-01-10T00:00:00-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
 
 <p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
 
@@ -231,25 +164,124 @@
 <p>All of MongoDB&rsquo;s <em>$ Operators</em> including Geospatial Queries are supported by Casbah&rsquo;s DSL.</p>
 
 <p>This is just a small taste of what Casbah and Scala offer to the MongoDB user, but we encourage you to explore more.  <a href="http://api.mongodb.org/scala/casbah/latest/setting_up.html">Version 2.01</a> is now available for download.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2011-01-10T00:00:00-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/blog/2011/01/10/intro-scala-mongo/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/blog/2011/01/10/intro-scala-mongo/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2009/10/20/talking-to-activedirectory-from-iron-python/" title="Previous Post: Talking to ActiveDirectory from IronPython">&laquo; Talking to ActiveDirectory from IronPython</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/01/27/MongoDB-1_8-MapReduce/" title="Next Post: A Look At MongoDB 1.8's MapReduce Changes">A Look At MongoDB 1.8&#8217;s MapReduce Changes &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached With Scala</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - and Shutting Down Afterwards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
 </section>
 
 
 
-	
-</article>
-</div>
-
-    </div>
-  </div>
-  <footer class="main-footer">
-	<section class="interior-footer">
-		<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-	</section>
-</footer>
 
 
   
+</aside>
 
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Brendan McAdams -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
 
 
 
@@ -266,6 +298,7 @@
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
+
 
 
 
