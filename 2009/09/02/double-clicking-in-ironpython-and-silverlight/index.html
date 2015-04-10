@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Evil Monkey Labs</title>
+  <title>Double Clicking in IronPython + Silverlight - Evil Monkey Labs</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for. Namely, since the &hellip;">
+  <meta name="description" content="Silverlight rather oddly lacks a double click event. You can detect single click, but for double clicking you&rsquo;re on your own. I found some &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2/">
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
@@ -48,55 +48,12 @@
 </header>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory From IronPython</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2009-10-20T00:00:00-04:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
-        
-         | <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people&rsquo;s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
-
-<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I&rsquo;ve been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
-
-<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of &lsquo;valid&rsquo; attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn&rsquo;t know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2009/09/02/double-clicking-in-ironpython-and-silverlight/">Double Clicking in IronPython + Silverlight</a></h1>
+      <h1 class="entry-title">Double Clicking in IronPython + Silverlight</h1>
     
     
       <p class="meta">
@@ -107,14 +64,14 @@
 
 <time class='entry-date' datetime='2009-09-02T00:00:00-04:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
         
-         | <a href="/2009/09/02/double-clicking-in-ironpython-and-silverlight/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
+<div class="entry-content"><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
 
 <p>I&rsquo;ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
 
@@ -148,25 +105,82 @@
 
 <p>You may want to tweak the click interval based on what works for you.  500 milliseconds worked well with my users, for the application in question. To attach a ClickHandler simply invoke the static method <code>ClickHandler.attachDoubleClickHandler(«uiElementObj», «callbackFunc»)</code></p>
 
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2009/09/02/double-clicking-in-ironpython-and-silverlight/">Read on &rarr;</a>
-    </footer>
-  
+<!--more-->
 
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives/"> Archives </a>
-    
-    <a class="next" href="1">Newer &rarr;</a>
-    
-  </div>
+
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">System</span> <span class="kn">import</span> <span class="n">Uri</span><span class="p">,</span> <span class="n">UriKind</span>
+<span class="kn">from</span> <span class="nn">System.Windows</span> <span class="kn">import</span> <span class="n">Application</span><span class="p">,</span> <span class="n">UIElement</span>
+<span class="kn">from</span> <span class="nn">System.Windows.Browser</span> <span class="kn">import</span> <span class="n">HtmlPage</span>
+ 
+<span class="kn">from</span> <span class="nn">util</span> <span class="kn">import</span> <span class="n">ClickHandler</span>
+ 
+ 
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="n">UIElement</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Sample UIElement class demonstrating usage of </span>
+<span class="sd">  ClickHandler and it&#39;s events.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+ 
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">Application</span><span class="o">.</span><span class="n">LoadComponent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Uri</span><span class="p">(</span><span class="s">&#39;xaml/widgets/foo.xaml&#39;</span><span class="p">,</span>
+            <span class="n">UriKind</span><span class="o">.</span><span class="n">Relative</span><span class="p">))</span>
+    <span class="n">ClickHandler</span><span class="o">.</span><span class="n">attachDoubleClickHandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evt_dblClicked</span><span class="p">)</span>
+ 
+  <span class="k">def</span> <span class="nf">evt_dblClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event for double click; this gets passed</span>
+<span class="sd">    the original &quot;MouseLeftButtonDown&quot; arguments </span>
+<span class="sd">    which ClickHandler got, so you&#39;ll want to match</span>
+<span class="sd">    the &quot;MouseButtonEventHandler&quot; delegate arguments.</span>
+<span class="sd">    Object sender - the object the mouse click handler is attached to,</span>
+<span class="sd">            in this case, should be the same as &#39;self&#39;</span>
+<span class="sd">    System.Windows.Input.MouseButtonEventArgs args - the mouse event arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">HtmlPage</span><span class="o">.</span><span class="n">Window</span><span class="o">.</span><span class="n">Alert</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> got double clicked!&#39;</span> <span class="o">%</span> <span class="n">sender</span><span class="p">)</span></code></pre></div>
+
+
+<p>It&rsquo;s not the world&rsquo;s greatest solution, but it gets the job done.</p>
 </div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2009-09-02T00:00:00-04:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/2009/10/20/talking-to-activedirectory-from-iron-python/" title="Next Post: Talking to ActiveDirectory from IronPython">Talking to ActiveDirectory from IronPython &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
 <aside class="sidebar">
   
     <section id="titles">
@@ -265,6 +279,7 @@
 
   
 </aside>
+
 
     </div>
   </div>

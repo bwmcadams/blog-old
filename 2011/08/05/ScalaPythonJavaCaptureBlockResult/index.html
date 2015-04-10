@@ -1,0 +1,550 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Immutability and Clever Variable Usage in the Land of Blocks and Branches - Evil Monkey Labs</title>
+  <meta name="author" content="Brendan McAdams">
+
+  
+  <meta name="description" content="Last night, I found myself unconciously refactoring some Scala code (I don&rsquo;t recall if it was something I wrote or someone else did at this &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+   <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:200,300,400,500,600,700,900' rel='stylesheet' type='text/css'>
+
+
+
+
+  
+
+  <style>html{background: url(/images/background.png) no-repeat center center fixed;-webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;}</style>
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+</hgroup>
+
+</header>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Immutability and Clever Variable Usage in the Land of Blocks and Branches</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-08-05T00:00:00-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Last night, I found myself unconciously refactoring some Scala code (I don&rsquo;t recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don&rsquo;t seem entirely aware of one of my favorite features.  What I&rsquo;m talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
+
+<p>In typical C-like languages (such as C, C++, and Java) we are restricted in our syntax should we wish to capture a value when running many branching blocks such as if-else statements, switch statements and even for/foreach constructs. When we find ourselves wanting to set the value of a variable within each possible condition or iteration, we need to declare a mutable variable before the block.  We then mutate this variable within each condition or iteration.  Take this example from Java:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kt">boolean</span> <span class="n">valid</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+
+<span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+<span class="k">if</span> <span class="o">(</span><span class="n">valid</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;VALIDATED&quot;</span><span class="o">;</span>
+<span class="o">}</span> 
+<span class="k">else</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;INVALID&quot;</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+
+
+
+<!--more-->
+
+
+<p>Not only have we had to declare a mutable value, but adding insult to injury the typical usage pattern includes declaring it as <code>null</code> (FACT: Everytime you explicitly use null, someone drowns a basket of adorable, whimpering puppies. Even if your language paradigm practically requires it.).  Within our if/else block we have established a new value for <code>status</code> based on the value of <code>valid</code>. Granted, this is a somewhat weak example of my point, as you could just as easily have expressed this in a more concise ternary statement:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="n">valid</span> <span class="o">?</span> <span class="s">&quot;VALIDATED&quot;</span> <span class="o">:</span> <span class="s">&quot;INVALID&quot;</span><span class="o">;</span></code></pre></div>
+
+
+<p>This simplification breaks down quickly once our block becomes more complex.  Even the addition of a single <code>elseif</code> would eliminate the usefulness of the ternary syntax:</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="c1">// In this case, valid is now an int that can hold several states</span>
+<span class="kt">int</span> <span class="n">valid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">;</span> 
+
+<span class="cm">/* valid = SomeMethodCallThatReturnsValid() */</span>
+
+<span class="n">String</span> <span class="n">status</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+<span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;VALIDATED&quot;</span><span class="o">;</span>
+<span class="o">}</span> 
+<span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;INVALID&quot;</span><span class="o">;</span> <span class="c1">// A simple not-valid indicator</span>
+<span class="o">}</span> 
+<span class="k">else</span> <span class="nf">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;UNINITIALIZED_ERROR&quot;</span><span class="o">;</span>
+<span class="o">}</span>
+<span class="k">else</span> <span class="o">{</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;UNKNOWN_ERROR&quot;</span><span class="o">;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>We&rsquo;ve already bounced ourselves back to the land of <code>null</code> and forced mutability (can you hear those poor, helpless puppies trying to learn how to swim?). We will encounter similar (or potentially worse) limitations in the case of a for/foreach construct.</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span> <span class="n">users</span> <span class="o">=</span> <span class="k">new</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;();</span>
+
+<span class="k">for</span> <span class="o">(</span><span class="n">DBRow</span> <span class="n">row</span> <span class="o">:</span> <span class="n">databaseQuery</span><span class="o">(</span><span class="n">queryArgs</span><span class="o">))</span> <span class="o">{</span>
+    <span class="n">users</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="nf">User</span><span class="o">(</span><span class="n">row</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">),</span> <span class="n">row</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;first_name&quot;</span><span class="o">),</span> <span class="n">row</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;last_name&quot;</span><span class="o">));</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>Admittedly, this last block isn&rsquo;t <em>that</em> bad, but it still irks me to <strong>have</strong> to declare a mutable list to facilitate it.  We probably could work around with a builder pattern but <strong>(a)</strong> as far as I know Java lacks a builtin List Builder and <strong>(b)</strong> We&rsquo;d still probably be &ldquo;building&rdquo; a mutable list.</p>
+
+<p>These paradigms obviously don&rsquo;t restrict or limit everyone, but those of us who try to pay attention to immutability and the like start to grind our teeth awfully fast when encountering these patterns.  There has to be a better way, right?  How do other languages handle these constructs and related problems?</p>
+
+<h2>The Pythonic Way</h2>
+
+<p>For those that know Python — a language that I have long loved, and using Scala has only reinforced that as I learn &amp; understand more of the FP goodness in Python — there are some nice tricks to alleviate the previously demonstrated pain (and save those puppies).  Unfortunately, some of these tricks also stink a bit too much like syntactic magic; I tend to think at least one of them violates Python&rsquo;s &ldquo;explicit over implicit&rdquo; rules too.</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Again, valid is now an int that can hold several states</span>
+<span class="n">valid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> 
+
+<span class="o">/*</span> <span class="n">valid</span> <span class="o">=</span> <span class="n">some_method_to_set_valid</span><span class="p">()</span> <span class="o">*/</span>
+
+<span class="k">if</span> <span class="n">valid</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;VALIDATED&quot;</span>
+<span class="k">elif</span> <span class="n">valid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;INVALID&quot;</span>
+<span class="k">elif</span> <span class="n">valid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;UNINITIALIZED_ERROR&quot;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="s">&quot;UNKNOWN_ERROR&quot;</span></code></pre></div>
+
+
+<p>Here&rsquo;s that magic I&rsquo;m talking about — despite us not explicitly declaring/initializing it, Python will instantiate a variable <code>status</code> at the <em>outer</em> scope (that is to say, outside of our if-else block).  This is incredibly useful for cutting down line noise related to unecessary declaration of variables; unfortunately it is also a common confusion point for beginning Pythonistas.</p>
+
+<pre><code>*"Where the hell did this `status` variable come from? It wasn't ever declared in an outer scope!"*
+</code></pre>
+
+<p>While we&rsquo;ve avoided initializing <code>status</code> to null, we still encounter the pesky mutability issue.  We ultimately ended up with a variable <code>status</code> which can be mutated later.  This isn&rsquo;t ideal, but as far as I know Python has no way to enable/enforce immutable state.</p>
+
+<p>Python also can take us closer to an ideal state with the for/foreach constructs.  My big gripe with the previous Java for loop code was the need to declare a mutable <code>List</code> and incrementally add to it.  Python has a cure for what ails us here, in the form of generators — a feature which, as you&rsquo;ll see, I&rsquo;d give my left pinkie (or maybe just the last millimeter of my left pinkie nail) to have in Scala as well.</p>
+
+<p>Here&rsquo;s how a smart Pythonista might express our database processing loop in a way that limits the declaration of mutable variables:</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="k">def</span> <span class="nf">process_dbusers</span><span class="p">(</span><span class="n">dbResults</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">dbResults</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">User</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s">&#39;username&#39;</span><span class="p">),</span> <span class="n">row</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s">&#39;first_name&#39;</span><span class="p">),</span> 
+                   <span class="n">row</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="s">&#39;last_name&#39;</span><span class="p">))</span>
+
+<span class="n">users</span> <span class="o">=</span> <span class="n">process_dbusers</span><span class="p">(</span><span class="n">db_query</span><span class="p">(</span><span class="n">query_args</span><span class="p">))</span></code></pre></div>
+
+
+<p>With this code, we&rsquo;ve already quickly wandered into the land of &ldquo;Things Java Can&rsquo;t Even Pretend To Do&rdquo; here (which I think highlights my amusement at people arguing Java&rsquo;s power over Python.  It&rsquo;s all relative when you know the right syntax &hellip; ).  To best handle this expression we&rsquo;ve constructed a higher- order function <code>process_dbusers</code>, which takes in a database results iterator, returning a list-like construct with the results.  I want to emphasize the term <em>list-like</em> here because what we got is not, in fact, a list (rather it is &ldquo;Iterable&rdquo;).  A quick peek at the REPL (if you don&rsquo;t already have <a href="http://ipython.org">IPython</a> you are really missing out) evinces this:</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">users</span>
+<span class="c"># &lt;generator object process_db at 0x10ca93690&gt;</span>
+
+<span class="nb">type</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
+<span class="c"># &lt;type &#39;generator&#39;&gt;</span></code></pre></div>
+
+
+<p>Python supports a special type of expression (which again, I&rsquo;d love to have in Scala and have been playing with ways to support) called a <em>generator</em>.  In addition to being immutable, a generator is also lazy; it does not evaluate the entire list at creation, instead evaluating each member as it is first read (notably though, Python generators do not memoize and cannot be iterated repeatedly).  Note that Python&rsquo;s <code>yield</code> keyword differs from Scala&rsquo;s; it may be easiest to think of it as a &ldquo;super-return&rdquo; or &ldquo;return on crack&rdquo; in that it actually suspends execution (via coroutines) after returning <em>each</em> value.</p>
+
+<p>The &lsquo;generator&rsquo; produced is actually an iterable value; requesting the &lsquo;next&rsquo; item resumes execution, runs the next iteration of the internal for loop again, yields the return value and suspends again.  Not only is this generator value immutable, but it should be significantly more efficient in many cases; if we don&rsquo;t need to store each <code>User</code> but process them as we read them, we should see a lot better resource usage.</p>
+
+<p>There is one other way to express the previous statement without needing a nested function set or the &lsquo;yield&rsquo; keyword, using &ldquo;generator expressions&rdquo;.  The downside to the <code>yield</code> based generators is that they must be wrapped inside another function, making them messy to inline with other code. With Generator Expressions we can get the same behavior in a compact, inline one-liner.  A Generator Expression is syntactically identical to a Python <a href="http://docs.python.org/tutorial/datastructures.html#list-comprehensions">List Comprehension</a> with one key difference:  You must enclose the expression in parentheses ( <code>(</code> and <code>)</code> ) instead of square brackets ( <code>[</code> and <code>]</code>).  While a List Comprehension will return a list, enclosing that same statement in parentheses instead of brackets will produce a generator. This Generator Expression works as if we had written a multiline <code>for</code> construct with <code>yield</code>:</p>
+
+<div class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Define a tuple of test values</span>
+<span class="n">items</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;Foo&#39;</span><span class="p">,</span> <span class="s">&#39;bar&#39;</span><span class="p">,</span> <span class="s">&#39;Baz&#39;</span><span class="p">,</span> <span class="s">&#39;spam&#39;</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">,</span> <span class="s">&#39;apples&#39;</span><span class="p">,</span> <span class="s">&#39;oranges&#39;</span><span class="p">)</span>
+
+<span class="c"># Use a List Comprehension, returns a list</span>
+<span class="n">itemList</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
+<span class="c"># [&#39;Foo&#39;, &#39;bar&#39;, &#39;Baz&#39;, &#39;spam&#39;, &#39;eggs&#39;, &#39;apples&#39;, &#39;oranges&#39;]</span>
+<span class="c"># Use a Generator Expression which returns a generator</span>
+<span class="n">itemGen</span>  <span class="o">=</span> <span class="p">(</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">)</span>
+<span class="c"># &lt;generator object &lt;genexpr&gt; at 0x10cafa050&gt;</span>
+
+<span class="c"># You can also filter these expressions</span>
+<span class="c"># Return a list which filters to return only items which are &#39;food&#39;</span>
+<span class="n">foodList</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;spam&#39;</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">,</span> <span class="s">&#39;apples&#39;</span><span class="p">,</span> <span class="s">&#39;oranges&#39;</span><span class="p">)]</span>
+<span class="c"># [&#39;spam&#39;, &#39;eggs&#39;, &#39;apples&#39;, &#39;oranges&#39;]</span>
+<span class="c"># The same filter, but as a generator expression</span>
+<span class="n">foodGen</span> <span class="o">=</span> <span class="p">(</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;spam&#39;</span><span class="p">,</span> <span class="s">&#39;eggs&#39;</span><span class="p">,</span> <span class="s">&#39;apples&#39;</span><span class="p">,</span> <span class="s">&#39;oranges&#39;</span><span class="p">))</span>
+<span class="c"># &lt;generator object &lt;genexpr&gt; at 0x10cafa140&gt;</span>
+<span class="c"># Generators are iterable ...</span>
+<span class="n">foodGen</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="c"># &#39;spam&#39;</span>
+<span class="n">foodGen</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="c"># &#39;eggs&#39;</span></code></pre></div>
+
+
+<p>We&rsquo;ve certainly, on the Python side, gotten closer to a world which can exist without unecessary variable initialization and sane immutability&hellip; but aren&rsquo;t entirely where I&rsquo;d like to be.  To understand things better let&rsquo;s look, finally, at what Scala lets us do.</p>
+
+<h2>The Scala Way</h2>
+
+<p>A rough take on the code I was optimizing last night can be used to highlight the power of Scala&rsquo;s way of solving the kinds of problems we are discussing.  Here&rsquo;s a Scala version of our if-elseif-else construct from Java:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">valid</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="n">someMethodCallThatSetsValidity</span><span class="o">()</span> 
+
+<span class="k">var</span> <span class="n">status</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="kc">null</span> <span class="c1">// ack, mutable *and* null inited - A scala programmer&#39;s worst nightmare</span>
+
+<span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">status</span> <span class="k">=</span> <span class="s">&quot;VALIDATED&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">status</span> <span class="k">=</span> <span class="s">&quot;INVALID&quot;</span> 
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+  <span class="n">status</span> <span class="k">=</span> <span class="s">&quot;UNINITIALIZED_ERROR&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span> 
+  <span class="n">status</span> <span class="k">=</span> <span class="s">&quot;UNKNOWN_ERROR&quot;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>There are lots of things that are egregious here from the eyes of an experienced Scala programmer, but it is also pretty close to the style I would expect from a fairly new Scala programmer.  There is of course a <em>much</em> better way to do this in Scala without any magic tricks.</p>
+
+<p>One of the cool little edge behaviors of Scala&rsquo;s syntax is the ability to capture the return value of most block statements — even if-else statements.  This lends itself to quickly shortening our code <em>and</em> enforcing immutability on the final value of status.</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">valid</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="n">someMethodCallThatSetsValidity</span><span class="o">()</span> 
+
+<span class="k">val</span> <span class="n">status</span> <span class="k">=</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> 
+  <span class="s">&quot;VALIDATED&quot;</span> <span class="c1">// returns &quot;VALIDATED&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+  <span class="s">&quot;INVALID&quot;</span>  <span class="c1">// returns &quot;INVALID&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+  <span class="s">&quot;UNINITIALIZED_ERROR&quot;</span> <span class="c1">// returns &quot;UNINITIALIZED_ERROR&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span> 
+  <span class="s">&quot;UNKNOWN_ERROR&quot;</span> <span class="c1">// returns &quot;UNKNOWN_ERROR&quot;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p>Much better! The way that Scala evaluates this code, you can think of each branch of the block (the body of each &ldquo;if&rdquo;, &ldquo;else if&rdquo; and &ldquo;else&rdquo; statements) as an anonymous function.  Because it is evaluated this way, Scala allows us to return values, which can be captured from the entire block (The use of the explicit <code>return</code> keyword is typically considered bad form in Scala which is why it is omitted here).  If <code>valid</code> has a value of <code>1</code>, this block will return <code>"VALIDATED"</code>.</p>
+
+<p>The type of <code>safe</code> in this code will be inferred to <code>String</code>, because each branch returns a <code>String</code>. Although in Scala it is usually recommended to let type inference do its work wherever possible and avoid explicit type annotations, variables capturing values from a block like this might be a good exception to the rule.</p>
+
+<p>The argument that I make is that if the type inference system finds multiple <em>differing</em> types in each branch, it will search backwards on the type hierarchies for the closest &ldquo;ancestor&rdquo; type of each type.  This can quickly lead to the type of <code>status</code> being something far too generic (or even unexpected in the case of a bug).</p>
+
+<p>We can see this quickly by changing the return of our <code>else</code> branch to a boolean:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">status</span> <span class="k">=</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> 
+  <span class="s">&quot;VALIDATED&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+  <span class="s">&quot;INVALID&quot;</span> 
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+  <span class="s">&quot;UNINITIALIZED_ERROR&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span> 
+  <span class="kc">false</span> 
+<span class="o">}</span>
+
+<span class="cm">/* Turn on &quot;Power Mode&quot; in the repl to dump the type (:power) </span>
+<span class="cm">scala&gt; :type status</span>
+<span class="cm">Any</span>
+<span class="cm">*/</span></code></pre></div>
+
+
+<p>This is not good, and often will result in a bug.  If you were expecting <code>String</code>, you will be sorely disappointed. The easiest fix to this is to explicitly annotate an expected return type, which forces the compiler to help you enforce expectations:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">status</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> 
+  <span class="s">&quot;VALIDATED&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+  <span class="s">&quot;INVALID&quot;</span> 
+<span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">valid</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+  <span class="s">&quot;UNINITIALIZED_ERROR&quot;</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span> 
+  <span class="kc">false</span> 
+<span class="o">}</span>
+<span class="cm">/* Fails to compile!</span>
+<span class="cm">&lt;console&gt;:29: error: type mismatch;</span>
+<span class="cm"> found   : Boolean(false)</span>
+<span class="cm"> required: String</span>
+<span class="cm">         false </span>
+
+<span class="cm">*/</span></code></pre></div>
+
+
+<p>We can also easily simplify this whole block into a pattern match, which will read more clearly in Scala.  Fortuitously, Scala also lets us capture the return values from <code>match</code> blocks, following the same rules (including the Type Annotation concerns) as in if-else.</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">annotation.switch</span>
+
+<span class="c1">// Even better, cut out one more variable storage by calling our valid check inline</span>
+<span class="k">val</span> <span class="n">status</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="o">(</span><span class="n">someMethodCallThatSetsValidity</span><span class="o">()</span><span class="k">:</span> <span class="kt">@switch</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+    <span class="k">case</span> <span class="mi">1</span>  <span class="k">=&gt;</span> <span class="s">&quot;VALIDATED&quot;</span>
+    <span class="k">case</span> <span class="mi">0</span>  <span class="k">=&gt;</span> <span class="s">&quot;INVALID&quot;</span>
+    <span class="k">case</span> <span class="o">-</span><span class="mi">1</span> <span class="k">=&gt;</span> <span class="s">&quot;UNINITIALIZED_ERROR&quot;</span>
+    <span class="k">case</span> <span class="n">default</span> <span class="k">=&gt;</span> <span class="s">&quot;UNKNOWN_ERROR&quot;</span>
+<span class="o">}</span></code></pre></div>
+
+
+<p><em>The use of the @switch annotation is a trick I learned from <a href="http://suereth.blogspot.com/">Josh Suereth&rsquo;s</a> absolutely superb book <a href="http://www.manning.com/suereth/">Scala in Depth</a>; when used with certain matches (they typically need to match numeric values) they ensure the compiler generates a much more efficient JVM bytecode for the match execution/evaluation.</em></p>
+
+<p>I&rsquo;ll leave the evaluation of that last as an exercise for the reader.  Fundamentally it is a simple restatement of our previous if-else blocks and should make sense.</p>
+
+<p>Now that we&rsquo;ve looked at branching block statements and value capture in Scala, we&rsquo;re left with one last item — for constructs (We aren&rsquo;t going to discuss monad operators such as <code>foreach</code>, <code>map</code>, <code>flatmap</code>, etc here).</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">for</span> <span class="o">(</span><span class="n">x</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="mi">42</span><span class="o">)</span> <span class="n">x</span>
+<span class="c1">// Loops 42 times, but returns / prints nothing</span></code></pre></div>
+
+
+<p>Unlike other the previously examined branching blocks (if-else and matches), Scala&rsquo;s <code>for</code> loops do <em>not</em> implicitly return the last value.  I would make an educated guess that this is because most developers would not expect or require the default behavior of a <code>for</code> loop to generate return values.  I&rsquo;d also go so far as to posit that this is a very sane default.</p>
+
+<p>Much like Python, to generate a return value from a <code>for</code> loop in Scala we must explicitly declare our intention to return a value. While (as I lamented previously) Scala lacks support for Python style generators, it does support a form of List Comprehensions which allow us to get the behavior we want.  For a Python developer, the rules for constructing these in Scala may get quickly confusing.  The first is that <code>return</code> is not a valid keyword at <em>all</em> inside of a Scala <code>for</code> statement (Incidentally, Python allows it as a &lsquo;valid&rsquo; keyword, but the function will always return the result of the first loop iteration and never progress).</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">for</span> <span class="o">(</span><span class="n">x</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="mi">42</span><span class="o">)</span> <span class="k">return</span> <span class="n">x</span>
+<span class="cm">/* Fails to compile </span>
+<span class="cm">&lt;console&gt;:29: error: return outside method definition</span>
+<span class="cm">       for (x &lt;- 1 until 42) return x </span>
+<span class="cm">*/</span></code></pre></div>
+
+
+<p>Instead, we need to use a special keyword, <code>yield</code>, to signify our intention to create a List Comprehension rather than a simple loop.  Like in Python, <code>yield</code> changes the behavior of a <code>for</code> loop.  However, the behavior of the <code>yield</code> keyword in Scala differs significantly from Python, as it does not invoke generator behavior.  The use of <code>yield</code> inside a Scala <code>for</code> loop will produce results along the lines of those of Python&rsquo;s square bracket enclosed List Comprehensions:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">for</span> <span class="o">(</span><span class="n">x</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">until</span> <span class="mi">42</span><span class="o">)</span> <span class="k">yield</span> <span class="n">x</span>
+<span class="cm">/* scala.collection.immutable.IndexedSeq[Int] = Vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42)</span>
+<span class="cm">*/</span></code></pre></div>
+
+
+<p>The output of the <code>for</code> loop which uses <code>yield</code> will always be an <em>immutable</em> <code>Seq[_]</code>, letting us save that result for later usage much like we did with our Python generators and comprehensions.  And of course, Scala&rsquo;s <code>for</code> loops allow for filters just like Python&rsquo;s:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">items</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">,</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span> <span class="s">&quot;baz&quot;</span><span class="o">,</span> <span class="s">&quot;spam&quot;</span><span class="o">,</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;apples&quot;</span><span class="o">,</span> <span class="s">&quot;oranges&quot;</span><span class="o">)</span>
+
+<span class="k">val</span> <span class="n">itemList</span> <span class="k">=</span> <span class="k">for</span> <span class="o">(</span><span class="n">item</span> <span class="k">&lt;-</span> <span class="n">items</span><span class="o">)</span> <span class="k">yield</span> <span class="n">item</span>
+<span class="cm">/* itemList: List[java.lang.String] = List(foo, bar, baz, spam, eggs, apples, oranges) */</span>
+
+<span class="k">val</span> <span class="n">foodList</span> <span class="k">=</span> 
+    <span class="k">for</span> <span class="o">(</span><span class="n">item</span> <span class="k">&lt;-</span> <span class="n">items</span> <span class="k">if</span> <span class="s">&quot;spam&quot;</span> <span class="o">::</span> <span class="s">&quot;eggs&quot;</span> <span class="o">::</span> <span class="s">&quot;apples&quot;</span> <span class="o">::</span> <span class="s">&quot;oranges&quot;</span> <span class="o">::</span> <span class="nc">Nil</span> <span class="n">contains</span> <span class="n">item</span><span class="o">)</span> 
+        <span class="k">yield</span> <span class="n">item</span>
+<span class="cm">/* foodList: List[java.lang.String] = List(spam, eggs, apples, oranges) */</span>
+
+<span class="c1">// We can also expand that for comprehension into the alternate syntax for clarity</span>
+<span class="k">val</span> <span class="n">expandedFoodList</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+  <span class="n">item</span> <span class="k">&lt;-</span> <span class="n">items</span>
+  <span class="k">if</span> <span class="s">&quot;spam&quot;</span> <span class="o">::</span> <span class="s">&quot;eggs&quot;</span> <span class="o">::</span> <span class="s">&quot;apples&quot;</span> <span class="o">::</span> <span class="s">&quot;oranges&quot;</span> <span class="o">::</span> <span class="nc">Nil</span> <span class="n">contains</span> <span class="n">item</span>
+<span class="o">}</span> <span class="k">yield</span> <span class="n">item</span>
+
+<span class="c1">// expandedFoodList: List[java.lang.String] = List(spam, eggs, apples, oranges)</span></code></pre></div>
+
+
+<p>The intention here wasn&rsquo;t to &ldquo;bash&rdquo; on Java or even champion Python or Scala; rather, to highlight the ways that different syntactic features add power, flexiblity and (in the case of things like mutability) potential safety to our code.  Though I&rsquo;m accused of being a Scala fanboy, I want to clearly reiterate generators as something that I still think Python gets as a <em>major</em> edge over Scala.  I work in all three of the highlighted languages on a daily basis and though I probably enjoy Java the least, find gems and strengths in each tool as I switch between them (to be honest though, most of Java&rsquo;s gems these days exist in the JVM and the JDK libraries rather than the language).</p>
+
+<p>It may easily be said that I am biased, but I consider the improved functionality highlighted in Python and Scala to be significantly more powerful (and yet less complex in many ways) than Java&rsquo;s approach.  Mutating variables, null initializations and general spaghetti code for the sake of expressing something that should be simpler to express are all things that lead to workplace violence and big bonus checks for employees of straight jacket manufacturers.</p>
+
+<p>With our improved examples in Scala, we didn&rsquo;t need to create any mutable placeholder values, initialize anything to <code>null</code> <em>or</em> worry about ending up with a still mutable list to contend with.  What we got was a pure, unadulterated, cleanly constructed immutable <code>Seq</code>, just like grandmom used to bake! And it smells freaking <em>delicious</em>.</p>
+
+<p>-b</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2011-08-05T00:00:00-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/" title="Previous Post: User Configurable Type Filtering with Scala Type Classes">&laquo; User Configurable Type Filtering with Scala Type Classes</a>
+      
+      
+        <a class="basic-alignment right" href="/2012/05/29/Casbah2.3_Released/" title="Next Post: Casbah 2.3.0-RC1 Released">Casbah 2.3.0-RC1 Released &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section id="titles">
+  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <h3 id="site_subtitle">Code and random ramblings.</h3>
+</section>
+
+<section id="menu">
+  <ul>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+  </ul>
+</section>
+
+<section id="social">
+  
+
+  
+
+  
+
+  
+    <a href="https://github.com/bwmcadams" title="bwmcadams"><i class="fa fa-github fa-2x"></i></a>
+  
+
+  
+
+  
+    <a href="https://twitter.com/rit" title="rit"><i class="fa fa-twitter fa-2x"></i></a>
+  
+</section>
+
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - And Shutting Down Afterwards</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Brendan McAdams -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'evilmonkeyblog';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

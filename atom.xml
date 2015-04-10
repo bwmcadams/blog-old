@@ -4,7 +4,7 @@
   <title><![CDATA[Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-10T18:06:28-04:00</updated>
+  <updated>2015-04-10T18:08:59-04:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Pickling Case Classes to Memcached with Scala]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
+    <link href="http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
     <updated>2015-03-23T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
+    <id>http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
     <content type="html"><![CDATA[<p>Recently, I&rsquo;ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I&rsquo;ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site&hellip; from Perl, PHP, and Python.</p>
 
 <p>Today, I&rsquo;m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I&rsquo;m discovering all sorts of new fun that I haven&rsquo;t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I&rsquo;ve found a powerful combination.</p>
@@ -119,9 +119,9 @@
   
   <entry>
     <title type="html"><![CDATA[Distributing Akka Workloads - And Shutting Down Afterwards]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/"/>
+    <link href="http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/"/>
     <updated>2013-01-17T00:00:00-05:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After</id>
+    <id>http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After</id>
     <content type="html"><![CDATA[<p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I&rsquo;ve gotten a chance to solve some interesting problems and answer obscure questions&hellip; which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we&rsquo;re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
 
 <p>One item in particular came up recently as we tried to create a cron-style job to do interval data processing – big blocks of input data would be separated into individual instructions for processing, using <a href="http://doc.akka.io/docs/akka/2.0.5/">Akka 2.0.x</a>. The developer I was working with found that, among other things, using only a single actor to process all of their data items was not particularly performant. Further, once we solved this problem we couldn&rsquo;t figure out how to cleanly shut down Akka without interrupting any messages being processed. Fortunately, Akka offers simple answers to both of these problems&hellip; if you know where to look.</p>
@@ -355,9 +355,9 @@
   
   <entry>
     <title type="html"><![CDATA[Understanding Scala's Type Classes]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2012/06/11/Understanding_Scala_Type_Classes/"/>
+    <link href="http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes/"/>
     <updated>2012-06-11T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2012/06/11/Understanding_Scala_Type_Classes</id>
+    <id>http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes</id>
     <content type="html"><![CDATA[<p>Over the last year or so, I have found myself making more and more use of Scala&rsquo;s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
 
 <p>During this work however, I&rsquo;ve found during that many otherwise adroit Scala engineers seem befuddled or daunted by the Type Class. It does me no good to take advantage of clever features that my users don&rsquo;t understand, and many will benefit from introducing these concepts to their own code. So let&rsquo;s take a look at what type classes are, as well as how &amp; why we can utilize them.</p>
@@ -481,9 +481,9 @@
   
   <entry>
     <title type="html"><![CDATA[Forcing Scala Compiler 'Nothing' Checks]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
+    <link href="http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
     <updated>2012-05-31T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2012/05/31/Forcing_Compiler_Nothing_checks</id>
+    <id>http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks</id>
     <content type="html"><![CDATA[<p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is &ldquo;Some type you&rsquo;d like to fetch a particular field as&rdquo;. Because of type erasure on the JVM, working with a Mongo Document can be annoying &ndash; the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
 <div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">doc</span><span class="k">:</span> <span class="kt">DBObject</span> <span class="o">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span> <span class="s">&quot;balance&quot;</span> <span class="o">-&gt;</span> <span class="mf">2.5</span><span class="o">)</span>
@@ -614,9 +614,9 @@
   
   <entry>
     <title type="html"><![CDATA[Casbah 2.3.0-RC1 Released]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2012/05/29/Casbah2.3_Released/"/>
+    <link href="http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released/"/>
     <updated>2012-05-29T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2012/05/29/Casbah2.3_Released</id>
+    <id>http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released</id>
     <content type="html"><![CDATA[<p>Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as  <code>"org.mongodb" % "casbah" % "2.3.0-RC1"</code>. My <a href="http://notes.implicit.ly/post/24009446396/casbah-2-3-0rc1">release announcement</a> to <a href="http://implicit.ly">implicit.ly</a> contains the details on all of the bugs fixed – I will also be posting another set of blog entries shortly outlining the specific improvements to the code and demoing fetaures.</p>
 
 <p>It has been just about a year since the last major release of Casbah, which was version <strong>2.1.5-1</strong>.  A number of factors led to the delay in getting a major update out the door, for which I apologize.  Amongst other things I have spent much of the last year since Casbah&rsquo;s prior release on the road doing training, consulting and evangelization of MongoDB to users around the globe; I had less time for code among all these things than I expected!  Additionally, after releasing the <strong>2.1.x</strong> series of Casbah I embarked on what quickly morphed from Casbah <strong>2.2.0</strong> to <strong>3.0.0</strong> – a major refactoring and cleanup of 2+ years of API cruft and &ldquo;I&rsquo;m Gonna Learn Me Some Scala!&rdquo; detritus.  In all the excitement to release a perfect release to end all releases, I did a poor job of making it easy to backport and maintain a compatibility series for <strong>2.x</strong> users – a harsh lesson in the importance of creating small, bite sized git commits that can be cherry picked.</p>
@@ -635,9 +635,9 @@
   
   <entry>
     <title type="html"><![CDATA[Immutability and Clever Variable Usage in the Land of Blocks and Branches]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2011/08/05/ScalaPythonJavaCaptureBlockResult/"/>
+    <link href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/"/>
     <updated>2011-08-05T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2011/08/05/ScalaPythonJavaCaptureBlockResult</id>
+    <id>http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult</id>
     <content type="html"><![CDATA[<p>Last night, I found myself unconciously refactoring some Scala code (I don&rsquo;t recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don&rsquo;t seem entirely aware of one of my favorite features.  What I&rsquo;m talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
 
 <p>In typical C-like languages (such as C, C++, and Java) we are restricted in our syntax should we wish to capture a value when running many branching blocks such as if-else statements, switch statements and even for/foreach constructs. When we find ourselves wanting to set the value of a variable within each possible condition or iteration, we need to declare a mutable variable before the block.  We then mutate this variable within each condition or iteration.  Take this example from Java:</p>
@@ -932,9 +932,9 @@
   
   <entry>
     <title type="html"><![CDATA[User Configurable Type Filtering with Scala Type Classes]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/"/>
+    <link href="http://blog.evilmonkeylabs.com/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/"/>
     <updated>2011-07-13T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes</id>
+    <id>http://blog.evilmonkeylabs.com/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes</id>
     <content type="html"><![CDATA[<p>When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:</p>
 
 <p><img src="http://blog.evilmonkeylabs.com/images/oid_lt_casbah.png" alt="@rit when using &quot;_id&quot; $lt new ObjectId(timestamp) it throws ValidDateOrNumericType, but we might want to select records after id timestamp (from @justthor)" /></p>
@@ -1057,9 +1057,9 @@
   
   <entry>
     <title type="html"><![CDATA[MapReduce with MongoDB 1.8 and Java]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java/"/>
+    <link href="http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java/"/>
     <updated>2011-02-28T00:00:00-05:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java</id>
+    <id>http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java</id>
     <content type="html"><![CDATA[<p>In my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the
 new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://www.mongodb.org/display/DOCS/1.8+Release+Notes">available as a release candidate</a>.  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the <em>merge</em> and <em>reduce</em> output modes.</p>
 
@@ -1185,9 +1185,9 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   
   <entry>
     <title type="html"><![CDATA[A Look At MongoDB 1.8's MapReduce Changes]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2011/01/27/MongoDB-1_8-MapReduce/"/>
+    <link href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/"/>
     <updated>2011-01-27T00:00:00-05:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2011/01/27/MongoDB-1_8-MapReduce</id>
+    <id>http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce</id>
     <content type="html"><![CDATA[<p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last &lsquo;beta&rsquo; release of what will become MongoDB 1.8.  As part of the release, I&rsquo;ve been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
 
 <p>If you aren&rsquo;t new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn&rsquo;t possible to safely clean these up–&ndash;they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they&rsquo;ve been replaced with an even better system for saving the results of MapReduce jobs!</p>
@@ -1452,9 +1452,9 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   
   <entry>
     <title type="html"><![CDATA[Exploring Scala with MongoDB]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2011/01/10/intro-scala-mongo/"/>
+    <link href="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/"/>
     <updated>2011-01-10T00:00:00-05:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2011/01/10/intro-scala-mongo</id>
+    <id>http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo</id>
     <content type="html"><![CDATA[<p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
 
 <p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
@@ -1540,9 +1540,9 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   
   <entry>
     <title type="html"><![CDATA[Talking to ActiveDirectory from IronPython]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2009/10/20/talking-to-activedirectory-from-iron-python/"/>
+    <link href="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/"/>
     <updated>2009-10-20T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2009/10/20/talking-to-activedirectory-from-iron-python</id>
+    <id>http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python</id>
     <content type="html"><![CDATA[<p>We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people&rsquo;s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
 
 <p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I&rsquo;ve been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
@@ -1891,9 +1891,9 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   
   <entry>
     <title type="html"><![CDATA[Double Clicking in IronPython + Silverlight]]></title>
-    <link href="http://blog.evilmonkeylabs.com/blog/2009/09/02/double-clicking-in-ironpython-and-silverlight/"/>
+    <link href="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/"/>
     <updated>2009-09-02T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/blog/2009/09/02/double-clicking-in-ironpython-and-silverlight</id>
+    <id>http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight</id>
     <content type="html"><![CDATA[<p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
 
 <p>I&rsquo;ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
