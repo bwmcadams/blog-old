@@ -9,7 +9,7 @@
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="Since early in its history, Casbah has had a helper method called getAs[T], where T is &ldquo;Some type you&rsquo;d like to fetch a particular field &hellip;">
+  <meta name="description" content="Forcing Scala Compiler 'Nothing' Checks Since early in its history, Casbah has had a helper method called getAs[T], where T is &ldquo;Some type you& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,44 +18,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2012/05/31/Forcing_Compiler_Nothing_checks">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/stylesheets/styles.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic' rel='stylesheet' type='text/css'>
-
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <script src="/javascripts/jquery.sidr.min.js"></script>
+  <script src="/javascripts/ah-blue.js"></script>
+  
   
 
-</head>
+</head> 
 
 <body   >
-  <header role="banner"><hgroup>
-  <img src="/images/ah_frame_transparent.svg" />
-  <h1><a href="/">Evil Monkey Labs</a></h1>
-</hgroup>
+  <div class="aux-container">
+    <a id="nav-toggle" href="#sidr"></a>
+    <a id="search-toggle"></a>
+</div>
 
+<header class="header-container clearfix">
+        <a href="/"><img src="/images/ah-frame.svg" onerror="this.onerror=null; this.src='ah-frame.png'"></a>
 </header>
-  <div id="main">
-    <div id="content">
-      <div>
-<article class="hentry" role="article">
+
+  <div class="main-container">
+    <div class="main wrapper clearfix">
+    	
+    	<aside>
+			
+			  	<div class="search-container">
+					<form action="http://google.com/search" method="get">
+						<fieldset role="search">
+							<input type="hidden" name="q" value="site:blog.alexharr.is" />
+							<input class="search-field" type="text" name="q" results="0" placeholder=""/>
+							<input class="submit" type="submit" value=""/>
+						</fieldset>
+					</form>
+				</div>
+			
+		  <div id="main-nav">
+    <nav>
+        <ul>
+        	<li>
+        		
+					<h3>Recent Posts</h3>
+<ul>
+	
+    <li>
+    	<a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached With Scala</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - and Shutting Down Afterwards</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
+    </li>
+    
+</ul>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
   
-  <header>
-    
-      <h1 class="entry-title">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</h1>
-    
-  </header>
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
 
 
 
 
 
-<div class="entry-content"><p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is &ldquo;Some type you&rsquo;d like to fetch a particular field as&rdquo;. Because of type erasure on the JVM, working with a Mongo Document can be annoying &ndash; the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
+				
+        	</li>
+        	<li>
+        		<ul>
+                    <li>Projects - <a href="http://www.alexharr.is" target="_blank">alexharr.is</a>
+        			<li>Github - <a href="http://www.github.com/alexharris" target="_blank">github.com/alexharris</a></li>
+                    <li>Twitter - <a href="http://www.twitter.com/alexharris6" target="_blank">@alexharris6</a></li>
+                    <li>Email - <a href="mailto:alexharris6@gmail.com" target="_blank">alexharris6 at gmail</a></li>
+        		</ul>
+        	</li>
+        </ul>
+    </nav>
+</div>
+		</aside>
+		
+      <div>
+<article>
+	<header>
+  <div class="article-tags">
+      
+
+
+  </div>
+  
+    <h1>
+      Forcing Scala Compiler &#8216;Nothing&#8217; Checks
+    </h1>
+  
+</header>
+
+  <section><p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is &ldquo;Some type you&rsquo;d like to fetch a particular field as&rdquo;. Because of type erasure on the JVM, working with a Mongo Document can be annoying &ndash; the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
 <div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">doc</span><span class="k">:</span> <span class="kt">DBObject</span> <span class="o">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span> <span class="s">&quot;balance&quot;</span> <span class="o">-&gt;</span> <span class="mf">2.5</span><span class="o">)</span>
 
@@ -180,137 +276,25 @@
 
 
 <p>Now, when you ask for a type that doesn&rsquo;t match what the Document contains, you will receive <code>None</code> and a warning in your log such as <code>Unable to cast 'java.lang.Double' as 'java.lang.String'; please check your types.</code>.</p>
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
-  
-
-<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
-
-      
+</section>
 
 
 
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-31T00:00:00-04:00" pubdate data-updated="true"></time>
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/blog/2012/05/31/Forcing_Compiler_Nothing_checks/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/blog/2012/05/31/Forcing_Compiler_Nothing_checks/" >Tweet</a>
-  
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2012/05/29/Casbah2.3_Released/" title="Previous Post: Casbah 2.3.0-RC1 Released">&laquo; Casbah 2.3.0-RC1 Released</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2012/06/11/Understanding_Scala_Type_Classes/" title="Next Post: Understanding Scala's Type Classes">Understanding Scala&#8217;s Type Classes &raquo;</a>
-      
-    </p>
-  </footer>
+	
 </article>
-
 </div>
-
-<aside class="sidebar">
-  
-    <form action="https://www.google.com/search" method="get">
-      <fieldset role="search">
-        <input type="hidden" name="q" value="site:blog.evilmonkeylabs.com" />
-        <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-      </fieldset>
-    </form>
-  
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - And Shutting Down Afterwards</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
-      </li>
-    
-  </ul>
-</section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  
-  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
-  
-  <script type="text/javascript">
-    $.domReady(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'bwmcadams',
-            count: 5,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
-
-
-
-
-  
-</aside>
-
-
 
     </div>
   </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Brendan McAdams -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
+  <footer class="main-footer">
+	<section class="interior-footer">
+		<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	</section>
 </footer>
+
+
   
+
 
 <script type="text/javascript">
       var disqus_shortname = 'evilmonkeyblog';
@@ -336,17 +320,13 @@
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
 
 
 
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/aharris.js"></script>
 
 </body>
 </html>

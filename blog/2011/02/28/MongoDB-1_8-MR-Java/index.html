@@ -9,8 +9,8 @@
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="In my last post, I introduced the
-new MapReduce features introduced in MongoDB 1.8, which is now available as a release candidate. Most importantly &hellip;">
+  <meta name="description" content="MapReduce With MongoDB 1.8 and Java In my last post, I introduced the
+new MapReduce features introduced in MongoDB 1.8, which is now available as a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,44 +19,140 @@ new MapReduce features introduced in MongoDB 1.8, which is now available as a re
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java/">
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/stylesheets/styles.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic' rel='stylesheet' type='text/css'>
-
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <script src="/javascripts/jquery.sidr.min.js"></script>
+  <script src="/javascripts/ah-blue.js"></script>
+  
   
 
-</head>
+</head> 
 
 <body   >
-  <header role="banner"><hgroup>
-  <img src="/images/ah_frame_transparent.svg" />
-  <h1><a href="/">Evil Monkey Labs</a></h1>
-</hgroup>
+  <div class="aux-container">
+    <a id="nav-toggle" href="#sidr"></a>
+    <a id="search-toggle"></a>
+</div>
 
+<header class="header-container clearfix">
+        <a href="/"><img src="/images/ah-frame.svg" onerror="this.onerror=null; this.src='ah-frame.png'"></a>
 </header>
-  <div id="main">
-    <div id="content">
-      <div>
-<article class="hentry" role="article">
+
+  <div class="main-container">
+    <div class="main wrapper clearfix">
+    	
+    	<aside>
+			
+			  	<div class="search-container">
+					<form action="http://google.com/search" method="get">
+						<fieldset role="search">
+							<input type="hidden" name="q" value="site:blog.alexharr.is" />
+							<input class="search-field" type="text" name="q" results="0" placeholder=""/>
+							<input class="submit" type="submit" value=""/>
+						</fieldset>
+					</form>
+				</div>
+			
+		  <div id="main-nav">
+    <nav>
+        <ul>
+        	<li>
+        		
+					<h3>Recent Posts</h3>
+<ul>
+	
+    <li>
+    	<a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached With Scala</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - and Shutting Down Afterwards</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
+    </li>
+    
+</ul>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
   
-  <header>
-    
-      <h1 class="entry-title">MapReduce With MongoDB 1.8 and Java</h1>
-    
-  </header>
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
 
 
 
 
 
-<div class="entry-content"><p>In my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the
+				
+        	</li>
+        	<li>
+        		<ul>
+                    <li>Projects - <a href="http://www.alexharr.is" target="_blank">alexharr.is</a>
+        			<li>Github - <a href="http://www.github.com/alexharris" target="_blank">github.com/alexharris</a></li>
+                    <li>Twitter - <a href="http://www.twitter.com/alexharris6" target="_blank">@alexharris6</a></li>
+                    <li>Email - <a href="mailto:alexharris6@gmail.com" target="_blank">alexharris6 at gmail</a></li>
+        		</ul>
+        	</li>
+        </ul>
+    </nav>
+</div>
+		</aside>
+		
+      <div>
+<article>
+	<header>
+  <div class="article-tags">
+      
+
+
+  </div>
+  
+    <h1>
+      MapReduce With MongoDB 1.8 and Java
+    </h1>
+  
+</header>
+
+  <section><p>In my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the
 new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://www.mongodb.org/display/DOCS/1.8+Release+Notes">available as a release candidate</a>.  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the <em>merge</em> and <em>reduce</em> output modes.</p>
 
 <p>As I write this, we are prepping new releases of our <a href="http://www.mongodb.org/display/DOCS/Java+Language+Center">Java Driver</a> (v2.5) and our <a href="http://api.mongodb.org/scala/casbah">Scala Driver, Casbah</a> (v2.1) which are intended to support MongoDB 1.8&rsquo;s new features including incremental MapReduce.  Since I implemented the APIs for the new MapReduce output in both drivers, I thought I&rsquo;d demonstrate the application of these new output features to the previous dataset.  This post is focused on the Java API, but a Scala one will likely follow.</p>
@@ -176,137 +272,25 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
 
 
 <p>That&rsquo;s it! Go forth, and MapReduce&hellip;</p>
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
-  
-
-<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
-
-      
+</section>
 
 
 
-
-
-
-
-
-  
-
-
-<time datetime="2011-02-28T00:00:00-05:00" pubdate data-updated="true"></time>
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/blog/2011/02/28/MongoDB-1_8-MR-Java/" >Tweet</a>
-  
-  
-  
-</div>
-
-    
-    <p class="meta">
-      
-        <a class="basic-alignment left" href="/blog/2011/01/27/MongoDB-1_8-MapReduce/" title="Previous Post: A Look At MongoDB 1.8's MapReduce Changes">&laquo; A Look At MongoDB 1.8&#8217;s MapReduce Changes</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/" title="Next Post: User Configurable Type Filtering with Scala Type Classes">User Configurable Type Filtering with Scala Type Classes &raquo;</a>
-      
-    </p>
-  </footer>
+	
 </article>
-
 </div>
-
-<aside class="sidebar">
-  
-    <form action="https://www.google.com/search" method="get">
-      <fieldset role="search">
-        <input type="hidden" name="q" value="site:blog.evilmonkeylabs.com" />
-        <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-      </fieldset>
-    </form>
-  
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - And Shutting Down Afterwards</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
-      </li>
-    
-  </ul>
-</section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  
-  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
-  
-  <script type="text/javascript">
-    $.domReady(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'bwmcadams',
-            count: 5,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
-
-
-
-
-  
-</aside>
-
-
 
     </div>
   </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Brendan McAdams -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
+  <footer class="main-footer">
+	<section class="interior-footer">
+		<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	</section>
 </footer>
+
+
   
+
 
 <script type="text/javascript">
       var disqus_shortname = 'evilmonkeyblog';
@@ -332,17 +316,13 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
 
 
 
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/aharris.js"></script>
 
 </body>
 </html>

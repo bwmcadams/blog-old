@@ -9,7 +9,7 @@
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for. Namely, since the &hellip;">
+  <meta name="description" content="Talking to ActiveDirectory From IronPython We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,117 +18,188 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/posts/2/">
+  <link rel="canonical" href="http://blog.evilmonkeylabs.com/posts/2">
   <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="/javascripts/ender.js"></script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/stylesheets/styles.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic' rel='stylesheet' type='text/css'>
-
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <script src="/javascripts/jquery.sidr.min.js"></script>
+  <script src="/javascripts/ah-blue.js"></script>
+  
   
 
-</head>
+</head> 
 
 <body   >
-  <header role="banner"><hgroup>
-  <img src="/images/ah_frame_transparent.svg" />
-  <h1><a href="/">Evil Monkey Labs</a></h1>
-</hgroup>
+  <div class="aux-container">
+    <a id="nav-toggle" href="#sidr"></a>
+    <a id="search-toggle"></a>
+</div>
 
+<header class="header-container clearfix">
+        <a href="/"><img src="/images/ah-frame.svg" onerror="this.onerror=null; this.src='ah-frame.png'"></a>
 </header>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+
+  <div class="main-container">
+    <div class="main wrapper clearfix">
+    	
+    	<aside>
+			
+			  	<div class="search-container">
+					<form action="http://google.com/search" method="get">
+						<fieldset role="search">
+							<input type="hidden" name="q" value="site:blog.alexharr.is" />
+							<input class="search-field" type="text" name="q" results="0" placeholder=""/>
+							<input class="submit" type="submit" value=""/>
+						</fieldset>
+					</form>
+				</div>
+			
+		  <div id="main-nav">
+    <nav>
+        <ul>
+        	<li>
+        		
+					<h3>Recent Posts</h3>
+<ul>
+	
+    <li>
+    	<a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached With Scala</a>
+    </li>
     
-      <h1 class="entry-title"><a href="/blog/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory From IronPython</a></h1>
+    <li>
+    	<a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - and Shutting Down Afterwards</a>
+    </li>
     
-  </header>
+    <li>
+    	<a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
+    </li>
+    
+    <li>
+    	<a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
+    </li>
+    
+</ul>
 
-
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
   
-    <p class="meta">
+  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'bwmcadams',
+            count: 5,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+				
+        	</li>
+        	<li>
+        		<ul>
+                    <li>Projects - <a href="http://www.alexharr.is" target="_blank">alexharr.is</a>
+        			<li>Github - <a href="http://www.github.com/alexharris" target="_blank">github.com/alexharris</a></li>
+                    <li>Twitter - <a href="http://www.twitter.com/alexharris6" target="_blank">@alexharris6</a></li>
+                    <li>Email - <a href="mailto:alexharris6@gmail.com" target="_blank">alexharris6 at gmail</a></li>
+        		</ul>
+        	</li>
+        </ul>
+    </nav>
+</div>
+		</aside>
+		
       
 
 
-
-
-
-
-
-
-  
-
-
-<time datetime="2009-10-20T00:00:00-04:00" pubdate data-updated="true"></time>
+<article>
+	<header>
+  <div class="article-tags">
       
-       | <a href="/blog/2009/10/20/talking-to-activedirectory-from-iron-python/#disqus_thread">Comments</a>
-      
-    </p>
-  
-  
 
 
-  <div class="entry-content"><p>We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people&rsquo;s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
+  </div>
+  
+    <h1><a href="/blog/2009/10/20/talking-to-activedirectory-from-iron-python/">
+      Talking to ActiveDirectory From IronPython
+    </a></h1>
+  
+</header>
+
+  <section><p>We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people&rsquo;s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
 
 <p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I&rsquo;ve been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
 
 <p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of &lsquo;valid&rsquo; attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn&rsquo;t know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
 
-</div>
+</section>
   
   
-    <footer>
-      <a rel="full-article" href="/blog/2009/10/20/talking-to-activedirectory-from-iron-python/">Read on &rarr;</a>
-    </footer>
+  <footer>
+      <div class="article-date">
+        
+
+
+
+
+
+
+
+
   
 
 
-    </article>
+<time datetime="2009-10-20T00:00:00-04:00" pubdate data-updated="true"></time></div>
+  </footer>
   
-  
-    <article>
+
+
+
+</article>
+
+
+<article>
+	<header>
+  <div class="article-tags">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2009/09/02/double-clicking-in-ironpython-and-silverlight/">Double Clicking in IronPython + Silverlight</a></h1>
-    
-  </header>
 
 
+  </div>
   
-    <p class="meta">
-      
-
-
-
-
-
-
-
-
+    <h1><a href="/blog/2009/09/02/double-clicking-in-ironpython-and-silverlight/">
+      Double Clicking in IronPython + Silverlight
+    </a></h1>
   
+</header>
 
-
-<time datetime="2009-09-02T00:00:00-04:00" pubdate data-updated="true"></time>
-      
-       | <a href="/blog/2009/09/02/double-clicking-in-ironpython-and-silverlight/#disqus_thread">Comments</a>
-      
-    </p>
-  
-  
-
-
-  <div class="entry-content"><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
+  <section><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
 
 <p>I&rsquo;ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
 
@@ -162,108 +233,51 @@
 
 <p>You may want to tweak the click interval based on what works for you.  500 milliseconds worked well with my users, for the application in question. To attach a ClickHandler simply invoke the static method <code>ClickHandler.attachDoubleClickHandler(«uiElementObj», «callbackFunc»)</code></p>
 
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2009/09/02/double-clicking-in-ironpython-and-silverlight/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-    <a class="next" href="1">Newer &rarr;</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <form action="https://www.google.com/search" method="get">
-      <fieldset role="search">
-        <input type="hidden" name="q" value="site:blog.evilmonkeylabs.com" />
-        <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-      </fieldset>
-    </form>
-  
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - And Shutting Down Afterwards</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/11/Understanding_Scala_Type_Classes/">Understanding Scala&#8217;s Type Classes</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
-      </li>
-    
-  </ul>
 </section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
   
-  <a href="https://github.com/bwmcadams">@bwmcadams</a> on GitHub
   
-  <script type="text/javascript">
-    $.domReady(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
+  <footer>
+      <div class="article-date">
+        
 
-        github.showRepos({
-            user: 'bwmcadams',
-            count: 5,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
+
+
 
 
 
 
 
   
-</aside>
+
+
+<time datetime="2009-09-02T00:00:00-04:00" pubdate data-updated="true"></time></div>
+  </footer>
+  
+
+
+
+</article>
+
+<div class="pagination">
+
+
+
+<a class="next" href="1">Newer &rarr;</a>
+
+</div>
 
 
     </div>
   </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Brendan McAdams -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
+  <footer class="main-footer">
+	<section class="interior-footer">
+		<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+	</section>
 </footer>
+
+
   
+
 
 <script type="text/javascript">
       var disqus_shortname = 'evilmonkeyblog';
@@ -289,17 +303,13 @@
       var twitterWidgets = document.createElement('script');
       twitterWidgets.type = 'text/javascript';
       twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
       document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
     })();
   </script>
 
 
 
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="/javascripts/aharris.js"></script>
 
 </body>
 </html>
