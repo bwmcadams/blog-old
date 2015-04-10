@@ -1,6 +1,11 @@
 ---
 title: Pickling Case Classes to Memcached with Scala
-tags: scala pickling artisanbytecode
+categories: 
+  - scala 
+  - pickling 
+  - artisanbytecode
+
+comments: true
 layout: post
 ---
 Recently, I've been working on a rewrite of [Sluggy Freelance](http://www.sluggy.com) - a friend's site which I've worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I've come to trust [Memcached](http://memcached.org). Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site... from Perl, PHP, and Python.

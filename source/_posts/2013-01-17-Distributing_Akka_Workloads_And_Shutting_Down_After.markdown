@@ -1,11 +1,11 @@
 ---
 title: Distributing Akka Workloads - And Shutting Down Afterwards
-tags: scala akka bestpractices
 comments: true
 layout: post
 categories:
-  - Akka
-  - Poison Pill
+  - scala
+  - akka
+  - bestpractices
 sharing: true
 footer: true
 ---
