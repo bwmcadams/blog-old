@@ -1,6 +1,10 @@
 ---
 title: Forcing Scala Compiler 'Nothing' Checks
-tags: scala effectivescala stupidpettricks
+categories: 
+  - scala 
+  - effectivescala 
+  - stupidpettricks
+comments: true
 layout: post
 ---
 Since early in its history, Casbah has had a helper method called `getAs[T]`, where `T` is "Some type you'd like to fetch a particular field as". Because of type erasure on the JVM, working with a Mongo Document can be annoying -- the representation in Scala is the equivalent of a `Map[String, Any]`. If we were to work with the `Map[String, Any]` in a standard mode, fetching a field *balance* which is a `Double` would require manual casting.

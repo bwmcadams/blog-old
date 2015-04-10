@@ -1,6 +1,11 @@
 ---
 title: Understanding Scala's Type Classes
-tags: scala effectivescala typeclasses polymorphism
+categories: 
+  - scala 
+  - effectivescala 
+  - typeclasses 
+  - polymorphism
+comments: true
 layout: post
 ---
 Over the last year or so, I have found myself making more and more use of Scala's Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, [http://github.com/mongodb/casbah](Casbah), where the most recent work has been to simplify many features by migrating them to type classes. 

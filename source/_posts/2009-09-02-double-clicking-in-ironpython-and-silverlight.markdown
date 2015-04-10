@@ -1,6 +1,10 @@
 ---
 title: Double Clicking in IronPython + Silverlight
-tags: tech IronPython Silverlight Python
+categories: 
+  - IronPython 
+  - Silverlight 
+  - Python
+comments: true
 layout: post
 ---
 Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you're on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found [here](http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/) for IronPython.

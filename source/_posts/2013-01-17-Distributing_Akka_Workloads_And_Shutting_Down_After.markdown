@@ -1,7 +1,13 @@
 ---
 title: Distributing Akka Workloads - And Shutting Down Afterwards
 tags: scala akka bestpractices
+comments: true
 layout: post
+categories:
+  - Akka
+  - Poison Pill
+sharing: true
+footer: true
 ---
 Recently, as part of my role with the Professional Services team at [Typesafe](http://typesafe.com), I have been working on site at a customer who is using a lot of Akka and Play. During this time, I've gotten a chance to solve some interesting problems and answer obscure questions... which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (*and if this kind of thing sounds exciting to you, we're aggressively hiring for [this kind of work](http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w) ;)* )
 

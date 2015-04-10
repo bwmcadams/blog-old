@@ -1,6 +1,10 @@
 ---
 title: MapReduce with MongoDB 1.8 and Java
-tags: tech mongodb mapreduce java
+categories: 
+  - mongodb 
+  - mapreduce 
+  - java
+comments: true
 layout: post
 ---
 In my [last post](http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/), I introduced the 

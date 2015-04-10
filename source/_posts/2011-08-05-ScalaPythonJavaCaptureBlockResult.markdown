@@ -1,6 +1,10 @@
 ---
 title: Immutability and Clever Variable Usage in the Land of Blocks and Branches
-tags: tech scala effectivescala bestpractices python
+categories: 
+  - scala 
+  - effectivescala 
+  - bestpractices 
+comments: true
 layout: post
 ---
 Last night, I found myself unconciously refactoring some Scala code (I don't recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don't seem entirely aware of one of my favorite features.  What I'm talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.

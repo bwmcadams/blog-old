@@ -1,6 +1,12 @@
 ---
 title: Talking to ActiveDirectory from IronPython
-tags: tech IronPython Silverlight Python ActiveDirectory LDAP
+categories: 
+  - IronPython 
+  - Silverlight 
+  - Python 
+  - ActiveDirectory 
+  - LDAP
+comments: true
 layout: post
 ---
 We're building a new intranet system at work, and I've been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people's Work & Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.

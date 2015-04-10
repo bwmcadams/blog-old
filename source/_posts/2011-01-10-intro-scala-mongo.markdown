@@ -1,6 +1,10 @@
 ---
 title: Exploring Scala with MongoDB
-tags: tech mongodb scala casbah
+categories:
+  - mongodb 
+  - scala 
+  - casbah
+comments: true
 layout: post
 ---
 

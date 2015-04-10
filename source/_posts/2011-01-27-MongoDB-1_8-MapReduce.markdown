@@ -1,6 +1,9 @@
 ---
 title: A Look At MongoDB 1.8's MapReduce Changes
-tags: tech mongodb mapreduce
+categories: 
+  - mongodb 
+  - mapreduce
+comments: true
 layout: post
 ---
 MongoDB 1.7.5 shipped yesterday, and is expected to be the last 'beta' release of what will become MongoDB 1.8.  As part of the release, I've been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.

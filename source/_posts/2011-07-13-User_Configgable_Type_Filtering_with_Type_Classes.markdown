@@ -1,6 +1,10 @@
 ---
 title: User Configurable Type Filtering with Scala Type Classes
-tags: tech mongodb scala mongodb typeclasses stupidpettricks
+categories: 
+  - scala 
+  - typeclasses 
+  - stupidpettricks
+comments: true
 layout: post
 ---
 When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:
