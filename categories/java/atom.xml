@@ -4,7 +4,7 @@
   <title><![CDATA[Category: java | Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/categories/java/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-10T18:27:21-04:00</updated>
+  <updated>2015-04-11T08:51:15-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[MapReduce with MongoDB 1.8 and Java]]></title>
     <link href="http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java/"/>
-    <updated>2011-02-28T00:00:00-05:00</updated>
+    <updated>2011-02-28T00:00:00-08:00</updated>
     <id>http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java</id>
     <content type="html"><![CDATA[<p>In my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the
 new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://www.mongodb.org/display/DOCS/1.8+Release+Notes">available as a release candidate</a>.  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the <em>merge</em> and <em>reduce</em> output modes.</p>

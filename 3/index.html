@@ -9,7 +9,7 @@
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for. Namely, since the &hellip;">
+  <meta name="description" content="2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, MongoDB and Scala. Scala is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -56,6 +56,65 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2011/01/10/intro-scala-mongo/">Exploring Scala With MongoDB</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2011-01-10T00:00:00-08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+        
+         | <a href="/2011/01/10/intro-scala-mongo/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
+
+<p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
+
+<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more &lsquo;friendly&rsquo; syntax for creating MongoDB Objects, using Scala&rsquo;s Map syntax:</p>
+
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
+
+<span class="cm">/** Create an object directly */</span>
+<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span>
+                           <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">,</span>
+                           <span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">,</span>
+                           <span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">)</span>
+
+<span class="cm">/** Or, use a builder interface */</span>
+<span class="k">val</span> <span class="n">builder</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">.</span><span class="n">newBuilder</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">)</span>
+<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
+<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span></code></pre></div>
+
+
+<p>The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/2011/01/10/intro-scala-mongo/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2009/10/20/talking-to-activedirectory-from-iron-python/">Talking to ActiveDirectory From IronPython</a></h1>
     
     
@@ -65,7 +124,7 @@
 
 
 
-<time class='entry-date' datetime='2009-10-20T00:00:00-04:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2009-10-20T00:00:00-07:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
         
          | <a href="/2009/10/20/talking-to-activedirectory-from-iron-python/#disqus_thread">Comments</a>
         
@@ -105,7 +164,7 @@
 
 
 
-<time class='entry-date' datetime='2009-09-02T00:00:00-04:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2009-09-02T00:00:00-07:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>2</span><span class='date-suffix'>nd</span>, <span class='date-year'>2009</span></span> <span class='time'>12:00 am</span></time>
         
          | <a href="/2009/09/02/double-clicking-in-ironpython-and-silverlight/#disqus_thread">Comments</a>
         
@@ -208,6 +267,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">A Skeptic&#8217;s Guide to scalaz&#8217; Gateway Drugs: Part 1 - Disjunctions</a>
+      </li>
+    
+      <li class="post">
         <a href="/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
       </li>
     
@@ -221,10 +284,6 @@
     
       <li class="post">
         <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
       </li>
     
   </ul>

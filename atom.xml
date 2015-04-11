@@ -4,7 +4,7 @@
   <title><![CDATA[Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-10T18:27:21-04:00</updated>
+  <updated>2015-04-11T08:51:15-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -14,9 +14,229 @@
 
   
   <entry>
+    <title type="html"><![CDATA[A Skeptic's Guide to scalaz' Gateway Drugs: Part 1 - Disjunctions]]></title>
+    <link href="http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/"/>
+    <updated>2015-04-10T15:41:37-07:00</updated>
+    <id>http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions</id>
+    <content type="html"><![CDATA[<p><em>(This is Part 1 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
+
+<p>What is <code>scalaz</code> exactly? Well, at its core, <code>scalaz</code> is a functional programming library for Scala. It is intended to bring more functional programming concepts from languages like Haskell into Scala.</p>
+
+<p>Until recently, I&rsquo;ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
+
+<p><img src="http://blog.evilmonkeylabs.com/images/clockwork-eyes.gif" alt="" /></p>
+
+<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, &ldquo;what&rsquo;s wrong with the Scala standard library?&rdquo;. As it turns out, a lot. Let&rsquo;s look first at Scala&rsquo;s Either, and where we can improve upon it.</p>
+
+<!--more-->
+
+
+<p>Scala&rsquo;s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Either">Either</a> is a common construct used to indicate one of two conditions: Success or Error. These are, by convention, <code>Left</code> for Errors, and <code>Right</code> for Success. The concept is good, but there are some limits to interaction. By default, we cannot use it in a for comprehension:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">success</span> <span class="k">=</span> <span class="nc">Right</span><span class="o">(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">success</span><span class="k">:</span> <span class="kt">scala.util.Right</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Right</span><span class="o">(</span><span class="nc">Success</span><span class="o">!)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="n">success</span><span class="o">.</span><span class="n">isRight</span>
+</span><span class='line'><span class="n">res2</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">true</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="n">success</span><span class="o">.</span><span class="n">isLeft</span>
+</span><span class='line'><span class="n">res3</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">false</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>       <span class="o">|</span>   <span class="n">x</span> <span class="k">&lt;-</span> <span class="n">success</span>
+</span><span class='line'>       <span class="o">|</span> <span class="o">}</span> <span class="k">yield</span> <span class="n">x</span>
+</span><span class='line'>       <span class="o">&lt;</span><span class="n">console</span><span class="k">&gt;:</span><span class="mi">10</span><span class="k">:</span> <span class="kt">error:</span> <span class="kt">value</span> <span class="kt">map</span> <span class="kt">is</span> <span class="kt">not</span> <span class="kt">a</span> <span class="kt">member</span> <span class="kt">of</span> <span class="kt">scala.util.Right</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span>
+</span><span class='line'>                      <span class="n">x</span> <span class="k">&lt;-</span> <span class="n">success</span>
+</span><span class='line'>                           <span class="o">^</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p><em>(Note, there is a function called <code>rightProjection</code> which converts an <code>Either</code> into something comprehendable)</em></p>
+
+<p>In the <code>scalaz</code> world, there is a similar construct to <code>Either</code>, known as <code>\/</code>. If <code>\/</code> reads like a mouthful, you can call it Disjunction - which we&rsquo;ll do in this post as well. A Disjunction can, like in <code>Either</code> have either a Left or a Right side - typically representative of a Success (right) or an Error (left). These are represented by symbols: <code>-\/</code> for Left, <code>\/-</code> for Right.</p>
+
+<p><em>(I find, in general, that the easiest memory trick is to look at which side of the Disjunction the <code>-</code> appears on.)</em></p>
+
+<p>With Disjunctions, there is an assumption that we prefer Success (the right, or <code>\/-</code>) - this is also known as Right Bias. With Right Bias, for comprehensions, <code>map</code>, and <code>flatMap</code> unpack for us where &ldquo;success&rdquo; (<code>\/-</code>) continues and &ldquo;failure&rdquo; (<code>-\/</code>) aborts.</p>
+
+<p>When declaring a return type of a Disjunction, you should generally prefer to use the Infix notation for clarity sake. That is to say:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">query</span><span class="o">(</span><span class="n">arg</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="kt">Success</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>with the Infix notation for the return type, is preferable to this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">query</span><span class="o">(</span><span class="n">arg</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">\/</span><span class="o">[</span><span class="kt">Error</span>, <span class="kt">Success</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>the standard notation, which may not read as clearly.</p>
+
+<p>As for declaring instances of Left or Right, there are a few options in <code>scalaz</code>. The first is postfix operators, <code>.left</code> and <code>.right</code>, which wrap an existing value in a Disjunction instance:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="s">&quot;Success!&quot;</span><span class="o">.</span><span class="n">right</span>
+</span><span class='line'><span class="n">res7</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="s">&quot;Failure!&quot;</span><span class="o">.</span><span class="n">left</span>
+</span><span class='line'><span class="n">res8</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">String</span>,<span class="kt">Nothing</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Alternately, we can use the Disjunction singleton instance instead:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;Failure!&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">res10</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">String</span>,<span class="kt">Nothing</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">res12</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>which, by virtue of being more explicit, may be clearer to the reader.</p>
+
+<p>Finally, we can construct instances of Left and Right directly:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">-\/(</span><span class="s">&quot;Failure!&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">res9</span><span class="k">:</span> <span class="kt">scalaz.-\/</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/-(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="n">res11</span><span class="k">:</span> <span class="kt">scalaz.\/-</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Remember I talked about how we could comprehend over Disjunctions, and success continued while failure aborted?</p>
+
+<p><img src="http://blog.evilmonkeylabs.com/images/shining-grinning.gif" alt="Here's Johnny?" /></p>
+
+<p>Let&rsquo;s look at what that looks like with some sample data:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">success1</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;This succeeded&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">success2</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;This succeeded also!&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">fail1</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;This failed miserably...&quot;</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">fail2</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;Oops :(&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We now have a couple of Disjunction instances we can use. If we comprehend over only Right, we get back an instance of Right.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">success1</span>
+</span><span class='line'>  <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">success2</span>
+</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">two</span><span class="o">)</span>
+</span><span class='line'><span class="cm">/* res0: scalaz.\/[Nothing,(String, String)] = </span>
+</span><span class='line'><span class="cm">      \/-((This succeeded,This succeeded also!)) */</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since both instances we used were Right, we get back an instance of Right ( <code>\/-</code> ).</p>
+
+<p>What if we include a Left in there?</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">success1</span>
+</span><span class='line'>  <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">fail1</span>
+</span><span class='line'>  <span class="n">three</span> <span class="k">&lt;-</span> <span class="n">success2</span>
+</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">three</span><span class="o">)</span>
+</span><span class='line'><span class="cm">/* res1: scalaz.\/[String,(String, String)] = </span>
+</span><span class='line'><span class="cm">      -\/(This failed miserably...) */</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+The behavior here is much like with an <code>Option</code> instance of <code>None</code> (Which we&rsquo;ll talk about in the next post). When Scala encounters a &ldquo;failure&rdquo; - in this case a Left ( <code>-\/</code> ) - it aborts the iteration and returns an instance of the failure. This case means the <code>yield</code> never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.</p>
+
+<p>Now you&rsquo;ve had a (hopefully) gentle introduction to the world of <code>\/</code>. In the next part, we&rsquo;ll talk about using Scala&rsquo;s <code>Option</code> in conjunction with Disjunctions to better handle failure conditions with existing code.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Pickling Case Classes to Memcached with Scala]]></title>
     <link href="http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
-    <updated>2015-03-23T00:00:00-04:00</updated>
+    <updated>2015-03-23T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
     <content type="html"><![CDATA[<p>Recently, I&rsquo;ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I&rsquo;ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site&hellip; from Perl, PHP, and Python.</p>
 
@@ -120,7 +340,7 @@
   <entry>
     <title type="html"><![CDATA[Distributing Akka Workloads - And Shutting Down Afterwards]]></title>
     <link href="http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/"/>
-    <updated>2013-01-17T00:00:00-05:00</updated>
+    <updated>2013-01-17T00:00:00-08:00</updated>
     <id>http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After</id>
     <content type="html"><![CDATA[<p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I&rsquo;ve gotten a chance to solve some interesting problems and answer obscure questions&hellip; which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we&rsquo;re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
 
@@ -356,7 +576,7 @@
   <entry>
     <title type="html"><![CDATA[Understanding Scala's Type Classes]]></title>
     <link href="http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes/"/>
-    <updated>2012-06-11T00:00:00-04:00</updated>
+    <updated>2012-06-11T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes</id>
     <content type="html"><![CDATA[<p>Over the last year or so, I have found myself making more and more use of Scala&rsquo;s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
 
@@ -482,7 +702,7 @@
   <entry>
     <title type="html"><![CDATA[Forcing Scala Compiler 'Nothing' Checks]]></title>
     <link href="http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
-    <updated>2012-05-31T00:00:00-04:00</updated>
+    <updated>2012-05-31T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks</id>
     <content type="html"><![CDATA[<p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is &ldquo;Some type you&rsquo;d like to fetch a particular field as&rdquo;. Because of type erasure on the JVM, working with a Mongo Document can be annoying &ndash; the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
@@ -615,7 +835,7 @@
   <entry>
     <title type="html"><![CDATA[Casbah 2.3.0-RC1 Released]]></title>
     <link href="http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released/"/>
-    <updated>2012-05-29T00:00:00-04:00</updated>
+    <updated>2012-05-29T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released</id>
     <content type="html"><![CDATA[<p>Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as  <code>"org.mongodb" % "casbah" % "2.3.0-RC1"</code>. My <a href="http://notes.implicit.ly/post/24009446396/casbah-2-3-0rc1">release announcement</a> to <a href="http://implicit.ly">implicit.ly</a> contains the details on all of the bugs fixed – I will also be posting another set of blog entries shortly outlining the specific improvements to the code and demoing fetaures.</p>
 
@@ -636,7 +856,7 @@
   <entry>
     <title type="html"><![CDATA[Immutability and Clever Variable Usage in the Land of Blocks and Branches]]></title>
     <link href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/"/>
-    <updated>2011-08-05T00:00:00-04:00</updated>
+    <updated>2011-08-05T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult</id>
     <content type="html"><![CDATA[<p>Last night, I found myself unconciously refactoring some Scala code (I don&rsquo;t recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don&rsquo;t seem entirely aware of one of my favorite features.  What I&rsquo;m talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
 
@@ -933,7 +1153,7 @@
   <entry>
     <title type="html"><![CDATA[User Configurable Type Filtering with Scala Type Classes]]></title>
     <link href="http://blog.evilmonkeylabs.com/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/"/>
-    <updated>2011-07-13T00:00:00-04:00</updated>
+    <updated>2011-07-13T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes</id>
     <content type="html"><![CDATA[<p>When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:</p>
 
@@ -1058,7 +1278,7 @@
   <entry>
     <title type="html"><![CDATA[MapReduce with MongoDB 1.8 and Java]]></title>
     <link href="http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java/"/>
-    <updated>2011-02-28T00:00:00-05:00</updated>
+    <updated>2011-02-28T00:00:00-08:00</updated>
     <id>http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java</id>
     <content type="html"><![CDATA[<p>In my <a href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the
 new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://www.mongodb.org/display/DOCS/1.8+Release+Notes">available as a release candidate</a>.  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the <em>merge</em> and <em>reduce</em> output modes.</p>
@@ -1186,7 +1406,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[A Look At MongoDB 1.8's MapReduce Changes]]></title>
     <link href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/"/>
-    <updated>2011-01-27T00:00:00-05:00</updated>
+    <updated>2011-01-27T00:00:00-08:00</updated>
     <id>http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce</id>
     <content type="html"><![CDATA[<p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last &lsquo;beta&rsquo; release of what will become MongoDB 1.8.  As part of the release, I&rsquo;ve been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
 
@@ -1453,7 +1673,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[Exploring Scala with MongoDB]]></title>
     <link href="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/"/>
-    <updated>2011-01-10T00:00:00-05:00</updated>
+    <updated>2011-01-10T00:00:00-08:00</updated>
     <id>http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo</id>
     <content type="html"><![CDATA[<p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
 
@@ -1541,7 +1761,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[Talking to ActiveDirectory from IronPython]]></title>
     <link href="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/"/>
-    <updated>2009-10-20T00:00:00-04:00</updated>
+    <updated>2009-10-20T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python</id>
     <content type="html"><![CDATA[<p>We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people&rsquo;s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
 
@@ -1892,7 +2112,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[Double Clicking in IronPython + Silverlight]]></title>
     <link href="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/"/>
-    <updated>2009-09-02T00:00:00-04:00</updated>
+    <updated>2009-09-02T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight</id>
     <content type="html"><![CDATA[<p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
 

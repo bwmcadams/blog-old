@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: functionalprogramming | Evil Monkey Labs]]></title>
+  <link href="http://blog.evilmonkeylabs.com/categories/functionalprogramming/atom.xml" rel="self"/>
+  <link href="http://blog.evilmonkeylabs.com/"/>
+  <updated>2015-04-11T08:51:15-07:00</updated>
+  <id>http://blog.evilmonkeylabs.com/</id>
+  <author>
+    <name><![CDATA[Brendan McAdams]]></name>
+    <email><![CDATA[bwmcadams@evilmonkeylabs.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[A Skeptic's Guide to scalaz' Gateway Drugs: Part 1 - Disjunctions]]></title>
+    <link href="http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/"/>
+    <updated>2015-04-10T15:41:37-07:00</updated>
+    <id>http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions</id>
+    <content type="html"><![CDATA[<p><em>(This is Part 1 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
+
+<p>What is <code>scalaz</code> exactly? Well, at its core, <code>scalaz</code> is a functional programming library for Scala. It is intended to bring more functional programming concepts from languages like Haskell into Scala.</p>
+
+<p>Until recently, I&rsquo;ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
+
+<p><img src="/images/clockwork-eyes.gif" alt="" /></p>
+
+<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, &ldquo;what&rsquo;s wrong with the Scala standard library?&rdquo;. As it turns out, a lot. Let&rsquo;s look first at Scala&rsquo;s Either, and where we can improve upon it.</p>
+
+<!--more-->
+
+
+<p>Scala&rsquo;s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Either">Either</a> is a common construct used to indicate one of two conditions: Success or Error. These are, by convention, <code>Left</code> for Errors, and <code>Right</code> for Success. The concept is good, but there are some limits to interaction. By default, we cannot use it in a for comprehension:</p>
+
+<pre><code class="scala">scala&gt; val success = Right("Success!")
+success: scala.util.Right[Nothing,String] = Right(Success!)
+
+scala&gt; success.isRight
+res2: Boolean = true
+
+scala&gt; success.isLeft
+res3: Boolean = false
+
+scala&gt; for {
+       |   x &lt;- success
+       | } yield x
+       &lt;console&gt;:10: error: value map is not a member of scala.util.Right[Nothing,String]
+                      x &lt;- success
+                           ^
+</code></pre>
+
+<p><em>(Note, there is a function called <code>rightProjection</code> which converts an <code>Either</code> into something comprehendable)</em></p>
+
+<p>In the <code>scalaz</code> world, there is a similar construct to <code>Either</code>, known as <code>\/</code>. If <code>\/</code> reads like a mouthful, you can call it Disjunction - which we&rsquo;ll do in this post as well. A Disjunction can, like in <code>Either</code> have either a Left or a Right side - typically representative of a Success (right) or an Error (left). These are represented by symbols: <code>-\/</code> for Left, <code>\/-</code> for Right.</p>
+
+<p><em>(I find, in general, that the easiest memory trick is to look at which side of the Disjunction the <code>-</code> appears on.)</em></p>
+
+<p>With Disjunctions, there is an assumption that we prefer Success (the right, or <code>\/-</code>) - this is also known as Right Bias. With Right Bias, for comprehensions, <code>map</code>, and <code>flatMap</code> unpack for us where &ldquo;success&rdquo; (<code>\/-</code>) continues and &ldquo;failure&rdquo; (<code>-\/</code>) aborts.</p>
+
+<p>When declaring a return type of a Disjunction, you should generally prefer to use the Infix notation for clarity sake. That is to say:</p>
+
+<pre><code class="scala">def query(arg: String): Error \/ Success
+</code></pre>
+
+<p>with the Infix notation for the return type, is preferable to this:</p>
+
+<pre><code class="scala">def query(arg: String): \/[Error, Success]
+</code></pre>
+
+<p>the standard notation, which may not read as clearly.</p>
+
+<p>As for declaring instances of Left or Right, there are a few options in <code>scalaz</code>. The first is postfix operators, <code>.left</code> and <code>.right</code>, which wrap an existing value in a Disjunction instance:</p>
+
+<pre><code class="scala">import scalaz._
+import Scalaz._
+
+scala&gt; "Success!".right
+res7: scalaz.\/[Nothing,String] = \/-(Success!)
+
+scala&gt; "Failure!".left
+res8: scalaz.\/[String,Nothing] = -\/(Failure!)
+</code></pre>
+
+<p>Alternately, we can use the Disjunction singleton instance instead:</p>
+
+<pre><code class="scala">import scalaz._
+import Scalaz._
+
+scala&gt; \/.left("Failure!")
+res10: scalaz.\/[String,Nothing] = -\/(Failure!)
+
+
+scala&gt; \/.right("Success!")
+res12: scalaz.\/[Nothing,String] = \/-(Success!)
+</code></pre>
+
+<p>which, by virtue of being more explicit, may be clearer to the reader.</p>
+
+<p>Finally, we can construct instances of Left and Right directly:</p>
+
+<pre><code class="scala">import scalaz._
+import Scalaz._
+
+scala&gt; -\/("Failure!")
+res9: scalaz.-\/[String] = -\/(Failure!)
+
+scala&gt; \/-("Success!")
+res11: scalaz.\/-[String] = \/-(Success!)
+</code></pre>
+
+<p>Remember I talked about how we could comprehend over Disjunctions, and success continued while failure aborted?</p>
+
+<p><img src="/images/shining-grinning.gif" alt="Here's Johnny?" /></p>
+
+<p>Let&rsquo;s look at what that looks like with some sample data:</p>
+
+<pre><code class="scala">
+import scalaz._
+import Scalaz._
+
+val success1 = \/.right("This succeeded")
+
+val success2 = \/.right("This succeeded also!")
+
+val fail1 = \/.left("This failed miserably...")
+
+val fail2 = \/.left("Oops :(")
+</code></pre>
+
+<p>We now have a couple of Disjunction instances we can use. If we comprehend over only Right, we get back an instance of Right.</p>
+
+<pre><code class="scala">for {
+  one &lt;- success1
+  two &lt;- success2 
+} yield (one, two)
+/* res0: scalaz.\/[Nothing,(String, String)] = 
+      \/-((This succeeded,This succeeded also!)) */
+</code></pre>
+
+<p>Since both instances we used were Right, we get back an instance of Right ( <code>\/-</code> ).</p>
+
+<p>What if we include a Left in there?</p>
+
+<pre><code class="scala">for {
+  one &lt;- success1
+  two &lt;- fail1  
+  three &lt;- success2
+} yield (one, three)
+/* res1: scalaz.\/[String,(String, String)] = 
+      -\/(This failed miserably...) */
+</code></pre>
+
+<p>The behavior here is much like with an <code>Option</code> instance of <code>None</code> (Which we&rsquo;ll talk about in the next post). When Scala encounters a &ldquo;failure&rdquo; - in this case a Left ( <code>-\/</code> ) - it aborts the iteration and returns an instance of the failure. This case means the <code>yield</code> never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.</p>
+
+<p>Now you&rsquo;ve had a (hopefully) gentle introduction to the world of <code>\/</code>. In the next part, we&rsquo;ll talk about using Scala&rsquo;s <code>Option</code> in conjunction with Disjunctions to better handle failure conditions with existing code.</p>
+]]></content>
+  </entry>
+  
+</feed>

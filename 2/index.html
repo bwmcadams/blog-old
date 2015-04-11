@@ -9,7 +9,7 @@
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="Last night, I found myself unconciously refactoring some Scala code (I don&rsquo;t recall if it was something I wrote or someone else did at this &hellip;">
+  <meta name="description" content="Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as "org.mongodb" % "casbah" % "2.3.0-RC1". My release &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -56,6 +56,49 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2012-05-29T00:00:00-07:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2012</span></span> <span class='time'>12:00 am</span></time>
+        
+         | <a href="/2012/05/29/Casbah2.3_Released/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as  <code>"org.mongodb" % "casbah" % "2.3.0-RC1"</code>. My <a href="http://notes.implicit.ly/post/24009446396/casbah-2-3-0rc1">release announcement</a> to <a href="http://implicit.ly">implicit.ly</a> contains the details on all of the bugs fixed – I will also be posting another set of blog entries shortly outlining the specific improvements to the code and demoing fetaures.</p>
+
+<p>It has been just about a year since the last major release of Casbah, which was version <strong>2.1.5-1</strong>.  A number of factors led to the delay in getting a major update out the door, for which I apologize.  Amongst other things I have spent much of the last year since Casbah&rsquo;s prior release on the road doing training, consulting and evangelization of MongoDB to users around the globe; I had less time for code among all these things than I expected!  Additionally, after releasing the <strong>2.1.x</strong> series of Casbah I embarked on what quickly morphed from Casbah <strong>2.2.0</strong> to <strong>3.0.0</strong> – a major refactoring and cleanup of 2+ years of API cruft and &ldquo;I&rsquo;m Gonna Learn Me Some Scala!&rdquo; detritus.  In all the excitement to release a perfect release to end all releases, I did a poor job of making it easy to backport and maintain a compatibility series for <strong>2.x</strong> users – a harsh lesson in the importance of creating small, bite sized git commits that can be cherry picked.</p>
+
+<h2>So What Happened to Casbah 3.0? And 2.2?</h2>
+
+<p>Casbah <strong>2.2.x</strong> is dead – <strong>3.0.x</strong> is certainly not!  When the work following <strong>2.1.x</strong> was begun, I had published a number of early snapshots as Casbah <em>2.2.0-SNAPSHOT</em>.  During this development cycle I found a lot of the aforementioned detritus such as overloaded methods (Casbah was begun as a Scala 2.7.x project and I never fully moved its core APIs over to use named and default arguments - some of these are corrected in Casbah <strong>2.3.0</strong> but in the interest of backwards compatibility with prior releases of 2.x, not completely). As I worked on coding improvements around these things the API drifted further and further away from compatibility and I chose to kill off the <strong>2.2.x</strong> series, planning the next release of Casbah as <strong>3.0.0</strong>.  In addition to that, I intended Casbah <strong>3.0.0</strong> to coincide with MongoDB <strong>2.2.0</strong> which will have additional features such as the New Aggregation Framework.  As MongoDB 2.2 hasn&rsquo;t been released yet, it became clear I needed to provide an updated Casbah release with many of the improvements but without many of the API breakages introduced in <strong>3.0</strong> - including a vastly improved build of the Casbah Query DSL which has stronger type safety and compiler checks thanks to the inimitable <a href="http://twitter.com/jteigen">Jon-Anders Teigen</a>.</p>
+
+<p>Casbah <strong>3.0</strong> is still very much alive and in development, with <strong>2.3.0</strong> representing a backporting of many of the changes and improvements from <strong>3.0</strong>.  Because of the abandonment of the original <strong>2.2</strong> development series, I felt it was saner to kill <strong>2.2.x</strong> dead and bring the backports into a <strong>2.3.x</strong> series. You can, if you wish, think of this as <em>Casbah 2.3 - The Search for Casbah 2.2</em> (The long rumored sequel to Spaceballs has been said to be called <em>Spaceballs 3: The Search for Spaceballs 2</em>).</p>
+
+<p>I will continue to support and improve Casbah <strong>2.3.x</strong> moving forward as well as completing Casbah <strong>3.0</strong> (still intended to coincide with the release of MongoDB 2.2). If you have any questions, please don&rsquo;t hesitate to contact me!</p>
+
+<p><em>Later tonight or tomorrow I will post an entry or two detailing all of the wonderful changes in Casbah 2.3.0 and how to take advantage of them.</em></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/">Immutability and Clever Variable Usage in the Land of Blocks and Branches</a></h1>
     
     
@@ -65,7 +108,7 @@
 
 
 
-<time class='entry-date' datetime='2011-08-05T00:00:00-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2011-08-05T00:00:00-07:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
         
          | <a href="/2011/08/05/ScalaPythonJavaCaptureBlockResult/#disqus_thread">Comments</a>
         
@@ -116,7 +159,7 @@
 
 
 
-<time class='entry-date' datetime='2011-07-13T00:00:00-04:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2011-07-13T00:00:00-07:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
         
          | <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/#disqus_thread">Comments</a>
         
@@ -160,7 +203,7 @@
 
 
 
-<time class='entry-date' datetime='2011-02-28T00:00:00-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2011-02-28T00:00:00-08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>28</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
         
          | <a href="/2011/02/28/MongoDB-1_8-MR-Java/#disqus_thread">Comments</a>
         
@@ -209,7 +252,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
 
 
 
-<time class='entry-date' datetime='2011-01-27T00:00:00-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
+<time class='entry-date' datetime='2011-01-27T00:00:00-08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
         
          | <a href="/2011/01/27/MongoDB-1_8-MapReduce/#disqus_thread">Comments</a>
         
@@ -243,65 +286,6 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   
     <footer>
       <a rel="full-article" href="/2011/01/27/MongoDB-1_8-MapReduce/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2011/01/10/intro-scala-mongo/">Exploring Scala With MongoDB</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2011-01-10T00:00:00-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2011</span></span> <span class='time'>12:00 am</span></time>
-        
-         | <a href="/2011/01/10/intro-scala-mongo/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
-
-<p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
-
-<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more &lsquo;friendly&rsquo; syntax for creating MongoDB Objects, using Scala&rsquo;s Map syntax:</p>
-
-<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
-
-<span class="cm">/** Create an object directly */</span>
-<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">(</span><span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span><span class="o">,</span>
-                           <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span><span class="o">,</span>
-                           <span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">,</span>
-                           <span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">)</span>
-
-<span class="cm">/** Or, use a builder interface */</span>
-<span class="k">val</span> <span class="n">builder</span> <span class="k">=</span> <span class="nc">MongoDBObject</span><span class="o">.</span><span class="n">newBuilder</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;foo&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bar&quot;</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="s">&quot;x&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;y&quot;</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">)</span>
-<span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
-<span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span></code></pre></div>
-
-
-<p>The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2011/01/10/intro-scala-mongo/">Read on &rarr;</a>
     </footer>
   
 
@@ -359,6 +343,10 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">A Skeptic&#8217;s Guide to scalaz&#8217; Gateway Drugs: Part 1 - Disjunctions</a>
+      </li>
+    
+      <li class="post">
         <a href="/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached with Scala</a>
       </li>
     
@@ -372,10 +360,6 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
     
       <li class="post">
         <a href="/2012/05/31/Forcing_Compiler_Nothing_checks/">Forcing Scala Compiler &#8216;Nothing&#8217; Checks</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2012/05/29/Casbah2.3_Released/">Casbah 2.3.0-RC1 Released</a>
       </li>
     
   </ul>

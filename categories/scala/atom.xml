@@ -4,7 +4,7 @@
   <title><![CDATA[Category: scala | Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/categories/scala/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-10T18:27:21-04:00</updated>
+  <updated>2015-04-11T08:51:15-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -14,9 +14,153 @@
 
   
   <entry>
+    <title type="html"><![CDATA[A Skeptic's Guide to scalaz' Gateway Drugs: Part 1 - Disjunctions]]></title>
+    <link href="http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/"/>
+    <updated>2015-04-10T15:41:37-07:00</updated>
+    <id>http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions</id>
+    <content type="html"><![CDATA[<p><em>(This is Part 1 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
+
+<p>What is <code>scalaz</code> exactly? Well, at its core, <code>scalaz</code> is a functional programming library for Scala. It is intended to bring more functional programming concepts from languages like Haskell into Scala.</p>
+
+<p>Until recently, I&rsquo;ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
+
+<p><img src="/images/clockwork-eyes.gif" alt="" /></p>
+
+<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, &ldquo;what&rsquo;s wrong with the Scala standard library?&rdquo;. As it turns out, a lot. Let&rsquo;s look first at Scala&rsquo;s Either, and where we can improve upon it.</p>
+
+<!--more-->
+
+
+<p>Scala&rsquo;s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Either">Either</a> is a common construct used to indicate one of two conditions: Success or Error. These are, by convention, <code>Left</code> for Errors, and <code>Right</code> for Success. The concept is good, but there are some limits to interaction. By default, we cannot use it in a for comprehension:</p>
+
+<pre><code class="scala">scala&gt; val success = Right("Success!")
+success: scala.util.Right[Nothing,String] = Right(Success!)
+
+scala&gt; success.isRight
+res2: Boolean = true
+
+scala&gt; success.isLeft
+res3: Boolean = false
+
+scala&gt; for {
+       |   x &lt;- success
+       | } yield x
+       &lt;console&gt;:10: error: value map is not a member of scala.util.Right[Nothing,String]
+                      x &lt;- success
+                           ^
+</code></pre>
+
+<p><em>(Note, there is a function called <code>rightProjection</code> which converts an <code>Either</code> into something comprehendable)</em></p>
+
+<p>In the <code>scalaz</code> world, there is a similar construct to <code>Either</code>, known as <code>\/</code>. If <code>\/</code> reads like a mouthful, you can call it Disjunction - which we&rsquo;ll do in this post as well. A Disjunction can, like in <code>Either</code> have either a Left or a Right side - typically representative of a Success (right) or an Error (left). These are represented by symbols: <code>-\/</code> for Left, <code>\/-</code> for Right.</p>
+
+<p><em>(I find, in general, that the easiest memory trick is to look at which side of the Disjunction the <code>-</code> appears on.)</em></p>
+
+<p>With Disjunctions, there is an assumption that we prefer Success (the right, or <code>\/-</code>) - this is also known as Right Bias. With Right Bias, for comprehensions, <code>map</code>, and <code>flatMap</code> unpack for us where &ldquo;success&rdquo; (<code>\/-</code>) continues and &ldquo;failure&rdquo; (<code>-\/</code>) aborts.</p>
+
+<p>When declaring a return type of a Disjunction, you should generally prefer to use the Infix notation for clarity sake. That is to say:</p>
+
+<pre><code class="scala">def query(arg: String): Error \/ Success
+</code></pre>
+
+<p>with the Infix notation for the return type, is preferable to this:</p>
+
+<pre><code class="scala">def query(arg: String): \/[Error, Success]
+</code></pre>
+
+<p>the standard notation, which may not read as clearly.</p>
+
+<p>As for declaring instances of Left or Right, there are a few options in <code>scalaz</code>. The first is postfix operators, <code>.left</code> and <code>.right</code>, which wrap an existing value in a Disjunction instance:</p>
+
+<pre><code class="scala">import scalaz._
+import Scalaz._
+
+scala&gt; "Success!".right
+res7: scalaz.\/[Nothing,String] = \/-(Success!)
+
+scala&gt; "Failure!".left
+res8: scalaz.\/[String,Nothing] = -\/(Failure!)
+</code></pre>
+
+<p>Alternately, we can use the Disjunction singleton instance instead:</p>
+
+<pre><code class="scala">import scalaz._
+import Scalaz._
+
+scala&gt; \/.left("Failure!")
+res10: scalaz.\/[String,Nothing] = -\/(Failure!)
+
+
+scala&gt; \/.right("Success!")
+res12: scalaz.\/[Nothing,String] = \/-(Success!)
+</code></pre>
+
+<p>which, by virtue of being more explicit, may be clearer to the reader.</p>
+
+<p>Finally, we can construct instances of Left and Right directly:</p>
+
+<pre><code class="scala">import scalaz._
+import Scalaz._
+
+scala&gt; -\/("Failure!")
+res9: scalaz.-\/[String] = -\/(Failure!)
+
+scala&gt; \/-("Success!")
+res11: scalaz.\/-[String] = \/-(Success!)
+</code></pre>
+
+<p>Remember I talked about how we could comprehend over Disjunctions, and success continued while failure aborted?</p>
+
+<p><img src="/images/shining-grinning.gif" alt="Here's Johnny?" /></p>
+
+<p>Let&rsquo;s look at what that looks like with some sample data:</p>
+
+<pre><code class="scala">
+import scalaz._
+import Scalaz._
+
+val success1 = \/.right("This succeeded")
+
+val success2 = \/.right("This succeeded also!")
+
+val fail1 = \/.left("This failed miserably...")
+
+val fail2 = \/.left("Oops :(")
+</code></pre>
+
+<p>We now have a couple of Disjunction instances we can use. If we comprehend over only Right, we get back an instance of Right.</p>
+
+<pre><code class="scala">for {
+  one &lt;- success1
+  two &lt;- success2 
+} yield (one, two)
+/* res0: scalaz.\/[Nothing,(String, String)] = 
+      \/-((This succeeded,This succeeded also!)) */
+</code></pre>
+
+<p>Since both instances we used were Right, we get back an instance of Right ( <code>\/-</code> ).</p>
+
+<p>What if we include a Left in there?</p>
+
+<pre><code class="scala">for {
+  one &lt;- success1
+  two &lt;- fail1  
+  three &lt;- success2
+} yield (one, three)
+/* res1: scalaz.\/[String,(String, String)] = 
+      -\/(This failed miserably...) */
+</code></pre>
+
+<p>The behavior here is much like with an <code>Option</code> instance of <code>None</code> (Which we&rsquo;ll talk about in the next post). When Scala encounters a &ldquo;failure&rdquo; - in this case a Left ( <code>-\/</code> ) - it aborts the iteration and returns an instance of the failure. This case means the <code>yield</code> never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.</p>
+
+<p>Now you&rsquo;ve had a (hopefully) gentle introduction to the world of <code>\/</code>. In the next part, we&rsquo;ll talk about using Scala&rsquo;s <code>Option</code> in conjunction with Disjunctions to better handle failure conditions with existing code.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Pickling Case Classes to Memcached with Scala]]></title>
     <link href="http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
-    <updated>2015-03-23T00:00:00-04:00</updated>
+    <updated>2015-03-23T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
     <content type="html"><![CDATA[<p>Recently, I&rsquo;ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I&rsquo;ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site&hellip; from Perl, PHP, and Python.</p>
 
@@ -117,7 +261,7 @@
   <entry>
     <title type="html"><![CDATA[Distributing Akka Workloads - And Shutting Down Afterwards]]></title>
     <link href="http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/"/>
-    <updated>2013-01-17T00:00:00-05:00</updated>
+    <updated>2013-01-17T00:00:00-08:00</updated>
     <id>http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After</id>
     <content type="html"><![CDATA[<p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I&rsquo;ve gotten a chance to solve some interesting problems and answer obscure questions&hellip; which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we&rsquo;re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
 
@@ -341,7 +485,7 @@ You might have expected a more sequential behavior out of this code, where every
   <entry>
     <title type="html"><![CDATA[Understanding Scala's Type Classes]]></title>
     <link href="http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes/"/>
-    <updated>2012-06-11T00:00:00-04:00</updated>
+    <updated>2012-06-11T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes</id>
     <content type="html"><![CDATA[<p>Over the last year or so, I have found myself making more and more use of Scala&rsquo;s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
 
@@ -466,7 +610,7 @@ You might have expected a more sequential behavior out of this code, where every
   <entry>
     <title type="html"><![CDATA[Forcing Scala Compiler 'Nothing' Checks]]></title>
     <link href="http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
-    <updated>2012-05-31T00:00:00-04:00</updated>
+    <updated>2012-05-31T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks</id>
     <content type="html"><![CDATA[<p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is &ldquo;Some type you&rsquo;d like to fetch a particular field as&rdquo;. Because of type erasure on the JVM, working with a Mongo Document can be annoying &ndash; the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
@@ -583,27 +727,6 @@ You might have expected a more sequential behavior out of this code, where every
 <span class="o">}</span></code></pre></div></p>
 
 <p>Now, when you ask for a type that doesn&rsquo;t match what the Document contains, you will receive <code>None</code> and a warning in your log such as <code>Unable to cast 'java.lang.Double' as 'java.lang.String'; please check your types.</code>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Casbah 2.3.0-RC1 Released]]></title>
-    <link href="http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released/"/>
-    <updated>2012-05-29T00:00:00-04:00</updated>
-    <id>http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released</id>
-    <content type="html"><![CDATA[<p>Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as  <code>"org.mongodb" % "casbah" % "2.3.0-RC1"</code>. My <a href="http://notes.implicit.ly/post/24009446396/casbah-2-3-0rc1">release announcement</a> to <a href="http://implicit.ly">implicit.ly</a> contains the details on all of the bugs fixed – I will also be posting another set of blog entries shortly outlining the specific improvements to the code and demoing fetaures.</p>
-
-<p>It has been just about a year since the last major release of Casbah, which was version <strong>2.1.5-1</strong>.  A number of factors led to the delay in getting a major update out the door, for which I apologize.  Amongst other things I have spent much of the last year since Casbah&rsquo;s prior release on the road doing training, consulting and evangelization of MongoDB to users around the globe; I had less time for code among all these things than I expected!  Additionally, after releasing the <strong>2.1.x</strong> series of Casbah I embarked on what quickly morphed from Casbah <strong>2.2.0</strong> to <strong>3.0.0</strong> – a major refactoring and cleanup of 2+ years of API cruft and &ldquo;I&rsquo;m Gonna Learn Me Some Scala!&rdquo; detritus.  In all the excitement to release a perfect release to end all releases, I did a poor job of making it easy to backport and maintain a compatibility series for <strong>2.x</strong> users – a harsh lesson in the importance of creating small, bite sized git commits that can be cherry picked.</p>
-
-<h2>So What Happened to Casbah 3.0? And 2.2?</h2>
-
-<p>Casbah <strong>2.2.x</strong> is dead – <strong>3.0.x</strong> is certainly not!  When the work following <strong>2.1.x</strong> was begun, I had published a number of early snapshots as Casbah <em>2.2.0-SNAPSHOT</em>.  During this development cycle I found a lot of the aforementioned detritus such as overloaded methods (Casbah was begun as a Scala 2.7.x project and I never fully moved its core APIs over to use named and default arguments - some of these are corrected in Casbah <strong>2.3.0</strong> but in the interest of backwards compatibility with prior releases of 2.x, not completely). As I worked on coding improvements around these things the API drifted further and further away from compatibility and I chose to kill off the <strong>2.2.x</strong> series, planning the next release of Casbah as <strong>3.0.0</strong>.  In addition to that, I intended Casbah <strong>3.0.0</strong> to coincide with MongoDB <strong>2.2.0</strong> which will have additional features such as the New Aggregation Framework.  As MongoDB 2.2 hasn&rsquo;t been released yet, it became clear I needed to provide an updated Casbah release with many of the improvements but without many of the API breakages introduced in <strong>3.0</strong> - including a vastly improved build of the Casbah Query DSL which has stronger type safety and compiler checks thanks to the inimitable <a href="http://twitter.com/jteigen">Jon-Anders Teigen</a>.</p>
-
-<p>Casbah <strong>3.0</strong> is still very much alive and in development, with <strong>2.3.0</strong> representing a backporting of many of the changes and improvements from <strong>3.0</strong>.  Because of the abandonment of the original <strong>2.2</strong> development series, I felt it was saner to kill <strong>2.2.x</strong> dead and bring the backports into a <strong>2.3.x</strong> series. You can, if you wish, think of this as <em>Casbah 2.3 - The Search for Casbah 2.2</em> (The long rumored sequel to Spaceballs has been said to be called <em>Spaceballs 3: The Search for Spaceballs 2</em>).</p>
-
-<p>I will continue to support and improve Casbah <strong>2.3.x</strong> moving forward as well as completing Casbah <strong>3.0</strong> (still intended to coincide with the release of MongoDB 2.2). If you have any questions, please don&rsquo;t hesitate to contact me!</p>
-
-<p><em>Later tonight or tomorrow I will post an entry or two detailing all of the wonderful changes in Casbah 2.3.0 and how to take advantage of them.</em></p>
 ]]></content>
   </entry>
   

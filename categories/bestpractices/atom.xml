@@ -4,7 +4,7 @@
   <title><![CDATA[Category: bestpractices | Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/categories/bestpractices/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-10T18:27:21-04:00</updated>
+  <updated>2015-04-11T08:51:15-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Distributing Akka Workloads - And Shutting Down Afterwards]]></title>
     <link href="http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/"/>
-    <updated>2013-01-17T00:00:00-05:00</updated>
+    <updated>2013-01-17T00:00:00-08:00</updated>
     <id>http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After</id>
     <content type="html"><![CDATA[<p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I&rsquo;ve gotten a chance to solve some interesting problems and answer obscure questions&hellip; which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we&rsquo;re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
 
@@ -240,7 +240,7 @@ You might have expected a more sequential behavior out of this code, where every
   <entry>
     <title type="html"><![CDATA[Immutability and Clever Variable Usage in the Land of Blocks and Branches]]></title>
     <link href="http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/"/>
-    <updated>2011-08-05T00:00:00-04:00</updated>
+    <updated>2011-08-05T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult</id>
     <content type="html"><![CDATA[<p>Last night, I found myself unconciously refactoring some Scala code (I don&rsquo;t recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don&rsquo;t seem entirely aware of one of my favorite features.  What I&rsquo;m talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
 

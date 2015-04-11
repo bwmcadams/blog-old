@@ -4,7 +4,7 @@
   <title><![CDATA[Category: polymorphism | Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/categories/polymorphism/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-10T18:27:21-04:00</updated>
+  <updated>2015-04-11T08:51:15-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Understanding Scala's Type Classes]]></title>
     <link href="http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes/"/>
-    <updated>2012-06-11T00:00:00-04:00</updated>
+    <updated>2012-06-11T00:00:00-07:00</updated>
     <id>http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes</id>
     <content type="html"><![CDATA[<p>Over the last year or so, I have found myself making more and more use of Scala&rsquo;s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
 
