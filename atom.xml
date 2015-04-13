@@ -4,7 +4,7 @@
   <title><![CDATA[Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-13T13:43:23-07:00</updated>
+  <updated>2015-04-13T14:03:38-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -442,7 +442,7 @@
 <p>
 The behavior here is much like with an <code>Option</code> instance of <code>None</code> (Which we&rsquo;ll talk about in the next post). When Scala encounters a &ldquo;failure&rdquo; - in this case a Left ( <code>-\/</code> ) - it aborts the iteration and returns an instance of the failure. This case means the <code>yield</code> never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.</p>
 
-<p>Now you&rsquo;ve had a (hopefully) gentle introduction to the world of <code>\/</code>. In the next part, we&rsquo;ll talk about using Scala&rsquo;s <code>Option</code> in conjunction with Disjunctions to better handle failure conditions with existing code.</p>
+<p>Now you&rsquo;ve had a (hopefully) gentle introduction to the world of <code>\/</code>. In <a href="http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/">the next part</a>, we&rsquo;ll talk about using Scala&rsquo;s <code>Option</code> in conjunction with Disjunctions to better handle failure conditions with existing code.</p>
 ]]></content>
   </entry>
   
