@@ -149,4 +149,4 @@ for {
 ``` 
 The behavior here is much like with an `Option` instance of `None` (Which we'll talk about in the next post). When Scala encounters a "failure" - in this case a Left ( `-\/` ) - it aborts the iteration and returns an instance of the failure. This case means the `yield` never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.
 
-Now you've had a (hopefully) gentle introduction to the world of `\/`. In the next part, we'll talk about using Scala's `Option` in conjunction with Disjunctions to better handle failure conditions with existing code.
+Now you've had a (hopefully) gentle introduction to the world of `\/`. In [the next part](http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/), we'll talk about using Scala's `Option` in conjunction with Disjunctions to better handle failure conditions with existing code.
