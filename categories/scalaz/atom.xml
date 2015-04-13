@@ -4,7 +4,7 @@
   <title><![CDATA[Category: scalaz | Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/categories/scalaz/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-13T12:09:56-07:00</updated>
+  <updated>2015-04-13T13:43:23-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -12,6 +12,142 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Skeptic's Guide to Scalaz' Gateway Drugs: Part 2 - Options with Disjunction]]></title>
+    <link href="http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/"/>
+    <updated>2015-04-13T12:14:44-07:00</updated>
+    <id>http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction</id>
+    <content type="html"><![CDATA[<p><em>(This is Part 2 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 &ndash; Disjunctions</a>)</em></p>
+
+<p>Welcome back to the Skeptic&rsquo;s Guide to <code>scalaz</code>. In <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">the last part</a> of this series, we introduced you to the power of <code>scalaz</code> Disjunctions&mdash;also known as <code>\/</code>&mdash;and how we can use them to indicate a return value of <em>either</em> an Error or a Success. As a reminder, convention dictates that Left&mdash;<code>-\/</code>&mdash;is an error, while Right&mdash;<code>\/-</code>&mdash;is success.</p>
+
+<p><img src="/images/buck-phone.gif" alt="Hello? scalaz?" /></p>
+
+<p>In this part, we&rsquo;ll discuss interactions with Scala&rsquo;s <code>Option</code>. Specifically, I want to discuss how to manage &ldquo;stacks&rdquo; of <code>Option</code> in for comprehensions, and how to use Disjunction to manage them.</p>
+
+<!--more-->
+
+
+<p>In Scala, <code>Option</code> is a container commonly used to indicate a return type that can have no value. <code>Option</code> has two subtypes: <code>Some[T]</code>&mdash;which contains a value of type <code>T</code>&mdash;and <code>None</code>, which contains no value. We use these in the Scala world to avoid the sins of <code>null</code>; Because <code>None</code> is a valid object, invoking functions on it doesn&rsquo;t cause the dreaded <code>NullPointerException</code>.</p>
+
+<p>Similar to <code>scalaz</code> Disjunctions, there is a &ldquo;Right&rdquo; bias on <code>Option</code>. Specifically, it is biased towards <code>Some[T]</code>, and when we comprehend over <code>Some[T]</code> the loop continues:</p>
+
+<pre><code class="scala ">val some1 = Some("This is a value.")
+
+val some2 = Some("This is also a value.")
+
+val some3 = Some("You guessed it. A value")
+
+
+for {
+  one &lt;- some1
+  two &lt;- some2
+  three &lt;- some3 
+} yield (one, two, three)
+/* res2: Option[(String, String, String)] = 
+    Some((This is a value.,This is also a value.,You guessed it. A value)) */
+</code></pre>
+
+<p>As I said, <code>Option</code> has a bias towards <code>Some</code>. Each step of the comprehension here unpacks a value from <code>Some</code>. But what if there&rsquo;s a <code>None</code> thrown in there?</p>
+
+<pre><code class="scala">
+for {
+  one &lt;- some1
+  two &lt;- None
+  three &lt;- some3
+} yield (one, two, three)
+/* res3: Option[(String, Nothing, String)] = None */
+</code></pre>
+
+<p>What went wrong? In short, the same behavior as we saw when we threw a Left Disjunction into a comprehension. When we encounter a <code>None</code>, the loop aborts and returns the failure value. For a deeper look at what I mean&mdash;and how to fix it&mdash;let&rsquo;s construct some more concrete sample data.</p>
+
+<pre><code class="scala">case class Address(city: String)
+
+case class User(first: String, 
+                last: String, 
+                address: Option[Address])
+
+case class DBObject(id: Long, 
+                    user: Option[User])
+
+val brendan = 
+  Some(DBObject(1, Some(User("Brendan", "McAdams", None))))
+
+val someOtherGuy = 
+  Some(DBObject(2, None))
+</code></pre>
+
+<p>Here is a set of constructs that will let us represent a user &amp; address in our database. Note that both <code>User</code> and <code>Address</code> are optional on their respective containers. I&rsquo;ve seen a lot of code that works this way: &ldquo;If the database failed to return a row, let&rsquo;s return <code>None</code>&rdquo;. Here&rsquo;s what it looks like in practice when one of those row retrievals fails&hellip;</p>
+
+<pre><code class="scala">for {
+  dao &lt;- brendan
+  user &lt;- dao.user
+} yield user
+
+/* res4: Option[User] = Some(User(Brendan,McAdams,None)) */
+</code></pre>
+
+<p>In our first example, <code>brendan</code> is a <code>DBObject</code> with a valid <code>User</code>. When we comprehend over just the <code>DBObject</code> and <code>User</code>, we get back a valid <code>Some</code>. But what if we try to extract both the <code>User</code> and <code>Address</code> from <code>someOtherGuy</code>?</p>
+
+<pre><code class="scala">for {
+  dao &lt;- someOtherGuy
+  user &lt;- dao.user
+  address &lt;- user.address
+} yield address
+/* res5: Option[Address] = None */
+</code></pre>
+
+<p>Now, if we were retrieving the data from the database we&rsquo;ve run up against a very interesting question. Was there no <code>User</code>? Or was there no <code>Address</code>? This is the problem I ran into a <em>lot</em> with returning <code>Option</code> from the database.</p>
+
+<p><img src="/images/majorKong.gif" alt="Boom!" /></p>
+
+<p>Fundamentally, comprehending over groups of <code>Option</code> leads to &ldquo;silent failure&rdquo;. Luckily, <code>scalaz</code> includes some implicits to convert an <code>Option</code> to a Disjunction. Since Disjunction&rsquo;s right bias makes it easy to comprehend, we can do the conversion in place without rewriting a lot of code. For a Left, we&rsquo;ll still get useful information in place of <code>None</code>.</p>
+
+<pre><code class="scala">None.toRightDisjunction("No object found")
+/* res6: scalaz.\/[String,Nothing] = -\/(No object found) */
+</code></pre>
+
+<p>Here, we call the implicit function <code>toRightDisjunction</code> upon an instance of <code>Option</code> (<code>None</code>, in this case). Specifically, <code>toRightDisjunction</code> says &ldquo;Convert an <code>Option</code> to a disjunction where <code>Some[T]</code> becomes <code>\/-(T)</code>&mdash;Right&mdash;and <code>None</code> becomes <code>-\/(&lt;argument&gt;)</code>&rdquo;, or Left. That last bit is important: the argument to <code>toRightDisjunction</code> is used to create a value for a Left Disjunction.</p>
+
+<p>For those who prefer &lsquo;concise&rsquo; over &lsquo;explicit&rsquo;, there is also a symbolic version of <code>toRightDisjunction</code>, which is functionally identical:</p>
+
+<pre><code class="scala">None \/&gt; "No object found"
+/* res7: scalaz.\/[String,Nothing] = -\/(No object found) */
+</code></pre>
+
+<p>So, when there&rsquo;s a <code>None</code> we use the argument to <code>toRightDisjunction</code> to create a <code>-\/</code>, but if there&rsquo;s a <code>Some</code> we convert the value from <code>Some[T]</code> to <code>\/-[T]</code>. Here&rsquo;s what it looks like with <code>Some</code> values:</p>
+
+<pre><code class="scala">Some("My Hovercraft Is Full of Eels") \/&gt; "No object found"
+/* res8: scalaz.\/[String, String] = \/-(My Hovercraft Is Full of Eels) */
+
+Some("I Will Not Buy This Record It Is Scratched")
+  .toRightDisjunction("No object found")
+/* res9: scalaz.\/[String, String] = 
+  \/-(I Will Not Buy This Record, It Is Scratched") */
+</code></pre>
+
+<p>Given these new tools, let&rsquo;s look at that user/address extraction again.</p>
+
+<pre><code class="scala">for {
+  dao &lt;- brendan \/&gt; "No user by that ID"
+  user &lt;- dao.user \/&gt; "Join failed: no user object"
+} yield user
+/* res10: scalaz.\/[String,User] = \/-(User(Brendan,McAdams,None)) */
+
+for {
+  dao &lt;- someOtherGuy \/&gt; "No user by that ID"
+  user &lt;- dao.user \/&gt; "Join failed: no user object"
+  address &lt;- user.address \/&gt; "Join failed: No address on user"
+} yield address
+/* res11: scalaz.\/[String,Address] = -\/(Join failed: no user object) */
+</code></pre>
+
+<p>Hey, look at that! On our second comprehension, we got some useful information back about what went wrong. Now we can log that, return it to the frontend, or whatever else it is you do with failure data.</p>
+
+<p>What if we want to do something beyond comprehensions? Stay tuned for our next episode, where we&rsquo;ll talk about <code>Validation</code>, and how to use it to check multiple error conditions.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Skeptic's Guide to scalaz' Gateway Drugs: Part 1 - Disjunctions]]></title>

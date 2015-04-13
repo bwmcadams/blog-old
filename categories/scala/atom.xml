@@ -4,7 +4,7 @@
   <title><![CDATA[Category: scala | Evil Monkey Labs]]></title>
   <link href="http://blog.evilmonkeylabs.com/categories/scala/atom.xml" rel="self"/>
   <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-13T12:09:56-07:00</updated>
+  <updated>2015-04-13T13:43:23-07:00</updated>
   <id>http://blog.evilmonkeylabs.com/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -12,6 +12,142 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Skeptic's Guide to Scalaz' Gateway Drugs: Part 2 - Options with Disjunction]]></title>
+    <link href="http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/"/>
+    <updated>2015-04-13T12:14:44-07:00</updated>
+    <id>http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction</id>
+    <content type="html"><![CDATA[<p><em>(This is Part 2 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 &ndash; Disjunctions</a>)</em></p>
+
+<p>Welcome back to the Skeptic&rsquo;s Guide to <code>scalaz</code>. In <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">the last part</a> of this series, we introduced you to the power of <code>scalaz</code> Disjunctions&mdash;also known as <code>\/</code>&mdash;and how we can use them to indicate a return value of <em>either</em> an Error or a Success. As a reminder, convention dictates that Left&mdash;<code>-\/</code>&mdash;is an error, while Right&mdash;<code>\/-</code>&mdash;is success.</p>
+
+<p><img src="/images/buck-phone.gif" alt="Hello? scalaz?" /></p>
+
+<p>In this part, we&rsquo;ll discuss interactions with Scala&rsquo;s <code>Option</code>. Specifically, I want to discuss how to manage &ldquo;stacks&rdquo; of <code>Option</code> in for comprehensions, and how to use Disjunction to manage them.</p>
+
+<!--more-->
+
+
+<p>In Scala, <code>Option</code> is a container commonly used to indicate a return type that can have no value. <code>Option</code> has two subtypes: <code>Some[T]</code>&mdash;which contains a value of type <code>T</code>&mdash;and <code>None</code>, which contains no value. We use these in the Scala world to avoid the sins of <code>null</code>; Because <code>None</code> is a valid object, invoking functions on it doesn&rsquo;t cause the dreaded <code>NullPointerException</code>.</p>
+
+<p>Similar to <code>scalaz</code> Disjunctions, there is a &ldquo;Right&rdquo; bias on <code>Option</code>. Specifically, it is biased towards <code>Some[T]</code>, and when we comprehend over <code>Some[T]</code> the loop continues:</p>
+
+<pre><code class="scala ">val some1 = Some("This is a value.")
+
+val some2 = Some("This is also a value.")
+
+val some3 = Some("You guessed it. A value")
+
+
+for {
+  one &lt;- some1
+  two &lt;- some2
+  three &lt;- some3 
+} yield (one, two, three)
+/* res2: Option[(String, String, String)] = 
+    Some((This is a value.,This is also a value.,You guessed it. A value)) */
+</code></pre>
+
+<p>As I said, <code>Option</code> has a bias towards <code>Some</code>. Each step of the comprehension here unpacks a value from <code>Some</code>. But what if there&rsquo;s a <code>None</code> thrown in there?</p>
+
+<pre><code class="scala">
+for {
+  one &lt;- some1
+  two &lt;- None
+  three &lt;- some3
+} yield (one, two, three)
+/* res3: Option[(String, Nothing, String)] = None */
+</code></pre>
+
+<p>What went wrong? In short, the same behavior as we saw when we threw a Left Disjunction into a comprehension. When we encounter a <code>None</code>, the loop aborts and returns the failure value. For a deeper look at what I mean&mdash;and how to fix it&mdash;let&rsquo;s construct some more concrete sample data.</p>
+
+<pre><code class="scala">case class Address(city: String)
+
+case class User(first: String, 
+                last: String, 
+                address: Option[Address])
+
+case class DBObject(id: Long, 
+                    user: Option[User])
+
+val brendan = 
+  Some(DBObject(1, Some(User("Brendan", "McAdams", None))))
+
+val someOtherGuy = 
+  Some(DBObject(2, None))
+</code></pre>
+
+<p>Here is a set of constructs that will let us represent a user &amp; address in our database. Note that both <code>User</code> and <code>Address</code> are optional on their respective containers. I&rsquo;ve seen a lot of code that works this way: &ldquo;If the database failed to return a row, let&rsquo;s return <code>None</code>&rdquo;. Here&rsquo;s what it looks like in practice when one of those row retrievals fails&hellip;</p>
+
+<pre><code class="scala">for {
+  dao &lt;- brendan
+  user &lt;- dao.user
+} yield user
+
+/* res4: Option[User] = Some(User(Brendan,McAdams,None)) */
+</code></pre>
+
+<p>In our first example, <code>brendan</code> is a <code>DBObject</code> with a valid <code>User</code>. When we comprehend over just the <code>DBObject</code> and <code>User</code>, we get back a valid <code>Some</code>. But what if we try to extract both the <code>User</code> and <code>Address</code> from <code>someOtherGuy</code>?</p>
+
+<pre><code class="scala">for {
+  dao &lt;- someOtherGuy
+  user &lt;- dao.user
+  address &lt;- user.address
+} yield address
+/* res5: Option[Address] = None */
+</code></pre>
+
+<p>Now, if we were retrieving the data from the database we&rsquo;ve run up against a very interesting question. Was there no <code>User</code>? Or was there no <code>Address</code>? This is the problem I ran into a <em>lot</em> with returning <code>Option</code> from the database.</p>
+
+<p><img src="/images/majorKong.gif" alt="Boom!" /></p>
+
+<p>Fundamentally, comprehending over groups of <code>Option</code> leads to &ldquo;silent failure&rdquo;. Luckily, <code>scalaz</code> includes some implicits to convert an <code>Option</code> to a Disjunction. Since Disjunction&rsquo;s right bias makes it easy to comprehend, we can do the conversion in place without rewriting a lot of code. For a Left, we&rsquo;ll still get useful information in place of <code>None</code>.</p>
+
+<pre><code class="scala">None.toRightDisjunction("No object found")
+/* res6: scalaz.\/[String,Nothing] = -\/(No object found) */
+</code></pre>
+
+<p>Here, we call the implicit function <code>toRightDisjunction</code> upon an instance of <code>Option</code> (<code>None</code>, in this case). Specifically, <code>toRightDisjunction</code> says &ldquo;Convert an <code>Option</code> to a disjunction where <code>Some[T]</code> becomes <code>\/-(T)</code>&mdash;Right&mdash;and <code>None</code> becomes <code>-\/(&lt;argument&gt;)</code>&rdquo;, or Left. That last bit is important: the argument to <code>toRightDisjunction</code> is used to create a value for a Left Disjunction.</p>
+
+<p>For those who prefer &lsquo;concise&rsquo; over &lsquo;explicit&rsquo;, there is also a symbolic version of <code>toRightDisjunction</code>, which is functionally identical:</p>
+
+<pre><code class="scala">None \/&gt; "No object found"
+/* res7: scalaz.\/[String,Nothing] = -\/(No object found) */
+</code></pre>
+
+<p>So, when there&rsquo;s a <code>None</code> we use the argument to <code>toRightDisjunction</code> to create a <code>-\/</code>, but if there&rsquo;s a <code>Some</code> we convert the value from <code>Some[T]</code> to <code>\/-[T]</code>. Here&rsquo;s what it looks like with <code>Some</code> values:</p>
+
+<pre><code class="scala">Some("My Hovercraft Is Full of Eels") \/&gt; "No object found"
+/* res8: scalaz.\/[String, String] = \/-(My Hovercraft Is Full of Eels) */
+
+Some("I Will Not Buy This Record It Is Scratched")
+  .toRightDisjunction("No object found")
+/* res9: scalaz.\/[String, String] = 
+  \/-(I Will Not Buy This Record, It Is Scratched") */
+</code></pre>
+
+<p>Given these new tools, let&rsquo;s look at that user/address extraction again.</p>
+
+<pre><code class="scala">for {
+  dao &lt;- brendan \/&gt; "No user by that ID"
+  user &lt;- dao.user \/&gt; "Join failed: no user object"
+} yield user
+/* res10: scalaz.\/[String,User] = \/-(User(Brendan,McAdams,None)) */
+
+for {
+  dao &lt;- someOtherGuy \/&gt; "No user by that ID"
+  user &lt;- dao.user \/&gt; "Join failed: no user object"
+  address &lt;- user.address \/&gt; "Join failed: No address on user"
+} yield address
+/* res11: scalaz.\/[String,Address] = -\/(Join failed: no user object) */
+</code></pre>
+
+<p>Hey, look at that! On our second comprehension, we got some useful information back about what went wrong. Now we can log that, return it to the frontend, or whatever else it is you do with failure data.</p>
+
+<p>What if we want to do something beyond comprehensions? Stay tuned for our next episode, where we&rsquo;ll talk about <code>Validation</code>, and how to use it to check multiple error conditions.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Skeptic's Guide to scalaz' Gateway Drugs: Part 1 - Disjunctions]]></title>
@@ -604,129 +740,6 @@ You might have expected a more sequential behavior out of this code, where every
 <p>Now go forth and Type with Class.</p>
 
 <p>* <a href="http://twitter.com/djspiewak">Daniel Spiewak</a> points out that Sun realized this complication as well a few Java releases back and introduced <a href="http://docs.oracle.com/javase/6/docs/api/java/util/Comparator.html">Comparator</a>, which is very similar to this Type Class approach.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Forcing Scala Compiler 'Nothing' Checks]]></title>
-    <link href="http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
-    <updated>2012-05-31T00:00:00-07:00</updated>
-    <id>http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks</id>
-    <content type="html"><![CDATA[<p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is &ldquo;Some type you&rsquo;d like to fetch a particular field as&rdquo;. Because of type erasure on the JVM, working with a Mongo Document can be annoying &ndash; the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">val</span> <span class="n">doc</span><span class="k">:</span> <span class="kt">DBObject</span> <span class="o">=</span> <span class="nc">MongoDBObject</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">foo</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">-&gt;</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">bar</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">balance</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">-&gt;</span> <span class="mf">2.5</span><span class="o">)&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-
-<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">val</span> <span class="n">balance</span> <span class="k">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">balance</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span></code></pre></div></p>
-
-<p>We have already hit another issue here &ndash; in Scala, invoking <code>get</code> on a <code>Map</code> returns <code>Option[T]</code> (Where, in this case, <code>T</code> is of type <code>Any</code>). Which means casting has become more complex: to get a <code>Double</code> we also have to unwrap the <code>Option[Any]</code> first. A lazy man&rsquo;s approach might be something hairy like so:</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">balance</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="kc">null</span><span class="o">).</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span></code></pre></div></p>
-
-<p>In the annals of history (when men were <em>real</em> men, and small furry creatures from Alpha Centauri were <em>real</em> small furry creatures from Alpha Centauri), the above became an annoyingly common pattern. A solution was needed - and so <code>getAs[T]</code> was born. The idea was not only to allow a shortcut to casting, but take care of the <code>Option[T]</code> wrapping for you as well. Invoking <code>getAs[Double]</code> will, in this case, return us an <code>Option[Double]</code>.</p>
-
-<p>But not everything is perfect in the land of <code>getAs[T]</code> &ndash; if the type requested doesn&rsquo;t match the actual type, runtime failures occur. Worse, if the user fails to pass a type, the Scala compiler substitutes <code>Nothing</code>, which <em>guarantees</em> a runtime failure. Runtime failures are bad &ndash; but fortunately, <a href="http://twitter.com/milessabin">Miles Sabin</a> &amp; <a href="http://twitter.com/jteigen">Jon-Anders Teigen</a> came up with an awesome solution.</p>
-
-<!--more-->
-
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s">&quot;foo&quot;</span><span class="o">&gt;</span><span class="nc">String</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">res1</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="n">bar</span><span class="o">)</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/&amp;</span><span class="n">lsquo</span><span class="o">;</span>
-<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s">&quot;balance&quot;</span><span class="o">&gt;</span><span class="nc">Double</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">res2</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="mf">2.5</span><span class="o">)</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
-<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">balance</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">res3</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Nothing</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="mf">2.5</span><span class="o">)</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-
-<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="nc">Notably</span> <span class="n">at</span> <span class="n">least</span><span class="o">,</span> <span class="n">the</span> <span class="nc">Scala</span> <span class="n">compiler</span> <span class="n">is</span> <span class="n">smart</span> <span class="n">enough</span> <span class="n">to</span> <span class="n">infer</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">A</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="n">from</span> <span class="n">the</span> <span class="n">left</span><span class="o">-</span><span class="n">hand</span> <span class="n">side</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span><span class="k">if</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span>
-   <span class="n">an</span> <span class="n">explicit</span> <span class="k">type</span> <span class="kt">is</span> <span class="kt">declared</span> <span class="kt">&lt;/em&gt;/</span>
-<span class="k">val</span> <span class="n">bal</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="n">getAs</span><span class="o">(</span><span class="n">doc</span><span class="o">,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">balance</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">bal</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="mf">2.5</span><span class="o">)</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-
-<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span></code></pre></div></p>
-
-<p>We get back an option of <code>Nothing</code>, which is less than ideal (The REPL appears to be somewhat more forgiving in some of this behavior than the actual runtime is). My reaction to this early on was quite strong –– I wanted to <em>require</em> that the user pass their type argument. Unfortunately, the best I could do within Casbah was attempt to detect the compiler substituted <code>Nothing</code> and warn the user at runtime. Less than ideal, I know.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;key:%20String&quot;</span><span class="o">&gt;</span><span class="n">A</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="k">:</span> <span class="kt">Any:</span> <span class="kt">Manifest&lt;/a</span><span class="k">&gt;:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-  <span class="n">require</span><span class="o">(</span><span class="n">manifest</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">!=</span> <span class="n">manifest</span><span class="o">[</span><span class="kt">scala.Nothing</span><span class="o">],</span>
-    <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nc">Type</span> <span class="n">inference</span> <span class="n">failed</span><span class="o">;</span> <span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="o">&gt;</span><span class="n">A</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="k">requires</span> <span class="n">an</span> <span class="n">explicit</span> <span class="k">type</span> <span class="kt">argument</span> <span class="kt">&amp;rdquo</span><span class="o">;</span> <span class="o">+</span>
-    <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">dbObject</span><span class="o">.</span><span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;%22somegetAKey%22&quot;</span><span class="o">&gt;&lt;</span><span class="nc">ReturnType</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="o">)</span> <span class="n">to</span> <span class="n">function</span> <span class="n">correctly</span><span class="o">.&amp;</span><span class="n">rdquo</span><span class="o">;)&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-
-<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>  <span class="n">underlying</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
-    <span class="k">case</span> <span class="kc">null</span> <span class="k">=&gt;</span> <span class="nc">None</span>
-    <span class="k">case</span> <span class="n">value</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
-  <span class="o">}</span>
-<span class="o">}</span></code></pre></div></p>
-
-<p>This gave me somewhat improved behavior –- at least users are warned at runtime before something breaks.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">balance</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span>
-<span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="nc">IllegalArgumentException</span><span class="k">:</span> <span class="kt">requirement</span> <span class="kt">failed:</span> <span class="kt">Type</span> <span class="kt">inference</span> <span class="kt">failed</span><span class="o">;</span> <span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="o">&gt;</span><span class="n">A</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="k">requires</span> <span class="n">an</span> <span class="n">explicit</span> <span class="k">type</span> <span class="kt">argument</span> <span class="o">(</span><span class="kt">e.g.</span> <span class="kt">dbObject.getAs&lt;a</span> <span class="kt">href</span><span class="o">=</span><span class="err">&quot;&quot;</span> <span class="kt">title</span><span class="o">=</span><span class="s">&quot;somegetAKey&quot;</span><span class="o">&gt;&lt;</span><span class="nc">ReturnType</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span> <span class="o">)</span> <span class="n">to</span> <span class="n">function</span> <span class="n">correctly</span><span class="o">.</span>
-<span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span></code></pre></div></p>
-
-<p>Great &ndash; we prevent people from utterly failing to pass a type to <code>getAs</code> by throwing an exception at runtime. A bit like closing the barn doors after the horses escaped, and somewhat counter to the point of compiled languages. Fortunately, Miles Sabin knows a lot of great compiler tricks and Jon-Anders has superpowers (which he uses for good, not evil). Using some of Miles&#8217; tricks, Jon-Anders has fixed Casbah (as of 2.3.0+) to make <code>getAs[T]</code> fail utterly at <em>compile time</em> when no type is passed.</p>
-
-<p>The secret to this trick is essentially that the Scala compiler <em>hates</em> ambiguity. In order to substitute <code>Nothing</code> as a type argument when one isn&rsquo;t supplied, the Scala compiler has an implicit for <code>Nothing</code> scoped. If one were to exacerbate the situation by introducing an additional implicit for <code>Nothing</code>, the compiler would fail when no type argument is passed.</p>
-
-<p>With this in mind, we can morph <code>getAs</code> to work with a type class instead of a standard type argument.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;key:%20String&quot;</span><span class="o">&gt;</span><span class="n">A</span> <span class="k">:</span> <span class="kt">NotNothing&lt;/a</span><span class="k">&gt;:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-  <span class="n">underlying</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
-    <span class="k">case</span> <span class="kc">null</span> <span class="k">=&gt;</span> <span class="nc">None</span>
-    <span class="k">case</span> <span class="n">value</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
-  <span class="o">}</span>
-<span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-
-<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">sealed</span> <span class="k">trait</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]{</span>
-  <span class="k">type</span> <span class="kt">B</span>
-<span class="o">}</span></code></pre></div></p>
-
-<p>Our previous unbounded type argument is replaced with the new type class boundary of <code>NotNothing</code> and the runtime <code>Nothing</code> check is removed. We also need concrete instances of our type class, which is where the real magic comes into play.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">object</span> <span class="nc">NotNothing</span> <span class="o">{</span>
-  <span class="k">implicit</span> <span class="k">val</span> <span class="n">nothing</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">Nothing</span><span class="o">]{</span> <span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="nc">Any</span> <span class="o">}</span>
-  <span class="k">implicit</span> <span class="k">def</span> <span class="n">notNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]{</span> <span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="n">A</span> <span class="o">}</span>
-<span class="o">}</span></code></pre></div></p>
-
-<p>Now, any application of <code>Nothing</code> will trigger the ambiguity problem &ndash; the Scala compiler won&rsquo;t figure out how to resolve the type argument. This trick works because <code>Nothing</code> is at the <em>bottom</em> of Scala&rsquo;s type hierarchy. Were I to call <code>getAs("balance")</code>, the Scala compiler would attempt to fill in <code>Nothing</code> as the type argument. However, both implicit conversons for <code>nothing</code> <em>and</em> <code>notNothing[A]</code> will match &ndash; causing ambiguity and compilation fails.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s">&quot;foo&quot;</span><span class="o">&gt;</span><span class="nc">String</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">res0</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="n">bar</span><span class="o">)</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
-<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s">&quot;balance&quot;</span><span class="o">&gt;</span><span class="nc">Double</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">res1</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="mf">2.5</span><span class="o">)</span> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
-<span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">balance</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span>
-<span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;</span> <span class="n">error</span><span class="k">:</span> <span class="kt">ambiguous</span> <span class="kt">implicit</span> <span class="kt">values:</span>
- <span class="n">both</span> <span class="n">value</span> <span class="n">nothing</span> <span class="n">in</span> <span class="k">object</span> <span class="nc">NotNothing</span> <span class="n">of</span> <span class="k">type</span> <span class="o">=&gt;</span> <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="nc">Object</span> <span class="k">with</span> <span class="n">com</span><span class="o">.</span><span class="n">mongodb</span><span class="o">.</span><span class="n">casbah</span><span class="o">.</span><span class="n">commons</span><span class="o">.</span><span class="nc">NotNothing</span><span class="o">[</span><span class="kt">Nothing</span><span class="o">]{</span><span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="nc">Any</span><span class="o">}</span>
- <span class="n">and</span> <span class="n">method</span> <span class="n">notNothing</span> <span class="n">in</span> <span class="k">object</span> <span class="nc">NotNothing</span> <span class="n">of</span> <span class="k">type</span> <span class="err">[</span><span class="kt">A</span><span class="err">]</span><span class="o">=&gt;</span> <span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="nc">Object</span> <span class="k">with</span> <span class="n">com</span><span class="o">.</span><span class="n">mongodb</span><span class="o">.</span><span class="n">casbah</span><span class="o">.</span><span class="n">commons</span><span class="o">.</span><span class="nc">NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]{</span><span class="k">type</span> <span class="kt">B</span> <span class="o">=</span> <span class="n">A</span><span class="o">}</span>
- <span class="k">match</span> <span class="n">expected</span> <span class="k">type</span> <span class="kt">com.mongodb.casbah.commons.NotNothing</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
-              <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">balance</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;)</span>
-                       <span class="o">^</span>
-<span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span></code></pre></div></p>
-
-<p>A vast improvement in behavior, especially if we use the <a href="http://suereth.blogspot.com/2011/03/annotate-your-type-classes.html"><code>@implicitNotFound</code> annotation</a> to provide clear error messages.</p>
-
-<p>The moral of the story &ndash; knowing the ins and outs of the type system and compiler corners can do great things for improving the functionality of your code. Especially being aware that as smart as the Scala compiler is, there are limitations inherent in the runtime platform (the JVM, specifically type erasure) that can make our lives difficult if ignored.</p>
-
-<h2>Update</h2>
-
-<p>While reviewing a draft of this post, <a href="http://twitter.com/djspiewak">Daniel Spiewak</a> noted one more issue with my code as it exists.  Namely, that we don&rsquo;t have a sane way of preventing users from <em>miscasting</em>.  That is to say, if I try to fetch &ldquo;balance&rdquo; as a <code>String</code>, this shouldn&rsquo;t be OK.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="n">title</span><span class="o">=</span><span class="s">&quot;balance&quot;</span><span class="o">&gt;</span><span class="nc">String</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;.</span><span class="n">getOrElse</span><span class="o">(</span><span class="kc">null</span><span class="o">)</span>
-<span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="nc">ClassCastException</span><span class="k">:</span> <span class="kt">java.lang.Double</span> <span class="kt">cannot</span> <span class="kt">be</span> <span class="kt">cast</span> <span class="kt">to</span> <span class="kt">java.lang.String</span></code></pre></div></p>
-
-<p>Daniel rightly points out how bad a runtime <code>ClassCastException</code> is, and has proposed another fix which I&rsquo;m incorporating.</p>
-
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">def</span> <span class="n">getAs</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;key:%20String&quot;</span><span class="o">&gt;</span><span class="n">A</span> <span class="k">:</span> <span class="kt">NotNothing</span> <span class="kt">:</span> <span class="kt">Manifest&lt;/a</span><span class="k">&gt;:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-  <span class="n">underlying</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">key</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
-    <span class="k">case</span> <span class="kc">null</span> <span class="k">=&gt;</span> <span class="nc">None</span>
-    <span class="k">case</span> <span class="n">value</span> <span class="k">if</span> <span class="n">manifest</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">&gt;:&gt;</span> <span class="nc">Manifest</span><span class="o">.</span><span class="n">classType</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">getClass</span><span class="o">)</span> <span class="k">=&gt;</span>
-      <span class="nc">Some</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="n">asInstanceOf</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
-    <span class="k">case</span> <span class="n">fail</span> <span class="k">=&gt;</span>
-      <span class="n">log</span><span class="o">.</span><span class="n">warn</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nc">Unable</span> <span class="n">to</span> <span class="n">cast</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;%</span><span class="n">s</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span> <span class="n">as</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="o">;%</span><span class="n">s</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;;</span> <span class="n">please</span> <span class="n">check</span> <span class="n">your</span> <span class="n">types</span><span class="o">.&amp;</span><span class="n">rdquo</span><span class="o">;,</span> <span class="nc">Manifest</span><span class="o">.</span><span class="n">classType</span><span class="o">(</span><span class="n">fail</span><span class="o">.</span><span class="n">getClass</span><span class="o">),</span> <span class="n">manifest</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
-      <span class="nc">None</span>
-  <span class="o">}</span>
-<span class="o">}</span></code></pre></div></p>
-
-<p>Now, when you ask for a type that doesn&rsquo;t match what the Document contains, you will receive <code>None</code> and a warning in your log such as <code>Unable to cast 'java.lang.Double' as 'java.lang.String'; please check your types.</code>.</p>
 ]]></content>
   </entry>
   
