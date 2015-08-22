@@ -7,13 +7,13 @@ categories:
 comments: true
 layout: post
 ---
-In my [last post](http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/), I introduced the 
+In my [last post](http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/), I introduced the 
 new MapReduce features introduced in MongoDB 1.8, which is now [available as a release candidate](http://www.mongodb.org/display/DOCS/1.8+Release+Notes).  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the *merge* and *reduce* output modes.
 
 As I write this, we are prepping new releases of our [Java Driver](http://www.mongodb.org/display/DOCS/Java+Language+Center) (v2.5) and our [Scala Driver, Casbah](http://api.mongodb.org/scala/casbah) (v2.1) which are intended to support MongoDB 1.8's new features including incremental MapReduce.  Since I implemented the APIs for the new MapReduce output in both drivers, I thought I'd demonstrate the application of these new output features to the previous dataset.  This post is focused on the Java API, but a Scala one will likely follow.
 
 
-As a reminder (or a primer for those who skipped my [last post](http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/)), I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the [MongoDB+Hadoop Plugin](http://github.com/mongodb/mongo-hadoop).  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly [datadump from the MongoDB+Hadoop repo](https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json); here's a quick snippet of it:
+As a reminder (or a primer for those who skipped my [last post](http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/)), I've been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the [MongoDB+Hadoop Plugin](http://github.com/mongodb/mongo-hadoop).  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly [datadump from the MongoDB+Hadoop repo](https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json); here's a quick snippet of it:
  
 {% highlight javascript %}
 

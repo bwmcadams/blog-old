@@ -2,8 +2,8 @@
 #      Main Configs       #
 # ----------------------- #
 
-url: http://blog.evilmonkeylabs.com
-title: Evil Monkey Labs
+url: http://bytes.codes
+title: Bytes.Codes
 subtitle: Code and random ramblings.
 author: Brendan McAdams
 simple_search: https://www.google.com/search
@@ -20,7 +20,7 @@ date_format: "ordinal"
 subscribe_rss: /atom.xml
 subscribe_email:
 # RSS feeds can list your email address if you like
-email: bwmcadams@evilmonkeylabs.com
+email: brendan@bytes.codes
 
 # ----------------------- #
 #    Jekyll & Plugins     #
