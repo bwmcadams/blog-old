@@ -1,33 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: pickling | Evil Monkey Labs]]></title>
-  <link href="http://blog.evilmonkeylabs.com/categories/pickling/atom.xml" rel="self"/>
-  <link href="http://blog.evilmonkeylabs.com/"/>
-  <updated>2015-04-13T14:03:38-07:00</updated>
-  <id>http://blog.evilmonkeylabs.com/</id>
+  <title><![CDATA[Category: pickling | Bytes.Codes]]></title>
+  <link href="http://bytes.codes/categories/pickling/atom.xml" rel="self"/>
+  <link href="http://bytes.codes/"/>
+  <updated>2015-08-23T18:27:44-07:00</updated>
+  <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
-    <email><![CDATA[bwmcadams@evilmonkeylabs.com]]></email>
+    <email><![CDATA[brendan@bytes.codes]]></email>
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
   
   <entry>
     <title type="html"><![CDATA[Pickling Case Classes to Memcached with Scala]]></title>
-    <link href="http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
+    <link href="http://bytes.codes/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
     <updated>2015-03-23T00:00:00-07:00</updated>
-    <id>http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
-    <content type="html"><![CDATA[<p>Recently, I&rsquo;ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I&rsquo;ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site&hellip; from Perl, PHP, and Python.</p>
+    <id>http://bytes.codes/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
+    <content type="html"><![CDATA[<p>Recently, I’ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend’s site which I’ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I’ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site… from Perl, PHP, and Python.</p>
 
-<p>Today, I&rsquo;m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I&rsquo;m discovering all sorts of new fun that I haven&rsquo;t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I&rsquo;ve found a powerful combination.</p>
+<p>Today, I’m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I’m discovering all sorts of new fun that I haven’t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I’ve found a powerful combination.</p>
 
-<p>So far, I&rsquo;m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus&hellip; I&rsquo;m actually serialising case classes that are fetched from Slick.</p>
+<p>So far, I’m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus… I’m actually serialising case classes that are fetched from Slick.</p>
 
 <!--more-->
-
-
-<p>Here&rsquo;s the navigation structure:</p>
+<p>Here’s the navigation structure:</p>
 
 <p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">case</span> <span class="k">class</span> <span class="nc">NavigationStruct</span><span class="o">(</span>
 <span class="lineno">2</span>   <span class="n">book</span><span class="k">:</span> <span class="kt">Book</span><span class="o">,</span>
@@ -38,79 +36,74 @@
 <span class="lineno">7</span>   <span class="n">currentChapters</span><span class="k">:</span> <span class="kt">Seq</span><span class="o">[</span><span class="kt">Chapter</span><span class="o">]</span>
 <span class="lineno">8</span> <span class="o">)</span></code></pre></div></p>
 
-<p>We&rsquo;ll leave the content of <code>Book</code>, <code>Section</code>, and <code>Chapter</code> out, but suffice to say they are standard case classes made up of a variety of primitive fields and a few Joda <code>LocalDate</code>s for good measure.</p>
+<p>We’ll leave the content of <code>Book</code>, <code>Section</code>, and <code>Chapter</code> out, but suffice to say they are standard case classes made up of a variety of primitive fields and a few Joda <code>LocalDate</code>s for good measure.</p>
 
 <p>Here are my imports, setting up memcached :</p>
 
 <p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">import</span> <span class="nn">shade.memcached._</span>
-<span class="lineno">2</span> <span class="c1">// shade uses futures so you&amp;rsquo;ll need the execution context</span>
-<span class="lineno">3</span> <span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.</span><span class="o">{</span><span class="n">global</span> <span class="k">=&gt;</span> <span class="n">ec</span><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+<span class="lineno">2</span> <span class="c1">// shade uses futures so you’ll need the execution context</span>
+<span class="lineno">3</span> <span class="k">import</span> <span class="nn">scala.concurrent.ExecutionContext.Implicits.</span><span class="o">{</span><span class="n">global</span> <span class="o">=&amp;</span><span class="n">gt</span><span class="o">;</span> <span class="n">ec</span><span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 <span class="lineno">4</span> 
 <span class="lineno">5</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span></code></pre></div></p>
 
 <p>Now, given the topic of conversation what we need is two things:</p>
 
 <ol>
-<li>Code to convert a <code>NavigationStruct</code> case class to and from binary via pickling</li>
-<li>Code to tell the shade memcached client how to convert scala data to and from memcached</li>
+  <li>Code to convert a <code>NavigationStruct</code> case class to and from binary via pickling</li>
+  <li>Code to tell the shade memcached client how to convert scala data to and from memcached</li>
 </ol>
 
-
-<p>Luckily, we can combine these two things. shade provides a <code>Codec[T]</code> mechanism for encoding, into which we can wire our pickling. Here&rsquo;s a rough sketch of my <code>Codec[T]</code> for <code>NavigationStruct</code>:</p>
+<p>Luckily, we can combine these two things. shade provides a <code>Codec[T]</code> mechanism for encoding, into which we can wire our pickling. Here’s a rough sketch of my <code>Codec[T]</code> for <code>NavigationStruct</code>:</p>
 
 <p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">implicit</span> <span class="k">object</span> <span class="nc">NavStructCodec</span> <span class="k">extends</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">NavigationStruct</span><span class="o">]</span> <span class="o">{</span>
 <span class="lineno">2</span>     <span class="k">def</span> <span class="n">serialize</span><span class="o">(</span><span class="n">struct</span><span class="k">:</span> <span class="kt">NavigationStruct</span><span class="o">)</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]</span> <span class="k">=</span>  <span class="o">???&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 <span class="lineno">3</span> 
-<span class="lineno">4</span> <span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="n">deserialize</span><span class="o">(</span><span class="n">data</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">])</span><span class="k">:</span> <span class="kt">NavigationStruct</span> <span class="o">=</span> <span class="o">???</span>
+<span class="lineno">4</span> <span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="n">deserialize</span><span class="o">(</span><span class="n">data</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">])</span><span class="k">:</span> <span class="kt">NavigationStruct</span> <span class="o">=</span> <span class="o">???</span>   <span class="o">}</span>
 <span class="lineno">5</span> <span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
 <span class="lineno">6</span> 
-<span class="lineno">7</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>  <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-<span class="lineno">8</span> 
-<span class="lineno">9</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span></code></pre></div></p>
+<span class="lineno">7</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span></code></pre></div></p>
 
 <p>Our implicit <code>Codec[T]</code> object has two methods: <code>serialize(T): Array[Byte]</code> and <code>deserialize(Array[Byte]): T</code>. This is the shade memcached specific code: It leaves it up to us how we want to serialize/deserialize as long as we work with Arrays of bytes.</p>
 
-<p>And so, in comes Scala pickling&hellip;
-<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">import</span> <span class="nn">scala.pickling.</span><span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;</span>
-<span class="lineno">2</span> <span class="k">import</span> <span class="nn">scala.pickling.Defaults.</span><span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;</span>
+<p>And so, in comes Scala pickling…
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">import</span> <span class="nn">scala.pickling._</span>
+<span class="lineno">2</span> <span class="k">import</span> <span class="nn">scala.pickling.Defaults._</span>
 <span class="lineno">3</span> <span class="k">import</span> <span class="nn">scala.pickling.binary._</span></code></pre></div>
- While I import <code>binary</code> support from Pickling, it is worth noting that there&rsquo;s also JSON Support built in as outlined in [the docs]](<a href="https://github.com/scala/pickling">https://github.com/scala/pickling</a>).</p>
+ While I import <code>binary</code> support from Pickling, it is worth noting that there’s also JSON Support built in as outlined in [the docs]](https://github.com/scala/pickling).</p>
 
-<p> With the <code>scala.pickling.Defaults._</code> import comes a few implicits, which let us &ldquo;pickle&rdquo; (aka serialize) arbitrary objects:</p>
+<p>With the <code>scala.pickling.Defaults._</code> import comes a few implicits, which let us “pickle” (aka serialize) arbitrary objects:</p>
 
 <p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="n">struct</span><span class="o">.</span><span class="n">pickle</span><span class="o">.</span><span class="n">value</span></code></pre></div></p>
 
-<p>And &ldquo;unpickle&rdquo; (aka deserialize) from raw bytes back to something useful:
+<p>And “unpickle” (aka deserialize) from raw bytes back to something useful:
 <div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="n">data</span><span class="o">.</span><span class="n">unpickle</span><span class="o">[</span><span class="kt">NavigationStruct</span><span class="o">]</span></code></pre></div></p>
 
-<p>That&rsquo;s actually it, at least for my simple data structures. Here&rsquo;s the final implicit object:</p>
+<p>That’s actually it, at least for my simple data structures. Here’s the final implicit object:</p>
 
-<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno"> 1</span> <span class="k">implicit</span> <span class="k">object</span> <span class="nc">NavStructCodec</span> <span class="k">extends</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">NavigationStruct</span><span class="o">]</span> <span class="o">{</span>
-<span class="lineno"> 2</span>     <span class="k">def</span> <span class="n">serialize</span><span class="o">(</span><span class="n">struct</span><span class="k">:</span> <span class="kt">NavigationStruct</span><span class="o">)</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
-<span class="lineno"> 3</span>       <span class="n">struct</span><span class="o">.</span><span class="n">pickle</span><span class="o">.</span><span class="n">value</span>
-<span class="lineno"> 4</span>     <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-<span class="lineno"> 5</span> 
-<span class="lineno"> 6</span> <span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="n">deserialize</span><span class="o">(</span><span class="n">data</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">])</span><span class="k">:</span> <span class="kt">NavigationStruct</span> <span class="o">=</span> <span class="o">{</span>
-<span class="lineno"> 7</span>   <span class="n">data</span><span class="o">.</span><span class="n">unpickle</span><span class="o">[</span><span class="kt">NavigationStruct</span><span class="o">]</span>
-<span class="lineno"> 8</span> <span class="o">}</span>
-<span class="lineno"> 9</span> <span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-<span class="lineno">10</span> 
-<span class="lineno">11</span> <span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>  <span class="o">}</span></code></pre></div></p>
+<p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">implicit</span> <span class="k">object</span> <span class="nc">NavStructCodec</span> <span class="k">extends</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">NavigationStruct</span><span class="o">]</span> <span class="o">{</span>
+<span class="lineno">2</span>     <span class="k">def</span> <span class="n">serialize</span><span class="o">(</span><span class="n">struct</span><span class="k">:</span> <span class="kt">NavigationStruct</span><span class="o">)</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span> 
+<span class="lineno">3</span>       <span class="n">struct</span><span class="o">.</span><span class="n">pickle</span><span class="o">.</span><span class="n">value</span> 
+<span class="lineno">4</span>     <span class="o">}&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+<span class="lineno">5</span> 
+<span class="lineno">6</span> <span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="n">deserialize</span><span class="o">(</span><span class="n">data</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">])</span><span class="k">:</span> <span class="kt">NavigationStruct</span> <span class="o">=</span> <span class="o">{</span>
+<span class="lineno">7</span>   <span class="n">data</span><span class="o">.</span><span class="n">unpickle</span><span class="o">[</span><span class="kt">NavigationStruct</span><span class="o">]</span>
+<span class="lineno">8</span> <span class="o">}</span>   <span class="o">}</span></code></pre></div>
+</code></pre>
 
 <p>This leaves me with an easy route to fetch/save between memcached, where codec handling is automatically taken care of:</p>
 
 <p><div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="n">memcached</span><span class="o">.</span><span class="n">awaitGet</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s">&quot;key&quot;</span><span class="o">&gt;</span><span class="nc">NavigationStruct</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;(</span><span class="nc">NavStructCodec</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
-<span class="lineno">2</span>   <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">navData</span><span class="o">)</span> <span class="k">=&gt;</span>
+<span class="lineno">2</span>   <span class="k">case</span> <span class="nc">Some</span><span class="o">(</span><span class="n">navData</span><span class="o">)</span> <span class="o">=&amp;</span><span class="n">gt</span><span class="o">;</span> 
 <span class="lineno">3</span>     <span class="n">navData</span>
-<span class="lineno">4</span>   <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span>
+<span class="lineno">4</span>   <span class="k">case</span> <span class="nc">None</span> <span class="o">=&amp;</span><span class="n">gt</span><span class="o">;</span>
 <span class="lineno">5</span>     <span class="k">val</span> <span class="n">nav</span> <span class="k">=</span> <span class="n">getNavigationData</span><span class="o">(</span><span class="n">date</span><span class="o">)</span>
 <span class="lineno">6</span>     <span class="n">memcached</span><span class="o">.</span><span class="n">awaitSet</span><span class="o">(</span><span class="n">key</span><span class="o">,</span> <span class="n">nav</span><span class="o">,</span> <span class="n">timeout</span><span class="o">)</span>
 <span class="lineno">7</span>     <span class="n">nav</span>
 <span class="lineno">8</span> <span class="o">}</span></code></pre></div></p>
 
-<p>Suffice to say, I&rsquo;m quite happy with the simplicity.</p>
+<p>Suffice to say, I’m quite happy with the simplicity.</p>
 
-<p>* It&rsquo;s been mentioned to me as well that <a href="https://github.com/scodec/scodec">scodec</a> is a great solution for serialisation too, but I haven&rsquo;t yet gone down that road.</p>
+<p>* It’s been mentioned to me as well that <a href="https://github.com/scodec/scodec">scodec</a> is a great solution for serialisation too, but I haven’t yet gone down that road.</p>
 ]]></content>
   </entry>
   

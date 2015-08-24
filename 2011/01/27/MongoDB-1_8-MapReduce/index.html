@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>A Look At MongoDB 1.8&#8217;s MapReduce Changes - Evil Monkey Labs</title>
+  <title>A Look At MongoDB 1.8&#8217;s MapReduce Changes - Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="MongoDB 1.7.5 shipped yesterday, and is expected to be the last &lsquo;beta&rsquo; release of what will become MongoDB 1.8. As part of the release, I &hellip;">
+  <meta name="description" content="MongoDB 1.7.5 shipped yesterday, and is expected to be the last ‘beta’ release of what will become MongoDB 1.8. As part of the release, I’ve been &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/">
+  <link rel="canonical" href="http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -71,36 +71,31 @@
   </header>
 
 
-<div class="entry-content"><p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last &lsquo;beta&rsquo; release of what will become MongoDB 1.8.  As part of the release, I&rsquo;ve been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
+<div class="entry-content"><p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last ‘beta’ release of what will become MongoDB 1.8.  As part of the release, I’ve been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
 
-<p>If you aren&rsquo;t new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn&rsquo;t possible to safely clean these up–&ndash;they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they&rsquo;ve been replaced with an even better system for saving the results of MapReduce jobs!</p>
+<p>If you aren’t new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn’t possible to safely clean these up––they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they’ve been replaced with an even better system for saving the results of MapReduce jobs!</p>
 
-<p>While the <em>out</em> argument is now a required parameter in MapReduce jobs, it has a number of options for controlling what MongoDB does with results.  If you&rsquo;re running a truly one-off job where you don&rsquo;t need to keep the results later, MongoDB now supports returning results &ldquo;inline&rdquo;.  Be careful here though: your results are being returned in a single document and are subject to the document size limitations of MongoDB (16MB per document in 1.8).  To use inline results, set the value of <em>out</em> to a document <code>{inline: 1}</code>.  The result object will contain an additional key <em>results</em> which contains the MapReduce output; the <em>result</em> field will be omitted.</p>
+<p>While the <em>out</em> argument is now a required parameter in MapReduce jobs, it has a number of options for controlling what MongoDB does with results.  If you’re running a truly one-off job where you don’t need to keep the results later, MongoDB now supports returning results “inline”.  Be careful here though: your results are being returned in a single document and are subject to the document size limitations of MongoDB (16MB per document in 1.8).  To use inline results, set the value of <em>out</em> to a document <code>{inline: 1}</code>.  The result object will contain an additional key <em>results</em> which contains the MapReduce output; the <em>result</em> field will be omitted.</p>
 
-<p>As with previous versions of MongoDB, you can specify a collection name (as a string) in the <em>out</em> argument.  If the named collection already exists MongoDB will replace it entirely with the MapReduce results. Along with the inline mode, MongoDB 1.8 introduces support for &ldquo;merge&rdquo; and &ldquo;reduce&rdquo; output modes; instead of replacing the target collection MongoDB can be instructed to reconcile the MapReduce results with the existing data.  To use these modes, set the value of <em>out</em> to a document with a key of either &ldquo;merge&rdquo; or &ldquo;reduce&rdquo; and a value of the collection to save to.</p>
+<p>As with previous versions of MongoDB, you can specify a collection name (as a string) in the <em>out</em> argument.  If the named collection already exists MongoDB will replace it entirely with the MapReduce results. Along with the inline mode, MongoDB 1.8 introduces support for “merge” and “reduce” output modes; instead of replacing the target collection MongoDB can be instructed to reconcile the MapReduce results with the existing data.  To use these modes, set the value of <em>out</em> to a document with a key of either “merge” or “reduce” and a value of the collection to save to.</p>
 
-<p>The difference in &ldquo;merge&rdquo; and &ldquo;reduce&rdquo; has to do with MongoDB does when it encounters duplicate keys in both the existing collection and the MapReduce results.  In &ldquo;merge&rdquo; mode, MongoDB will simply overwrite the existing key with the new one from the MapReduce output.  In &ldquo;reduce&rdquo; mode, MongoDB will run the reduce function again with both the new and old data, saving those results to the collection (you remembered to make your reduce function idempotent, right?). <strong>UPDATE</strong>: If you specified a &ldquo;finalize&rdquo; function, MongoDB will re-run this after the &ldquo;reduce&rdquo; runs.</p>
+<p>The difference in “merge” and “reduce” has to do with MongoDB does when it encounters duplicate keys in both the existing collection and the MapReduce results.  In “merge” mode, MongoDB will simply overwrite the existing key with the new one from the MapReduce output.  In “reduce” mode, MongoDB will run the reduce function again with both the new and old data, saving those results to the collection (you remembered to make your reduce function idempotent, right?). <strong>UPDATE</strong>: If you specified a “finalize” function, MongoDB will re-run this after the “reduce” runs.</p>
 
-<p>Now that I&rsquo;ve thoroughly confused you, lets dig into examples of each of these behaviors.  I&rsquo;ve been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here&rsquo;s a quick snippet of it:</p>
+<p>Now that I’ve thoroughly confused you, lets dig into examples of each of these behaviors.  I’ve been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here’s a quick snippet of it:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span></code></pre></div>
 
-
-
-
 <!--more-->
 
-
-<p>The map function I&rsquo;m using extracts the year from the date, and the 10 year benchmark value:</p>
+<p>The map function I’m using extracts the year from the date, and the 10 year benchmark value:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">m</span><span class="p">()</span> <span class="p">{</span> 
     <span class="nx">key</span> <span class="o">=</span> <span class="k">typeof</span><span class="p">(</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;number&quot;</span> <span class="o">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span><span class="p">.</span><span class="nx">getYear</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1900</span><span class="p">;</span> 
     <span class="nx">emit</span><span class="p">(</span> <span class="nx">key</span><span class="p">,</span> <span class="p">{</span> <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">sum</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">bc10Year</span> <span class="p">}</span> <span class="p">)</span> <span class="p">;</span>
 <span class="p">}</span></code></pre></div>
-
 
 <p>While the reduce function aggregates the data by year, creating a set that can be averaged.  Remember that MongoDB reduce tasks have to be able to be called repeatedly, so the output is crafted to match the input: something that becomes even more important when we say, ask MongoDB to re-reduce our output with the old data.</p>
 
@@ -114,16 +109,14 @@
   <span class="k">return</span> <span class="nx">n</span><span class="p">;</span> 
 <span class="p">}</span></code></pre></div>
 
-
-<p>We&rsquo;ll round it all out out with a quick and dirty finalize function which can calculate the current average.  Note that I&rsquo;m keeping all the intermediate data around for demonstrating &ldquo;reduce&rdquo; mode.</p>
+<p>We’ll round it all out out with a quick and dirty finalize function which can calculate the current average.  Note that I’m keeping all the intermediate data around for demonstrating “reduce” mode.</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">f</span><span class="p">(</span> <span class="nx">year</span><span class="p">,</span> <span class="nx">value</span> <span class="p">){</span>
   <span class="nx">value</span><span class="p">.</span><span class="nx">avg</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">sum</span> <span class="o">/</span> <span class="nx">value</span><span class="p">.</span><span class="nx">count</span><span class="p">;</span>
   <span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
 <span class="p">}</span></code></pre></div>
 
-
-<p>First, a quick look at &ldquo;inline&rdquo; mode (I&rsquo;ll leave plain old name a collection as an exercise to you, my humble reader).</p>
+<p>First, a quick look at “inline” mode (I’ll leave plain old name a collection as an exercise to you, my humble reader).</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
 <span class="p">...</span>   <span class="p">{</span> 
@@ -137,33 +130,32 @@
 <span class="p">...</span>   <span class="p">}</span>
 <span class="p">...</span> <span class="p">)</span>
 <span class="p">{</span>
-    <span class="s2">&quot;results&quot;</span> <span class="o">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1990</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="mf">8.552400000000002</span>
-        <span class="p">},</span>
+	<span class="s2">&quot;results&quot;</span> <span class="o">:</span> <span class="p">[</span>
+		<span class="p">{</span>
+			<span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1990</span><span class="p">,</span>
+			<span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="mf">8.552400000000002</span>
+		<span class="p">},</span>
         <span class="cm">/* ... */</span>
-        <span class="p">{</span>
-            <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2010</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="mf">3.3255026455026435</span>
-        <span class="p">}</span>
-    <span class="p">],</span>
-    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">218</span><span class="p">,</span>
-    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">168</span><span class="p">),</span>
-        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">215</span><span class="p">,</span>
-        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">218</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
-        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
-        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">11</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+		<span class="p">{</span>
+			<span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2010</span><span class="p">,</span>
+			<span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="mf">3.3255026455026435</span>
+		<span class="p">}</span>
+	<span class="p">],</span>
+	<span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">218</span><span class="p">,</span>
+	<span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">168</span><span class="p">),</span>
+		<span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">215</span><span class="p">,</span>
+		<span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">218</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+		<span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+		<span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">11</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
 <span class="p">}</span></code></pre></div>
 
-
-<p>To demonstrate &ldquo;merge&rdquo; and &ldquo;reduce&rdquo; mode, I&rsquo;m going to use queries to break out the data a bit.  Lets look first at &ldquo;merge&rdquo;, by first running MapReduce against the first half of the data, and then merge in the second half.</p>
+<p>To demonstrate “merge” and “reduce” mode, I’m going to use queries to break out the data a bit.  Lets look first at “merge”, by first running MapReduce against the first half of the data, and then merge in the second half.</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
 <span class="p">...</span>   <span class="p">{</span> 
@@ -177,19 +169,19 @@
 <span class="p">...</span>   <span class="p">}</span>
 <span class="p">...</span> <span class="p">)</span>
 <span class="p">{</span>
-    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">223</span><span class="p">,</span>
-    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">166</span><span class="p">),</span>
-        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">217</span><span class="p">,</span>
-        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">223</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2503</span><span class="p">,</span>
-        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2503</span><span class="p">,</span>
-        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">10</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+	<span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">223</span><span class="p">,</span>
+	<span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">166</span><span class="p">),</span>
+		<span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">217</span><span class="p">,</span>
+		<span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">223</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2503</span><span class="p">,</span>
+		<span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2503</span><span class="p">,</span>
+		<span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">10</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
 <span class="p">}</span>
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">merged</span><span class="p">.</span><span class="nx">find</span><span class="p">({},</span> <span class="p">{</span><span class="s2">&quot;value.avg&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">})</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1990</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">8.552400000000002</span> <span class="p">}</span> <span class="p">}</span>
@@ -203,7 +195,6 @@
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1998</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.262879999999994</span> <span class="p">}</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">1999</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.646135458167332</span> <span class="p">}</span> <span class="p">}</span>
 <span class="o">&gt;</span></code></pre></div>
-
 
 <p>That gives us our first half of the data; we ran that with a normal named collection output.  Lets merge in the second half:</p>
 
@@ -219,19 +210,19 @@
 <span class="p">...</span>   <span class="p">}</span>
 <span class="p">...</span> <span class="p">)</span>
 <span class="p">{</span>
-    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">242</span><span class="p">,</span>
-    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">173</span><span class="p">),</span>
-        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">236</span><span class="p">,</span>
-        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">242</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
-        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
-        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">21</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+	<span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.merged&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">242</span><span class="p">,</span>
+	<span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">173</span><span class="p">),</span>
+		<span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">236</span><span class="p">,</span>
+		<span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">242</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+		<span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">2690</span><span class="p">,</span>
+		<span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">21</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
 <span class="p">}</span>
 
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">merged</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="nx">$gt</span><span class="o">:</span> <span class="mi">1998</span><span class="p">}},</span> <span class="p">{</span><span class="s2">&quot;value.avg&quot;</span><span class="o">:</span> <span class="mi">1</span><span class="p">})</span> 
@@ -248,8 +239,7 @@
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2009</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.2641200000000037</span> <span class="p">}</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2010</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">3.3255026455026435</span> <span class="p">}</span> <span class="p">}</span></code></pre></div>
 
-
-<p>To close out, lets take &ldquo;reduce&rdquo; mode for a quick spin.  We&rsquo;ll select a half of a year for the first part, and then reduce in the second half.</p>
+<p>To close out, lets take “reduce” mode for a quick spin.  We’ll select a half of a year for the first part, and then reduce in the second half.</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>
 <span class="p">...</span>   <span class="p">{</span> 
@@ -266,25 +256,24 @@
 <span class="p">...</span>   <span class="p">}</span>
 <span class="p">...</span> <span class="p">)</span>
 <span class="p">{</span>
-    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">21</span><span class="p">,</span>
-    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
-        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">17</span><span class="p">,</span>
-        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">21</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span>
-        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span>
-        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">1</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+	<span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">21</span><span class="p">,</span>
+	<span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span>
+		<span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">17</span><span class="p">,</span>
+		<span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">21</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span>
+		<span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span>
+		<span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
 <span class="p">}</span>
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">105</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">539.5599999999998</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.138666666666665</span> <span class="p">}</span> <span class="p">}</span></code></pre></div>
 
-
-<p>That handles the first half&hellip; Let&rsquo;s grab the second:</p>
+<p>That handles the first half… Let’s grab the second:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="o">&gt;</span> <span class="nx">res</span> <span class="o">=</span> <span class="nx">db</span><span class="p">.</span><span class="nx">runCommand</span><span class="p">(</span>              
 <span class="p">...</span>   <span class="p">{</span> 
@@ -301,35 +290,33 @@
 <span class="p">...</span>   <span class="p">}</span>
 <span class="p">...</span> <span class="p">)</span>
 <span class="p">{</span>
-    <span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">26</span><span class="p">,</span>
-    <span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span>
-        <span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">22</span><span class="p">,</span>
-        <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">26</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
-        <span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">143</span><span class="p">,</span>
-        <span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">143</span><span class="p">,</span>
-        <span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">1</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+	<span class="s2">&quot;result&quot;</span> <span class="o">:</span> <span class="s2">&quot;yield_historical.reduced&quot;</span><span class="p">,</span>
+	<span class="s2">&quot;timeMillis&quot;</span> <span class="o">:</span> <span class="mi">26</span><span class="p">,</span>
+	<span class="s2">&quot;timing&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;mapTime&quot;</span> <span class="o">:</span> <span class="nx">NumberLong</span><span class="p">(</span><span class="mi">9</span><span class="p">),</span>
+		<span class="s2">&quot;emitLoop&quot;</span> <span class="o">:</span> <span class="mi">22</span><span class="p">,</span>
+		<span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">26</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;counts&quot;</span> <span class="o">:</span> <span class="p">{</span>
+		<span class="s2">&quot;input&quot;</span> <span class="o">:</span> <span class="mi">143</span><span class="p">,</span>
+		<span class="s2">&quot;emit&quot;</span> <span class="o">:</span> <span class="mi">143</span><span class="p">,</span>
+		<span class="s2">&quot;output&quot;</span> <span class="o">:</span> <span class="mi">1</span>
+	<span class="p">},</span>
+	<span class="s2">&quot;ok&quot;</span> <span class="o">:</span> <span class="mi">1</span>
 <span class="p">}</span>
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">()</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1299999999997</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870967</span> <span class="p">}</span> <span class="p">}</span></code></pre></div>
 
-
-<p>Of course, this does us no good if the results don&rsquo;t add up.  A quick comparison between the &lsquo;merged&rsquo; output and the &lsquo;reduced&rsquo; output validates our code:</p>
+<p>Of course, this does us no good if the results don’t add up.  A quick comparison between the ‘merged’ output and the ‘reduced’ output validates our code:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">reduced</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="mi">2001</span><span class="p">})</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1299999999997</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870967</span> <span class="p">}</span> <span class="p">}</span>
 <span class="o">&gt;</span> <span class="nx">db</span><span class="p">.</span><span class="nx">yield_historical</span><span class="p">.</span><span class="nx">merged</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span><span class="nx">_id</span><span class="o">:</span> <span class="mi">2001</span><span class="p">})</span> 
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="mi">2001</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;count&quot;</span> <span class="o">:</span> <span class="mi">248</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span> <span class="o">:</span> <span class="mf">1245.1300000000003</span><span class="p">,</span> <span class="s2">&quot;avg&quot;</span> <span class="o">:</span> <span class="mf">5.020685483870969</span> <span class="p">}</span> <span class="p">}</span></code></pre></div>
 
-
 <p>There are some minor differences at a decimal level since we are working with floating point numbers here, but the results are the same.</p>
 
-<p>These new MapReduce output parameters are available in MongoDB as of version 1.7.4 (which is part of the unstable/development branch) and will ship with MongoDB 1.8. Leave a comment; I&rsquo;d love to hear what clever tricks you can pull off with these new options.</p>
+<p>These new MapReduce output parameters are available in MongoDB as of version 1.7.4 (which is part of the unstable/development branch) and will ship with MongoDB 1.8. Leave a comment; I’d love to hear what clever tricks you can pull off with these new options.</p>
 </div>
 
 
@@ -359,7 +346,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/" data-via="rit" data-counturl="http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/" >Tweet</a>
   
   
   
@@ -388,17 +375,17 @@
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 
@@ -500,8 +487,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/';
-        var disqus_url = 'http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/';
+        var disqus_identifier = 'http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/';
+        var disqus_url = 'http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/';
         var disqus_script = 'embed.js';
       
     (function () {

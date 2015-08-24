@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Evil Monkey Labs</title>
+  <title>Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="(This is Part 2 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, &ldquo;A Skeptic&rsquo;s Guide to scalaz' &hellip;">
+  <meta name="description" content="(This is Part 2 of a series of distillations of a presentation I’ve been giving for the last year, “A Skeptic’s Guide to scalaz’ Gateway Drugs”. It &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/">
+  <link rel="canonical" href="http://bytes.codes/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -74,13 +74,13 @@
   </header>
 
 
-  <div class="entry-content"><p><em>(This is Part 2 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 &ndash; Disjunctions</a>)</em></p>
+  <div class="entry-content"><p><em>(This is Part 2 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 – Disjunctions</a>)</em></p>
 
-<p>Welcome back to the Skeptic&rsquo;s Guide to <code>scalaz</code>. In <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">the last part</a> of this series, we introduced you to the power of <code>scalaz</code> Disjunctions&mdash;also known as <code>\/</code>&mdash;and how we can use them to indicate a return value of <em>either</em> an Error or a Success. As a reminder, convention dictates that Left&mdash;<code>-\/</code>&mdash;is an error, while Right&mdash;<code>\/-</code>&mdash;is success.</p>
+<p>Welcome back to the Skeptic’s Guide to <code>scalaz</code>. In <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">the last part</a> of this series, we introduced you to the power of <code>scalaz</code> Disjunctions—also known as <code>\/</code>—and how we can use them to indicate a return value of <em>either</em> an Error or a Success. As a reminder, convention dictates that Left—<code>-\/</code>—is an error, while Right—<code>\/-</code>—is success.</p>
 
 <p><img src="/images/buck-phone.gif" alt="Hello? scalaz?" /></p>
 
-<p>In this part, we&rsquo;ll discuss interactions with Scala&rsquo;s <code>Option</code>. Specifically, I want to discuss how to manage &ldquo;stacks&rdquo; of <code>Option</code> in for comprehensions, and how to use Disjunction to manage them.</p>
+<p>In this part, we’ll discuss interactions with Scala’s <code>Option</code>. Specifically, I want to discuss how to manage “stacks” of <code>Option</code> in for comprehensions, and how to use Disjunction to manage them.</p>
 
 </div>
   
@@ -116,16 +116,15 @@
   </header>
 
 
-  <div class="entry-content"><p><em>(This is Part 1 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
+  <div class="entry-content"><p><em>(This is Part 1 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
 
 <p>What is <code>scalaz</code> exactly? Well, at its core, <code>scalaz</code> is a functional programming library for Scala. It is intended to bring more functional programming concepts from languages like Haskell into Scala.</p>
 
-<p>Until recently, I&rsquo;ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
+<p>Until recently, I’ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
 
 <p><img src="/images/clockwork-eyes.gif" alt="" /></p>
 
-<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, &ldquo;what&rsquo;s wrong with the Scala standard library?&rdquo;. As it turns out, a lot. Let&rsquo;s look first at Scala&rsquo;s Either, and where we can improve upon it.</p>
-
+<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, “what’s wrong with the Scala standard library?”. As it turns out, a lot. Let’s look first at Scala’s Either, and where we can improve upon it.
 </div>
   
   
@@ -160,11 +159,11 @@
   </header>
 
 
-  <div class="entry-content"><p>Recently, I&rsquo;ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend&rsquo;s site which I&rsquo;ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I&rsquo;ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site&hellip; from Perl, PHP, and Python.</p>
+  <div class="entry-content"><p>Recently, I’ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend’s site which I’ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I’ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site… from Perl, PHP, and Python.</p>
 
-<p>Today, I&rsquo;m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I&rsquo;m discovering all sorts of new fun that I haven&rsquo;t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I&rsquo;ve found a powerful combination.</p>
+<p>Today, I’m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I’m discovering all sorts of new fun that I haven’t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I’ve found a powerful combination.</p>
 
-<p>So far, I&rsquo;m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus&hellip; I&rsquo;m actually serialising case classes that are fetched from Slick.</p>
+<p>So far, I’m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus… I’m actually serialising case classes that are fetched from Slick.</p>
 
 </div>
   
@@ -200,9 +199,9 @@
   </header>
 
 
-  <div class="entry-content"><p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I&rsquo;ve gotten a chance to solve some interesting problems and answer obscure questions&hellip; which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we&rsquo;re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
+  <div class="entry-content"><p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I’ve gotten a chance to solve some interesting problems and answer obscure questions… which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we’re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
 
-<p>One item in particular came up recently as we tried to create a cron-style job to do interval data processing – big blocks of input data would be separated into individual instructions for processing, using <a href="http://doc.akka.io/docs/akka/2.0.5/">Akka 2.0.x</a>. The developer I was working with found that, among other things, using only a single actor to process all of their data items was not particularly performant. Further, once we solved this problem we couldn&rsquo;t figure out how to cleanly shut down Akka without interrupting any messages being processed. Fortunately, Akka offers simple answers to both of these problems&hellip; if you know where to look.</p>
+<p>One item in particular came up recently as we tried to create a cron-style job to do interval data processing – big blocks of input data would be separated into individual instructions for processing, using <a href="http://doc.akka.io/docs/akka/2.0.5/">Akka 2.0.x</a>. The developer I was working with found that, among other things, using only a single actor to process all of their data items was not particularly performant. Further, once we solved this problem we couldn’t figure out how to cleanly shut down Akka without interrupting any messages being processed. Fortunately, Akka offers simple answers to both of these problems… if you know where to look.</p>
 
 </div>
   
@@ -238,15 +237,15 @@
   </header>
 
 
-  <div class="entry-content"><p>Over the last year or so, I have found myself making more and more use of Scala&rsquo;s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
+  <div class="entry-content"><p>Over the last year or so, I have found myself making more and more use of Scala’s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
 
-<p>During this work however, I&rsquo;ve found during that many otherwise adroit Scala engineers seem befuddled or daunted by the Type Class. It does me no good to take advantage of clever features that my users don&rsquo;t understand, and many will benefit from introducing these concepts to their own code. So let&rsquo;s take a look at what type classes are, as well as how &amp; why we can utilize them.</p>
+<p>During this work however, I’ve found during that many otherwise adroit Scala engineers seem befuddled or daunted by the Type Class. It does me no good to take advantage of clever features that my users don’t understand, and many will benefit from introducing these concepts to their own code. So let’s take a look at what type classes are, as well as how &amp; why we can utilize them.</p>
 
-<p>Wikipedia defines a Type Class as <em>&ldquo;&hellip; a type system construct that supports ad-hoc polymorphism. This is achieved by adding constraints to type variables in parametrically polymorphic types&rdquo;</em>. Admittedly, a bit of a mouthful &ndash; and not very helpful to those of us who are self taught and lack the benefit of a comprehensive academic Computer Science education (myself included). Surely, there must be a way to simplify this concept?</p>
+<p>Wikipedia defines a Type Class as <em>“… a type system construct that supports ad-hoc polymorphism. This is achieved by adding constraints to type variables in parametrically polymorphic types”</em>. Admittedly, a bit of a mouthful – and not very helpful to those of us who are self taught and lack the benefit of a comprehensive academic Computer Science education (myself included). Surely, there must be a way to simplify this concept?</p>
 
-<p>In evaluating these ideas, I&rsquo;ve found it easiest to think of a Type Class (in Scala, at least) as a special kind of <em>adapter</em>, which can impart additional capabilities upon a given type or set of types. In Scala the Type Class is communicated through <em>implicits</em>, and imparts one, or both, of two behaviors. First, a Type Class can be to utilized to <em>filter</em> what types are valid for a given method call (which I detailed in <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">this earlier post</a>). Second, a Type Class can impart additional features and behaviors upon a type at method invocation time. This latter is much along the lines of an enhanced kind of composition, rather than the weaker inheritance which often plagues similar behaviors in a language like Java.</p>
+<p>In evaluating these ideas, I’ve found it easiest to think of a Type Class (in Scala, at least) as a special kind of <em>adapter</em>, which can impart additional capabilities upon a given type or set of types. In Scala the Type Class is communicated through <em>implicits</em>, and imparts one, or both, of two behaviors. First, a Type Class can be to utilized to <em>filter</em> what types are valid for a given method call (which I detailed in <a href="/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/">this earlier post</a>). Second, a Type Class can impart additional features and behaviors upon a type at method invocation time. This latter is much along the lines of an enhanced kind of composition, rather than the weaker inheritance which often plagues similar behaviors in a language like Java.</p>
 
-<p>To better understand what I am describing, let&rsquo;s compare a few concepts around the creation and interaction of custom domain objects. I have several sets of tasks I have had to accomplish in Scala in the past &ndash; and Scala solutions show some elegant Type Class oriented approaches which are rooted in the Standard Library. While this may seem a bit contrived, it is exactly the kind of problem through which <em>I</em> initially came to understand Type Classes –– and is thus an ideal lesson.</p>
+<p>To better understand what I am describing, let’s compare a few concepts around the creation and interaction of custom domain objects. I have several sets of tasks I have had to accomplish in Scala in the past – and Scala solutions show some elegant Type Class oriented approaches which are rooted in the Standard Library. While this may seem a bit contrived, it is exactly the kind of problem through which <em>I</em> initially came to understand Type Classes –– and is thus an ideal lesson.</p>
 
 </div>
   
@@ -270,17 +269,17 @@
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 

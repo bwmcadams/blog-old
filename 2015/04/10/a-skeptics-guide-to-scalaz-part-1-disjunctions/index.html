@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>A Skeptic&#8217;s Guide to scalaz&#8217; Gateway Drugs: Part 1 - Disjunctions - Evil Monkey Labs</title>
+  <title>A Skeptic&#8217;s Guide to scalaz&#8217; Gateway Drugs: Part 1 - Disjunctions - Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="(This is Part 1 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, &ldquo;A Skeptic&rsquo;s Guide to scalaz' &hellip;">
+  <meta name="description" content="(This is Part 1 of a series of distillations of a presentation I’ve been giving for the last year, “A Skeptic’s Guide to scalaz’ Gateway Drugs”. It &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">
+  <link rel="canonical" href="http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -71,218 +71,129 @@
   </header>
 
 
-<div class="entry-content"><p><em>(This is Part 1 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
+<div class="entry-content"><p><em>(This is Part 1 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
 
 <p>What is <code>scalaz</code> exactly? Well, at its core, <code>scalaz</code> is a functional programming library for Scala. It is intended to bring more functional programming concepts from languages like Haskell into Scala.</p>
 
-<p>Until recently, I&rsquo;ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
+<p>Until recently, I’ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
 
 <p><img src="/images/clockwork-eyes.gif" alt="" /></p>
 
-<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, &ldquo;what&rsquo;s wrong with the Scala standard library?&rdquo;. As it turns out, a lot. Let&rsquo;s look first at Scala&rsquo;s Either, and where we can improve upon it.</p>
-
+<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, “what’s wrong with the Scala standard library?”. As it turns out, a lot. Let’s look first at Scala’s Either, and where we can improve upon it.
 <!--more-->
+Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Either">Either</a> is a common construct used to indicate one of two conditions: Success or Error. These are, by convention, <code>Left</code> for Errors, and <code>Right</code> for Success. The concept is good, but there are some limits to interaction. By default, we cannot use it in a for comprehension:</p>
 
-
-<p>Scala&rsquo;s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Either">Either</a> is a common construct used to indicate one of two conditions: Success or Error. These are, by convention, <code>Left</code> for Errors, and <code>Right</code> for Success. The concept is good, but there are some limits to interaction. By default, we cannot use it in a for comprehension:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">success</span> <span class="k">=</span> <span class="nc">Right</span><span class="o">(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="n">success</span><span class="k">:</span> <span class="kt">scala.util.Right</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Right</span><span class="o">(</span><span class="nc">Success</span><span class="o">!)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="n">success</span><span class="o">.</span><span class="n">isRight</span>
-</span><span class='line'><span class="n">res2</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">true</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="n">success</span><span class="o">.</span><span class="n">isLeft</span>
-</span><span class='line'><span class="n">res3</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">false</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>       <span class="o">|</span>   <span class="n">x</span> <span class="k">&lt;-</span> <span class="n">success</span>
-</span><span class='line'>       <span class="o">|</span> <span class="o">}</span> <span class="k">yield</span> <span class="n">x</span>
-</span><span class='line'>       <span class="o">&lt;</span><span class="n">console</span><span class="k">&gt;:</span><span class="mi">10</span><span class="k">:</span> <span class="kt">error:</span> <span class="kt">value</span> <span class="kt">map</span> <span class="kt">is</span> <span class="kt">not</span> <span class="kt">a</span> <span class="kt">member</span> <span class="kt">of</span> <span class="kt">scala.util.Right</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span>
-</span><span class='line'>                      <span class="n">x</span> <span class="k">&lt;-</span> <span class="n">success</span>
-</span><span class='line'>                           <span class="o">^</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno"> 1</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">success</span> <span class="k">=</span> <span class="nc">Right</span><span class="o">(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
+<span class="lineno"> 2</span> <span class="n">success</span><span class="k">:</span> <span class="kt">scala.util.Right</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Right</span><span class="o">(</span><span class="nc">Success</span><span class="o">!)</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="n">success</span><span class="o">.</span><span class="n">isRight</span>
+<span class="lineno"> 5</span> <span class="n">res2</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">true</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="n">success</span><span class="o">.</span><span class="n">isLeft</span>
+<span class="lineno"> 8</span> <span class="n">res3</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">false</span>
+<span class="lineno"> 9</span> 
+<span class="lineno">10</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno">11</span>        <span class="o">|</span>   <span class="n">x</span> <span class="k">&lt;-</span> <span class="n">success</span>
+<span class="lineno">12</span>        <span class="o">|</span> <span class="o">}</span> <span class="k">yield</span> <span class="n">x</span>
+<span class="lineno">13</span>        <span class="o">&lt;</span><span class="n">console</span><span class="k">&gt;:</span><span class="mi">10</span><span class="k">:</span> <span class="kt">error:</span> <span class="kt">value</span> <span class="kt">map</span> <span class="kt">is</span> <span class="kt">not</span> <span class="kt">a</span> <span class="kt">member</span> <span class="kt">of</span> <span class="kt">scala.util.Right</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span>
+<span class="lineno">14</span>                       <span class="n">x</span> <span class="k">&lt;-</span> <span class="n">success</span>
+<span class="lineno">15</span>                            <span class="o">^</span></code></pre></div>
 
 <p><em>(Note, there is a function called <code>rightProjection</code> which converts an <code>Either</code> into something comprehendable)</em></p>
 
-<p>In the <code>scalaz</code> world, there is a similar construct to <code>Either</code>, known as <code>\/</code>. If <code>\/</code> reads like a mouthful, you can call it Disjunction - which we&rsquo;ll do in this post as well. A Disjunction can, like in <code>Either</code> have either a Left or a Right side - typically representative of a Success (right) or an Error (left). These are represented by symbols: <code>-\/</code> for Left, <code>\/-</code> for Right.</p>
+<p>In the <code>scalaz</code> world, there is a similar construct to <code>Either</code>, known as <code>\/</code>. If <code>\/</code> reads like a mouthful, you can call it Disjunction - which we’ll do in this post as well. A Disjunction can, like in <code>Either</code> have either a Left or a Right side - typically representative of a Success (right) or an Error (left). These are represented by symbols: <code>-\/</code> for Left, <code>\/-</code> for Right.</p>
 
 <p><em>(I find, in general, that the easiest memory trick is to look at which side of the Disjunction the <code>-</code> appears on.)</em></p>
 
-<p>With Disjunctions, there is an assumption that we prefer Success (the right, or <code>\/-</code>) - this is also known as Right Bias. With Right Bias, for comprehensions, <code>map</code>, and <code>flatMap</code> unpack for us where &ldquo;success&rdquo; (<code>\/-</code>) continues and &ldquo;failure&rdquo; (<code>-\/</code>) aborts.</p>
+<p>With Disjunctions, there is an assumption that we prefer Success (the right, or <code>\/-</code>) - this is also known as Right Bias. With Right Bias, for comprehensions, <code>map</code>, and <code>flatMap</code> unpack for us where “success” (<code>\/-</code>) continues and “failure” (<code>-\/</code>) aborts.</p>
 
 <p>When declaring a return type of a Disjunction, you should generally prefer to use the Infix notation for clarity sake. That is to say:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">query</span><span class="o">(</span><span class="n">arg</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="kt">Success</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">def</span> <span class="n">query</span><span class="o">(</span><span class="n">arg</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="kt">Success</span></code></pre></div>
 
 <p>with the Infix notation for the return type, is preferable to this:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">query</span><span class="o">(</span><span class="n">arg</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">\/</span><span class="o">[</span><span class="kt">Error</span>, <span class="kt">Success</span><span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">def</span> <span class="n">query</span><span class="o">(</span><span class="n">arg</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">\/</span><span class="o">[</span><span class="kt">Error</span>, <span class="kt">Success</span><span class="o">]</span></code></pre></div>
 
 <p>the standard notation, which may not read as clearly.</p>
 
 <p>As for declaring instances of Left or Right, there are a few options in <code>scalaz</code>. The first is postfix operators, <code>.left</code> and <code>.right</code>, which wrap an existing value in a Disjunction instance:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
-</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="s">&quot;Success!&quot;</span><span class="o">.</span><span class="n">right</span>
-</span><span class='line'><span class="n">res7</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="s">&quot;Failure!&quot;</span><span class="o">.</span><span class="n">left</span>
-</span><span class='line'><span class="n">res8</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">String</span>,<span class="kt">Nothing</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">import</span> <span class="nn">scalaz._</span>
+<span class="lineno">2</span> <span class="k">import</span> <span class="nn">Scalaz._</span>
+<span class="lineno">3</span> 
+<span class="lineno">4</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="s">&quot;Success!&quot;</span><span class="o">.</span><span class="n">right</span>
+<span class="lineno">5</span> <span class="n">res7</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span>
+<span class="lineno">6</span> 
+<span class="lineno">7</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="s">&quot;Failure!&quot;</span><span class="o">.</span><span class="n">left</span>
+<span class="lineno">8</span> <span class="n">res8</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">String</span>,<span class="kt">Nothing</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span></code></pre></div>
 
 <p>Alternately, we can use the Disjunction singleton instance instead:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
-</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;Failure!&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="n">res10</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">String</span>,<span class="kt">Nothing</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="n">res12</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">import</span> <span class="nn">scalaz._</span>
+<span class="lineno">2</span> <span class="k">import</span> <span class="nn">Scalaz._</span>
+<span class="lineno">3</span> 
+<span class="lineno">4</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;Failure!&quot;</span><span class="o">)</span>
+<span class="lineno">5</span> <span class="n">res10</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">String</span>,<span class="kt">Nothing</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
+<span class="lineno">6</span> 
+<span class="lineno">7</span> 
+<span class="lineno">8</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
+<span class="lineno">9</span> <span class="n">res12</span><span class="k">:</span> <span class="kt">scalaz.\/</span><span class="o">[</span><span class="kt">Nothing</span>,<span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span></code></pre></div>
 
 <p>which, by virtue of being more explicit, may be clearer to the reader.</p>
 
 <p>Finally, we can construct instances of Left and Right directly:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
-</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">-\/(</span><span class="s">&quot;Failure!&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="n">res9</span><span class="k">:</span> <span class="kt">scalaz.-\/</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/-(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="n">res11</span><span class="k">:</span> <span class="kt">scalaz.\/-</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">import</span> <span class="nn">scalaz._</span>
+<span class="lineno">2</span> <span class="k">import</span> <span class="nn">Scalaz._</span>
+<span class="lineno">3</span> 
+<span class="lineno">4</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="o">-\/(</span><span class="s">&quot;Failure!&quot;</span><span class="o">)</span>
+<span class="lineno">5</span> <span class="n">res9</span><span class="k">:</span> <span class="kt">scalaz.-\/</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">-\/(</span><span class="nc">Failure</span><span class="o">!)</span>
+<span class="lineno">6</span> 
+<span class="lineno">7</span> <span class="n">scala</span><span class="o">&gt;</span> <span class="o">\/-(</span><span class="s">&quot;Success!&quot;</span><span class="o">)</span>
+<span class="lineno">8</span> <span class="n">res11</span><span class="k">:</span> <span class="kt">scalaz.\/-</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">Success</span><span class="o">!)</span></code></pre></div>
 
 <p>Remember I talked about how we could comprehend over Disjunctions, and success continued while failure aborted?</p>
 
 <p><img src="/images/shining-grinning.gif" alt="Here's Johnny?" /></p>
 
-<p>Let&rsquo;s look at what that looks like with some sample data:</p>
+<p>Let’s look at what that looks like with some sample data:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">scalaz._</span>
-</span><span class='line'><span class="k">import</span> <span class="nn">Scalaz._</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">success1</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;This succeeded&quot;</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">success2</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;This succeeded also!&quot;</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">fail1</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;This failed miserably...&quot;</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">fail2</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;Oops :(&quot;</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno"> 1</span> <span class="k">import</span> <span class="nn">scalaz._</span>
+<span class="lineno"> 2</span> <span class="k">import</span> <span class="nn">Scalaz._</span>
+<span class="lineno"> 3</span> 
+<span class="lineno"> 4</span> <span class="k">val</span> <span class="n">success1</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;This succeeded&quot;</span><span class="o">)</span>
+<span class="lineno"> 5</span> 
+<span class="lineno"> 6</span> <span class="k">val</span> <span class="n">success2</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">right</span><span class="o">(</span><span class="s">&quot;This succeeded also!&quot;</span><span class="o">)</span>
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span> <span class="k">val</span> <span class="n">fail1</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;This failed miserably...&quot;</span><span class="o">)</span>
+<span class="lineno"> 9</span> 
+<span class="lineno">10</span> <span class="k">val</span> <span class="n">fail2</span> <span class="k">=</span> <span class="o">\/.</span><span class="n">left</span><span class="o">(</span><span class="s">&quot;Oops :(&quot;</span><span class="o">)</span></code></pre></div>
 
 <p>We now have a couple of Disjunction instances we can use. If we comprehend over only Right, we get back an instance of Right.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">success1</span>
-</span><span class='line'>  <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">success2</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">two</span><span class="o">)</span>
-</span><span class='line'><span class="cm">/* res0: scalaz.\/[Nothing,(String, String)] = </span>
-</span><span class='line'><span class="cm">      \/-((This succeeded,This succeeded also!)) */</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno">2</span>   <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">success1</span>
+<span class="lineno">3</span>   <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">success2</span> 
+<span class="lineno">4</span> <span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">two</span><span class="o">)</span>
+<span class="lineno">5</span> <span class="cm">/* res0: scalaz.\/[Nothing,(String, String)] = </span>
+<span class="lineno">6</span> <span class="cm">      \/-((This succeeded,This succeeded also!)) */</span></code></pre></div>
 
 <p>Since both instances we used were Right, we get back an instance of Right ( <code>\/-</code> ).</p>
 
 <p>What if we include a Left in there?</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">success1</span>
-</span><span class='line'>  <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">fail1</span>
-</span><span class='line'>  <span class="n">three</span> <span class="k">&lt;-</span> <span class="n">success2</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">three</span><span class="o">)</span>
-</span><span class='line'><span class="cm">/* res1: scalaz.\/[String,(String, String)] = </span>
-</span><span class='line'><span class="cm">      -\/(This failed miserably...) */</span>
-</span></code></pre></td></tr></table></div></figure>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno">2</span>   <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">success1</span>
+<span class="lineno">3</span>   <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">fail1</span>  
+<span class="lineno">4</span>   <span class="n">three</span> <span class="k">&lt;-</span> <span class="n">success2</span>
+<span class="lineno">5</span> <span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">three</span><span class="o">)</span>
+<span class="lineno">6</span> <span class="cm">/* res1: scalaz.\/[String,(String, String)] = </span>
+<span class="lineno">7</span> <span class="cm">      -\/(This failed miserably...) */</span></code></pre></div>
 
+<p>The behavior here is much like with an <code>Option</code> instance of <code>None</code> (Which we’ll talk about in the next post). When Scala encounters a “failure” - in this case a Left ( <code>-\/</code> ) - it aborts the iteration and returns an instance of the failure. This case means the <code>yield</code> never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.</p>
 
-<p>
-The behavior here is much like with an <code>Option</code> instance of <code>None</code> (Which we&rsquo;ll talk about in the next post). When Scala encounters a &ldquo;failure&rdquo; - in this case a Left ( <code>-\/</code> ) - it aborts the iteration and returns an instance of the failure. This case means the <code>yield</code> never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.</p>
-
-<p>Now you&rsquo;ve had a (hopefully) gentle introduction to the world of <code>\/</code>. In <a href="http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/">the next part</a>, we&rsquo;ll talk about using Scala&rsquo;s <code>Option</code> in conjunction with Disjunctions to better handle failure conditions with existing code.</p>
+<p>Now you’ve had a (hopefully) gentle introduction to the world of <code>\/</code>. In <a href="http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/">the next part</a>, we’ll talk about using Scala’s <code>Option</code> in conjunction with Disjunctions to better handle failure conditions with existing code.</p>
 </div>
 
 
@@ -312,7 +223,7 @@ The behavior here is much like with an <code>Option</code> instance of <code>Non
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/" data-via="rit" data-counturl="http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/" >Tweet</a>
   
   
   
@@ -341,17 +252,17 @@ The behavior here is much like with an <code>Option</code> instance of <code>Non
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 
@@ -453,8 +364,8 @@ The behavior here is much like with an <code>Option</code> instance of <code>Non
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/';
-        var disqus_url = 'http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/';
+        var disqus_identifier = 'http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/';
+        var disqus_url = 'http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Exploring Scala with MongoDB - Evil Monkey Labs</title>
+  <title>Exploring Scala with MongoDB - Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, MongoDB and Scala. Scala is &hellip;">
+  <meta name="description" content="2010 proved to be a great year for growth and adoption of many fledgling technologies—not least among them, MongoDB and Scala. Scala is designed as &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/">
+  <link rel="canonical" href="http://bytes.codes/2011/01/10/intro-scala-mongo/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -71,11 +71,11 @@
   </header>
 
 
-<div class="entry-content"><p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
+<div class="entry-content"><p>2010 proved to be a great year for growth and adoption of many fledgling technologies—not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala’s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
 
 <p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
 
-<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more &lsquo;friendly&rsquo; syntax for creating MongoDB Objects, using Scala&rsquo;s Map syntax:</p>
+<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more ‘friendly’ syntax for creating MongoDB Objects, using Scala’s Map syntax:</p>
 
 <div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
 
@@ -93,11 +93,9 @@
 <span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span></code></pre></div>
 
-
 <p>The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.</p>
 
 <!--more-->
-
 
 <p>In contrast, the same statements in Java tend to be more verbose:</p>
 
@@ -118,7 +116,6 @@
 <span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="s">&quot;spam&quot;</span><span class="o">,</span> <span class="s">&quot;eggs&quot;</span><span class="o">);</span>
 <span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="s">&quot;mmm&quot;</span><span class="o">,</span> <span class="s">&quot;bacon&quot;</span><span class="o">);</span>
 <span class="nc">DBObject</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get</span><span class="o">();</span></code></pre></div>
-
 
 <p>The semantics of working with Collections and Cursors in Casbah are similar to the Java driver they wrap, with a bit of Scala-friendly syntactic sugar added for things like <a href="http://www.scala-lang.org/node/111">for comprehensions</a>.  Where Casbah really shines is in its use of a DSL syntax for creating MongoDB Queries.</p>
 
@@ -147,10 +144,10 @@
 <span class="cm">/** Use Casbah&#39;s Query DSL to say it much simpler */</span>
 <span class="k">val</span> <span class="n">ltGtDSL</span> <span class="k">=</span> <span class="s">&quot;foo&quot;</span> <span class="nc">$not</span> <span class="o">{</span> <span class="k">_</span> <span class="nc">$gte</span> <span class="mi">15</span> <span class="nc">$lt</span> <span class="mf">35.2</span> <span class="nc">$ne</span> <span class="mi">16</span> <span class="o">}</span></code></pre></div>
 
-
-<p>All of MongoDB&rsquo;s <em>$ Operators</em> including Geospatial Queries are supported by Casbah&rsquo;s DSL.</p>
+<p>All of MongoDB’s <em>$ Operators</em> including Geospatial Queries are supported by Casbah’s DSL.</p>
 
 <p>This is just a small taste of what Casbah and Scala offer to the MongoDB user, but we encourage you to explore more.  <a href="http://api.mongodb.org/scala/casbah/latest/setting_up.html">Version 2.01</a> is now available for download.</p>
+
 </div>
 
 
@@ -180,7 +177,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bytes.codes/2011/01/10/intro-scala-mongo/" data-via="rit" data-counturl="http://bytes.codes/2011/01/10/intro-scala-mongo/" >Tweet</a>
   
   
   
@@ -209,17 +206,17 @@
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 
@@ -321,8 +318,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/';
-        var disqus_url = 'http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/';
+        var disqus_identifier = 'http://bytes.codes/2011/01/10/intro-scala-mongo/';
+        var disqus_url = 'http://bytes.codes/2011/01/10/intro-scala-mongo/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Evil Monkey Labs</title>
+  <title>Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="MongoDB 1.7.5 shipped yesterday, and is expected to be the last &lsquo;beta&rsquo; release of what will become MongoDB 1.8. As part of the release, I &hellip;">
+  <meta name="description" content="MongoDB 1.7.5 shipped yesterday, and is expected to be the last ‘beta’ release of what will become MongoDB 1.8. As part of the release, I’ve been &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/3/">
+  <link rel="canonical" href="http://bytes.codes/3/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -74,25 +74,22 @@
   </header>
 
 
-  <div class="entry-content"><p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last &lsquo;beta&rsquo; release of what will become MongoDB 1.8.  As part of the release, I&rsquo;ve been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
+  <div class="entry-content"><p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last ‘beta’ release of what will become MongoDB 1.8.  As part of the release, I’ve been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
 
-<p>If you aren&rsquo;t new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn&rsquo;t possible to safely clean these up–&ndash;they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they&rsquo;ve been replaced with an even better system for saving the results of MapReduce jobs!</p>
+<p>If you aren’t new to MongoDB MapReduce, the most important thing to note since MongoDB 1.6.x is that temporary collections are gone; it is now <em>required</em> to specify an output.  Previously, if you omitted the <em>out</em> argument MongoDB would create a temporary collection and return its name with the job results; In non-sharded MongoDB setups these temporary collections would go out of scope and be cleaned up when the connection closed.  Unfortunately, for sharded setups it wasn’t possible to safely clean these up––they would remain behind and clutter up the database.  For this and other reasons the temporary collection feature was removed. There is good news though: they’ve been replaced with an even better system for saving the results of MapReduce jobs!</p>
 
-<p>While the <em>out</em> argument is now a required parameter in MapReduce jobs, it has a number of options for controlling what MongoDB does with results.  If you&rsquo;re running a truly one-off job where you don&rsquo;t need to keep the results later, MongoDB now supports returning results &ldquo;inline&rdquo;.  Be careful here though: your results are being returned in a single document and are subject to the document size limitations of MongoDB (16MB per document in 1.8).  To use inline results, set the value of <em>out</em> to a document <code>{inline: 1}</code>.  The result object will contain an additional key <em>results</em> which contains the MapReduce output; the <em>result</em> field will be omitted.</p>
+<p>While the <em>out</em> argument is now a required parameter in MapReduce jobs, it has a number of options for controlling what MongoDB does with results.  If you’re running a truly one-off job where you don’t need to keep the results later, MongoDB now supports returning results “inline”.  Be careful here though: your results are being returned in a single document and are subject to the document size limitations of MongoDB (16MB per document in 1.8).  To use inline results, set the value of <em>out</em> to a document <code>{inline: 1}</code>.  The result object will contain an additional key <em>results</em> which contains the MapReduce output; the <em>result</em> field will be omitted.</p>
 
-<p>As with previous versions of MongoDB, you can specify a collection name (as a string) in the <em>out</em> argument.  If the named collection already exists MongoDB will replace it entirely with the MapReduce results. Along with the inline mode, MongoDB 1.8 introduces support for &ldquo;merge&rdquo; and &ldquo;reduce&rdquo; output modes; instead of replacing the target collection MongoDB can be instructed to reconcile the MapReduce results with the existing data.  To use these modes, set the value of <em>out</em> to a document with a key of either &ldquo;merge&rdquo; or &ldquo;reduce&rdquo; and a value of the collection to save to.</p>
+<p>As with previous versions of MongoDB, you can specify a collection name (as a string) in the <em>out</em> argument.  If the named collection already exists MongoDB will replace it entirely with the MapReduce results. Along with the inline mode, MongoDB 1.8 introduces support for “merge” and “reduce” output modes; instead of replacing the target collection MongoDB can be instructed to reconcile the MapReduce results with the existing data.  To use these modes, set the value of <em>out</em> to a document with a key of either “merge” or “reduce” and a value of the collection to save to.</p>
 
-<p>The difference in &ldquo;merge&rdquo; and &ldquo;reduce&rdquo; has to do with MongoDB does when it encounters duplicate keys in both the existing collection and the MapReduce results.  In &ldquo;merge&rdquo; mode, MongoDB will simply overwrite the existing key with the new one from the MapReduce output.  In &ldquo;reduce&rdquo; mode, MongoDB will run the reduce function again with both the new and old data, saving those results to the collection (you remembered to make your reduce function idempotent, right?). <strong>UPDATE</strong>: If you specified a &ldquo;finalize&rdquo; function, MongoDB will re-run this after the &ldquo;reduce&rdquo; runs.</p>
+<p>The difference in “merge” and “reduce” has to do with MongoDB does when it encounters duplicate keys in both the existing collection and the MapReduce results.  In “merge” mode, MongoDB will simply overwrite the existing key with the new one from the MapReduce output.  In “reduce” mode, MongoDB will run the reduce function again with both the new and old data, saving those results to the collection (you remembered to make your reduce function idempotent, right?). <strong>UPDATE</strong>: If you specified a “finalize” function, MongoDB will re-run this after the “reduce” runs.</p>
 
-<p>Now that I&rsquo;ve thoroughly confused you, lets dig into examples of each of these behaviors.  I&rsquo;ve been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here&rsquo;s a quick snippet of it:</p>
+<p>Now that I’ve thoroughly confused you, lets dig into examples of each of these behaviors.  I’ve been testing the 1.8 MapReduce using a dataset and MapReduce job originally created to test the <a href="http://github.com/mongodb/mongo-hadoop">MongoDB+Hadoop Plugin</a>.  It consists of daily U.S. Treasury Yield Data for about 20 years; the MapReduce task calculates an annual average for each year in the collection.  You can grab a copy of the entire collection in a handy mongoimport friendly <a href="https://github.com/mongodb/mongo-hadoop/raw/master/examples/treasury_yield/resources/yield_historical_in.json">datadump from the MongoDB+Hadoop repo</a>; here’s a quick snippet of it:</p>
 
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-10T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;WEDNESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.03</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.75</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.78</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-11T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;THURSDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.95</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.94</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.04</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.91</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.77</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.01</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-12T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;FRIDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">7.98</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">7.99</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">7.93</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.74</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.17</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.76</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.07</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.8100000000000005</span> <span class="p">}</span>
 <span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ISODate</span><span class="p">(</span><span class="s2">&quot;1990-01-16T00:00:00Z&quot;</span><span class="p">),</span> <span class="s2">&quot;dayOfWeek&quot;</span> <span class="o">:</span> <span class="s2">&quot;TUESDAY&quot;</span><span class="p">,</span> <span class="s2">&quot;bc3Year&quot;</span> <span class="o">:</span> <span class="mf">8.13</span><span class="p">,</span> <span class="s2">&quot;bc5Year&quot;</span> <span class="o">:</span> <span class="mf">8.11</span><span class="p">,</span> <span class="s2">&quot;bc10Year&quot;</span> <span class="o">:</span> <span class="mf">8.2</span><span class="p">,</span> <span class="s2">&quot;bc20Year&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc1Month&quot;</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span> <span class="s2">&quot;bc2Year&quot;</span> <span class="o">:</span> <span class="mf">8.1</span><span class="p">,</span> <span class="s2">&quot;bc3Month&quot;</span> <span class="o">:</span> <span class="mf">7.89</span><span class="p">,</span> <span class="s2">&quot;bc30Year&quot;</span> <span class="o">:</span> <span class="mf">8.25</span><span class="p">,</span> <span class="s2">&quot;bc1Year&quot;</span> <span class="o">:</span> <span class="mf">7.92</span><span class="p">,</span> <span class="s2">&quot;bc7Year&quot;</span> <span class="o">:</span> <span class="mf">8.18</span><span class="p">,</span> <span class="s2">&quot;bc6Month&quot;</span> <span class="o">:</span> <span class="mf">7.99</span> <span class="p">}</span></code></pre></div>
-
-
-
 
 </div>
   
@@ -128,11 +125,11 @@
   </header>
 
 
-  <div class="entry-content"><p>2010 proved to be a great year for growth and adoption of many fledgling technologies&mdash;not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala&rsquo;s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
+  <div class="entry-content"><p>2010 proved to be a great year for growth and adoption of many fledgling technologies—not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala’s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
 
 <p>For 2011, MongoDB has added official support for Scala with the release of <a href="http://api.mongodb.org/scala/casbah/latest/">Casbah</a>, a Scala driver for MongoDB.  Casbah is built around the existing MongoDB Java Driver to give it a strong foundation, but designed to take advantage of many of the idioms of Scala such as a strong collections library, fluid syntax for building DSLs and functional concepts like closures and currying.</p>
 
-<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more &lsquo;friendly&rsquo; syntax for creating MongoDB Objects, using Scala&rsquo;s Map syntax:</p>
+<p>Because it is designed to be easy to work with for Scala users, Casbah introduces a more ‘friendly’ syntax for creating MongoDB Objects, using Scala’s Map syntax:</p>
 
 <div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="k">import</span> <span class="nn">com.mongodb.casbah.Imports._</span>
 
@@ -149,7 +146,6 @@
 <span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;pie&quot;</span> <span class="o">-&gt;</span> <span class="mf">3.14</span><span class="o">)</span>
 <span class="n">builder</span> <span class="o">+=</span> <span class="o">(</span><span class="s">&quot;spam&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;eggs&quot;</span><span class="o">,</span> <span class="s">&quot;mmm&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;bacon&quot;</span><span class="o">)</span>
 <span class="k">val</span> <span class="n">newObj</span> <span class="k">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">result</span></code></pre></div>
-
 
 <p>The goal of this syntax is to be more readable, similar to what one might expect from a dynamic language like Ruby or Python.</p>
 
@@ -187,11 +183,11 @@
   </header>
 
 
-  <div class="entry-content"><p>We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people&rsquo;s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
+  <div class="entry-content"><p>We’re building a new intranet system at work, and I’ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people’s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
 
-<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I&rsquo;ve been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
+<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I’ve been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
 
-<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of &lsquo;valid&rsquo; attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn&rsquo;t know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
+<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of ‘valid’ attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn’t know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
 
 </div>
   
@@ -227,9 +223,9 @@
   </header>
 
 
-  <div class="entry-content"><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
+  <div class="entry-content"><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you’re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
 
-<p>I&rsquo;ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
+<p>I’ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
 
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">CLICK_INTERVAL</span> <span class="o">=</span> <span class="mi">500</span>
  
@@ -258,7 +254,6 @@
           <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></code></pre></div>
 
-
 <p>You may want to tweak the click interval based on what works for you.  500 milliseconds worked well with my users, for the application in question. To attach a ClickHandler simply invoke the static method <code>ClickHandler.attachDoubleClickHandler(«uiElementObj», «callbackFunc»)</code></p>
 
 </div>
@@ -283,17 +278,17 @@
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 

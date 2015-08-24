@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Double Clicking in IronPython + Silverlight - Evil Monkey Labs</title>
+  <title>Double Clicking in IronPython + Silverlight - Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="Silverlight rather oddly lacks a double click event. You can detect single click, but for double clicking you&rsquo;re on your own. I found some &hellip;">
+  <meta name="description" content="Silverlight rather oddly lacks a double click event. You can detect single click, but for double clicking you’re on your own. I found some examples &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/">
+  <link rel="canonical" href="http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -71,9 +71,9 @@
   </header>
 
 
-<div class="entry-content"><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you&rsquo;re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
+<div class="entry-content"><p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you’re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
 
-<p>I&rsquo;ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
+<p>I’ve been using it in application development and user testing for about 6 months and it works fairly well in both Silverlight 2 and 3, although YMMV.</p>
 
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="n">CLICK_INTERVAL</span> <span class="o">=</span> <span class="mi">500</span>
  
@@ -102,13 +102,9 @@
           <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lastClickTime</span> <span class="o">&gt;</span> <span class="mi">25</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span></code></pre></div>
 
-
 <p>You may want to tweak the click interval based on what works for you.  500 milliseconds worked well with my users, for the application in question. To attach a ClickHandler simply invoke the static method <code>ClickHandler.attachDoubleClickHandler(«uiElementObj», «callbackFunc»)</code></p>
 
 <!--more-->
-
-
-
 
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">System</span> <span class="kn">import</span> <span class="n">Uri</span><span class="p">,</span> <span class="n">UriKind</span>
 <span class="kn">from</span> <span class="nn">System.Windows</span> <span class="kn">import</span> <span class="n">Application</span><span class="p">,</span> <span class="n">UIElement</span>
@@ -138,8 +134,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">HtmlPage</span><span class="o">.</span><span class="n">Window</span><span class="o">.</span><span class="n">Alert</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> got double clicked!&#39;</span> <span class="o">%</span> <span class="n">sender</span><span class="p">)</span></code></pre></div>
 
+<p>It’s not the world’s greatest solution, but it gets the job done.</p>
 
-<p>It&rsquo;s not the world&rsquo;s greatest solution, but it gets the job done.</p>
 </div>
 
 
@@ -169,7 +165,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight/" data-via="rit" data-counturl="http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight/" >Tweet</a>
   
   
   
@@ -196,17 +192,17 @@
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 
@@ -308,8 +304,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/';
-        var disqus_url = 'http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/';
+        var disqus_identifier = 'http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight/';
+        var disqus_url = 'http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight/';
         var disqus_script = 'embed.js';
       
     (function () {

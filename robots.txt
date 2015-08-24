@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: 
 
-Sitemap: http://blog.evilmonkeylabs.com/sitemap.xml 
+Sitemap: http://bytes.codes/sitemap.xml 

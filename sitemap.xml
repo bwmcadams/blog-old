@@ -1,150 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/</loc>
+    <loc>http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/</loc>
     <lastmod>2015-04-13T12:14:44-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/</loc>
+    <loc>http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/</loc>
     <lastmod>2015-04-10T15:41:37-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2015/03/23/Pickling_Case_Classes_to_Memcached/</loc>
+    <loc>http://bytes.codes/2015/03/23/Pickling_Case_Classes_to_Memcached/</loc>
     <lastmod>2015-03-23T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/</loc>
+    <loc>http://bytes.codes/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/</loc>
     <lastmod>2013-01-17T00:00:00-08:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2012/06/11/Understanding_Scala_Type_Classes/</loc>
+    <loc>http://bytes.codes/2012/06/11/Understanding_Scala_Type_Classes/</loc>
     <lastmod>2012-06-11T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2012/05/31/Forcing_Compiler_Nothing_checks/</loc>
+    <loc>http://bytes.codes/2012/05/31/Forcing_Compiler_Nothing_checks/</loc>
     <lastmod>2012-05-31T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2012/05/29/Casbah2.3_Released/</loc>
+    <loc>http://bytes.codes/2012/05/29/Casbah2.3_Released/</loc>
     <lastmod>2012-05-29T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2011/08/05/ScalaPythonJavaCaptureBlockResult/</loc>
+    <loc>http://bytes.codes/2011/08/05/ScalaPythonJavaCaptureBlockResult/</loc>
     <lastmod>2011-08-05T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/</loc>
+    <loc>http://bytes.codes/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/</loc>
     <lastmod>2011-07-13T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2011/02/28/MongoDB-1_8-MR-Java/</loc>
+    <loc>http://bytes.codes/2011/02/28/MongoDB-1_8-MR-Java/</loc>
     <lastmod>2011-02-28T00:00:00-08:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2011/01/27/MongoDB-1_8-MapReduce/</loc>
+    <loc>http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/</loc>
     <lastmod>2011-01-27T00:00:00-08:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2011/01/10/intro-scala-mongo/</loc>
+    <loc>http://bytes.codes/2011/01/10/intro-scala-mongo/</loc>
     <lastmod>2011-01-10T00:00:00-08:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/</loc>
+    <loc>http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/</loc>
     <lastmod>2009-10-20T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/2009/09/02/double-clicking-in-ironpython-and-silverlight/</loc>
+    <loc>http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight/</loc>
     <lastmod>2009-09-02T00:00:00-07:00</lastmod>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/</loc>
+    <loc>http://bytes.codes/blog/archives/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/archives/</loc>
+    <loc>http://bytes.codes/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/blog/archives/</loc>
+    <loc>http://bytes.codes/archives/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/no-sidebar/example-formatting/</loc>
+    <loc>http://bytes.codes/about/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/no-sidebar/left-sidebar/</loc>
+    <loc>http://bytes.codes/no-sidebar/right-sidebar/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/no-sidebar/</loc>
+    <loc>http://bytes.codes/no-sidebar/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/about/</loc>
+    <loc>http://bytes.codes/no-sidebar/left-sidebar/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/no-sidebar/right-sidebar/</loc>
+    <loc>http://bytes.codes/no-sidebar/example-formatting/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/ironpython/</loc>
+    <loc>http://bytes.codes/categories/ironpython/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/silverlight/</loc>
+    <loc>http://bytes.codes/categories/silverlight/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/python/</loc>
+    <loc>http://bytes.codes/categories/python/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/activedirectory/</loc>
+    <loc>http://bytes.codes/categories/activedirectory/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/ldap/</loc>
+    <loc>http://bytes.codes/categories/ldap/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/mongodb/</loc>
+    <loc>http://bytes.codes/categories/mongodb/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/scala/</loc>
+    <loc>http://bytes.codes/categories/scala/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/casbah/</loc>
+    <loc>http://bytes.codes/categories/casbah/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/mapreduce/</loc>
+    <loc>http://bytes.codes/categories/mapreduce/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/java/</loc>
+    <loc>http://bytes.codes/categories/java/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/typeclasses/</loc>
+    <loc>http://bytes.codes/categories/typeclasses/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/stupidpettricks/</loc>
+    <loc>http://bytes.codes/categories/stupidpettricks/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/effectivescala/</loc>
+    <loc>http://bytes.codes/categories/effectivescala/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/bestpractices/</loc>
+    <loc>http://bytes.codes/categories/bestpractices/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/release/</loc>
+    <loc>http://bytes.codes/categories/release/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/polymorphism/</loc>
+    <loc>http://bytes.codes/categories/polymorphism/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/akka/</loc>
+    <loc>http://bytes.codes/categories/akka/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/pickling/</loc>
+    <loc>http://bytes.codes/categories/pickling/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/artisanbytecode/</loc>
+    <loc>http://bytes.codes/categories/artisanbytecode/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/scalaz/</loc>
+    <loc>http://bytes.codes/categories/scalaz/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/categories/functionalprogramming/</loc>
+    <loc>http://bytes.codes/categories/functionalprogramming/</loc>
   </url>
   <url>
-    <loc>http://blog.evilmonkeylabs.com/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/index.html</loc>
-    <lastmod>2015-04-13T12:09:17-07:00</lastmod>
+    <loc>http://bytes.codes/blog/2015/03/23/Pickling_Case_Classes_to_Memcached/index.html</loc>
+    <lastmod>2015-08-22T14:13:21-07:00</lastmod>
   </url>
 </urlset>

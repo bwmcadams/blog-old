@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>A Skeptic&#8217;s Guide to Scalaz&#8217; Gateway Drugs: Part 2 - Options with Disjunction - Evil Monkey Labs</title>
+  <title>A Skeptic&#8217;s Guide to Scalaz&#8217; Gateway Drugs: Part 2 - Options with Disjunction - Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="(This is Part 2 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, &ldquo;A Skeptic&rsquo;s Guide to scalaz' &hellip;">
+  <meta name="description" content="(This is Part 2 of a series of distillations of a presentation I’ve been giving for the last year, “A Skeptic’s Guide to scalaz’ Gateway Drugs”. It &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/">
+  <link rel="canonical" href="http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -71,211 +71,123 @@
   </header>
 
 
-<div class="entry-content"><p><em>(This is Part 2 of a series of distillations of a presentation I&rsquo;ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">&ldquo;A Skeptic&rsquo;s Guide to scalaz&#8217; Gateway Drugs&rdquo;</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 &ndash; Disjunctions</a>)</em></p>
+<div class="entry-content"><p><em>(This is Part 2 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 – Disjunctions</a>)</em></p>
 
-<p>Welcome back to the Skeptic&rsquo;s Guide to <code>scalaz</code>. In <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">the last part</a> of this series, we introduced you to the power of <code>scalaz</code> Disjunctions&mdash;also known as <code>\/</code>&mdash;and how we can use them to indicate a return value of <em>either</em> an Error or a Success. As a reminder, convention dictates that Left&mdash;<code>-\/</code>&mdash;is an error, while Right&mdash;<code>\/-</code>&mdash;is success.</p>
+<p>Welcome back to the Skeptic’s Guide to <code>scalaz</code>. In <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">the last part</a> of this series, we introduced you to the power of <code>scalaz</code> Disjunctions—also known as <code>\/</code>—and how we can use them to indicate a return value of <em>either</em> an Error or a Success. As a reminder, convention dictates that Left—<code>-\/</code>—is an error, while Right—<code>\/-</code>—is success.</p>
 
 <p><img src="/images/buck-phone.gif" alt="Hello? scalaz?" /></p>
 
-<p>In this part, we&rsquo;ll discuss interactions with Scala&rsquo;s <code>Option</code>. Specifically, I want to discuss how to manage &ldquo;stacks&rdquo; of <code>Option</code> in for comprehensions, and how to use Disjunction to manage them.</p>
+<p>In this part, we’ll discuss interactions with Scala’s <code>Option</code>. Specifically, I want to discuss how to manage “stacks” of <code>Option</code> in for comprehensions, and how to use Disjunction to manage them.</p>
 
 <!--more-->
 
+<p>In Scala, <code>Option</code> is a container commonly used to indicate a return type that can have no value. <code>Option</code> has two subtypes: <code>Some[T]</code>—which contains a value of type <code>T</code>—and <code>None</code>, which contains no value. We use these in the Scala world to avoid the sins of <code>null</code>; Because <code>None</code> is a valid object, invoking functions on it doesn’t cause the dreaded <code>NullPointerException</code>.</p>
 
-<p>In Scala, <code>Option</code> is a container commonly used to indicate a return type that can have no value. <code>Option</code> has two subtypes: <code>Some[T]</code>&mdash;which contains a value of type <code>T</code>&mdash;and <code>None</code>, which contains no value. We use these in the Scala world to avoid the sins of <code>null</code>; Because <code>None</code> is a valid object, invoking functions on it doesn&rsquo;t cause the dreaded <code>NullPointerException</code>.</p>
+<p>Similar to <code>scalaz</code> Disjunctions, there is a “Right” bias on <code>Option</code>. Specifically, it is biased towards <code>Some[T]</code>, and when we comprehend over <code>Some[T]</code> the loop continues:</p>
 
-<p>Similar to <code>scalaz</code> Disjunctions, there is a &ldquo;Right&rdquo; bias on <code>Option</code>. Specifically, it is biased towards <code>Some[T]</code>, and when we comprehend over <code>Some[T]</code> the loop continues:</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno"> 1</span> <span class="k">val</span> <span class="n">some1</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;This is a value.&quot;</span><span class="o">)</span>
+<span class="lineno"> 2</span> 
+<span class="lineno"> 3</span> <span class="k">val</span> <span class="n">some2</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;This is also a value.&quot;</span><span class="o">)</span>
+<span class="lineno"> 4</span> 
+<span class="lineno"> 5</span> <span class="k">val</span> <span class="n">some3</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;You guessed it. A value&quot;</span><span class="o">)</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span> 
+<span class="lineno"> 8</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno"> 9</span>   <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">some1</span>
+<span class="lineno">10</span>   <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">some2</span>
+<span class="lineno">11</span>   <span class="n">three</span> <span class="k">&lt;-</span> <span class="n">some3</span> 
+<span class="lineno">12</span> <span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">two</span><span class="o">,</span> <span class="n">three</span><span class="o">)</span>
+<span class="lineno">13</span> <span class="cm">/* res2: Option[(String, String, String)] = </span>
+<span class="lineno">14</span> <span class="cm">    Some((This is a value.,This is also a value.,You guessed it. A value)) */</span></code></pre></div>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">some1</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;This is a value.&quot;</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">some2</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;This is also a value.&quot;</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">some3</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;You guessed it. A value&quot;</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">some1</span>
-</span><span class='line'>  <span class="n">two</span> <span class="k">&lt;-</span> <span class="n">some2</span>
-</span><span class='line'>  <span class="n">three</span> <span class="k">&lt;-</span> <span class="n">some3</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">two</span><span class="o">,</span> <span class="n">three</span><span class="o">)</span>
-</span><span class='line'><span class="cm">/* res2: Option[(String, String, String)] = </span>
-</span><span class='line'><span class="cm">    Some((This is a value.,This is also a value.,You guessed it. A value)) */</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>As I said, <code>Option</code> has a bias towards <code>Some</code>. Each step of the comprehension here unpacks a value from <code>Some</code>. But what if there’s a <code>None</code> thrown in there?</p>
 
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno">2</span>   <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">some1</span>
+<span class="lineno">3</span>   <span class="n">two</span> <span class="k">&lt;-</span> <span class="nc">None</span>
+<span class="lineno">4</span>   <span class="n">three</span> <span class="k">&lt;-</span> <span class="n">some3</span>
+<span class="lineno">5</span> <span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">two</span><span class="o">,</span> <span class="n">three</span><span class="o">)</span>
+<span class="lineno">6</span> <span class="cm">/* res3: Option[(String, Nothing, String)] = None */</span></code></pre></div>
 
-<p>As I said, <code>Option</code> has a bias towards <code>Some</code>. Each step of the comprehension here unpacks a value from <code>Some</code>. But what if there&rsquo;s a <code>None</code> thrown in there?</p>
+<p>What went wrong? In short, the same behavior as we saw when we threw a Left Disjunction into a comprehension. When we encounter a <code>None</code>, the loop aborts and returns the failure value. For a deeper look at what I mean—and how to fix it—let’s construct some more concrete sample data.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">one</span> <span class="k">&lt;-</span> <span class="n">some1</span>
-</span><span class='line'>  <span class="n">two</span> <span class="k">&lt;-</span> <span class="nc">None</span>
-</span><span class='line'>  <span class="n">three</span> <span class="k">&lt;-</span> <span class="n">some3</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">one</span><span class="o">,</span> <span class="n">two</span><span class="o">,</span> <span class="n">three</span><span class="o">)</span>
-</span><span class='line'><span class="cm">/* res3: Option[(String, Nothing, String)] = None */</span>
-</span></code></pre></td></tr></table></div></figure>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno"> 1</span> <span class="k">case</span> <span class="k">class</span> <span class="nc">Address</span><span class="o">(</span><span class="n">city</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+<span class="lineno"> 2</span> 
+<span class="lineno"> 3</span> <span class="k">case</span> <span class="k">class</span> <span class="nc">User</span><span class="o">(</span><span class="n">first</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> 
+<span class="lineno"> 4</span>                 <span class="n">last</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> 
+<span class="lineno"> 5</span>                 <span class="n">address</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Address</span><span class="o">])</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span> <span class="k">case</span> <span class="k">class</span> <span class="nc">DBObject</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span> 
+<span class="lineno"> 8</span>                     <span class="n">user</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">User</span><span class="o">])</span>
+<span class="lineno"> 9</span> 
+<span class="lineno">10</span> <span class="k">val</span> <span class="n">brendan</span> <span class="k">=</span> 
+<span class="lineno">11</span>   <span class="nc">Some</span><span class="o">(</span><span class="nc">DBObject</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="nc">User</span><span class="o">(</span><span class="s">&quot;Brendan&quot;</span><span class="o">,</span> <span class="s">&quot;McAdams&quot;</span><span class="o">,</span> <span class="nc">None</span><span class="o">))))</span>
+<span class="lineno">12</span> 
+<span class="lineno">13</span> <span class="k">val</span> <span class="n">someOtherGuy</span> <span class="k">=</span> 
+<span class="lineno">14</span>   <span class="nc">Some</span><span class="o">(</span><span class="nc">DBObject</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="nc">None</span><span class="o">))</span></code></pre></div>
 
+<p>Here is a set of constructs that will let us represent a user &amp; address in our database. Note that both <code>User</code> and <code>Address</code> are optional on their respective containers. I’ve seen a lot of code that works this way: “If the database failed to return a row, let’s return <code>None</code>”. Here’s what it looks like in practice when one of those row retrievals fails…</p>
 
-<p>What went wrong? In short, the same behavior as we saw when we threw a Left Disjunction into a comprehension. When we encounter a <code>None</code>, the loop aborts and returns the failure value. For a deeper look at what I mean&mdash;and how to fix it&mdash;let&rsquo;s construct some more concrete sample data.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Address</span><span class="o">(</span><span class="n">city</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">User</span><span class="o">(</span><span class="n">first</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
-</span><span class='line'>                <span class="n">last</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span>
-</span><span class='line'>                <span class="n">address</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Address</span><span class="o">])</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">DBObject</span><span class="o">(</span><span class="n">id</span><span class="k">:</span> <span class="kt">Long</span><span class="o">,</span>
-</span><span class='line'>                    <span class="n">user</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">User</span><span class="o">])</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">brendan</span> <span class="k">=</span>
-</span><span class='line'>  <span class="nc">Some</span><span class="o">(</span><span class="nc">DBObject</span><span class="o">(</span><span class="mi">1</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="nc">User</span><span class="o">(</span><span class="s">&quot;Brendan&quot;</span><span class="o">,</span> <span class="s">&quot;McAdams&quot;</span><span class="o">,</span> <span class="nc">None</span><span class="o">))))</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">val</span> <span class="n">someOtherGuy</span> <span class="k">=</span>
-</span><span class='line'>  <span class="nc">Some</span><span class="o">(</span><span class="nc">DBObject</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="nc">None</span><span class="o">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here is a set of constructs that will let us represent a user &amp; address in our database. Note that both <code>User</code> and <code>Address</code> are optional on their respective containers. I&rsquo;ve seen a lot of code that works this way: &ldquo;If the database failed to return a row, let&rsquo;s return <code>None</code>&rdquo;. Here&rsquo;s what it looks like in practice when one of those row retrievals fails&hellip;</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">brendan</span>
-</span><span class='line'>  <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="n">user</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/* res4: Option[User] = Some(User(Brendan,McAdams,None)) */</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno">2</span>   <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">brendan</span>
+<span class="lineno">3</span>   <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span>
+<span class="lineno">4</span> <span class="o">}</span> <span class="k">yield</span> <span class="n">user</span>
+<span class="lineno">5</span> 
+<span class="lineno">6</span> <span class="cm">/* res4: Option[User] = Some(User(Brendan,McAdams,None)) */</span></code></pre></div>
 
 <p>In our first example, <code>brendan</code> is a <code>DBObject</code> with a valid <code>User</code>. When we comprehend over just the <code>DBObject</code> and <code>User</code>, we get back a valid <code>Some</code>. But what if we try to extract both the <code>User</code> and <code>Address</code> from <code>someOtherGuy</code>?</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">someOtherGuy</span>
-</span><span class='line'>  <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span>
-</span><span class='line'>  <span class="n">address</span> <span class="k">&lt;-</span> <span class="n">user</span><span class="o">.</span><span class="n">address</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="n">address</span>
-</span><span class='line'><span class="cm">/* res5: Option[Address] = None */</span>
-</span></code></pre></td></tr></table></div></figure>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno">2</span>   <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">someOtherGuy</span>
+<span class="lineno">3</span>   <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span>
+<span class="lineno">4</span>   <span class="n">address</span> <span class="k">&lt;-</span> <span class="n">user</span><span class="o">.</span><span class="n">address</span>
+<span class="lineno">5</span> <span class="o">}</span> <span class="k">yield</span> <span class="n">address</span>
+<span class="lineno">6</span> <span class="cm">/* res5: Option[Address] = None */</span></code></pre></div>
 
-
-<p>Now, if we were retrieving the data from the database we&rsquo;ve run up against a very interesting question. Was there no <code>User</code>? Or was there no <code>Address</code>? This is the problem I ran into a <em>lot</em> with returning <code>Option</code> from the database.</p>
+<p>Now, if we were retrieving the data from the database we’ve run up against a very interesting question. Was there no <code>User</code>? Or was there no <code>Address</code>? This is the problem I ran into a <em>lot</em> with returning <code>Option</code> from the database.</p>
 
 <p><img src="/images/majorKong.gif" alt="Boom!" /></p>
 
-<p>Fundamentally, comprehending over groups of <code>Option</code> leads to &ldquo;silent failure&rdquo;. Luckily, <code>scalaz</code> includes some implicits to convert an <code>Option</code> to a Disjunction. Since Disjunction&rsquo;s right bias makes it easy to comprehend, we can do the conversion in place without rewriting a lot of code. For a Left, we&rsquo;ll still get useful information in place of <code>None</code>.</p>
+<p>Fundamentally, comprehending over groups of <code>Option</code> leads to “silent failure”. Luckily, <code>scalaz</code> includes some implicits to convert an <code>Option</code> to a Disjunction. Since Disjunction’s right bias makes it easy to comprehend, we can do the conversion in place without rewriting a lot of code. For a Left, we’ll still get useful information in place of <code>None</code>.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="nc">None</span><span class="o">.</span><span class="n">toRightDisjunction</span><span class="o">(</span><span class="s">&quot;No object found&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="cm">/* res6: scalaz.\/[String,Nothing] = -\/(No object found) */</span>
-</span></code></pre></td></tr></table></div></figure>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="nc">None</span><span class="o">.</span><span class="n">toRightDisjunction</span><span class="o">(</span><span class="s">&quot;No object found&quot;</span><span class="o">)</span>
+<span class="lineno">2</span> <span class="cm">/* res6: scalaz.\/[String,Nothing] = -\/(No object found) */</span></code></pre></div>
 
+<p>Here, we call the implicit function <code>toRightDisjunction</code> upon an instance of <code>Option</code> (<code>None</code>, in this case). Specifically, <code>toRightDisjunction</code> says “Convert an <code>Option</code> to a disjunction where <code>Some[T]</code> becomes <code>\/-(T)</code>—Right—and <code>None</code> becomes <code>-\/(&lt;argument&gt;)</code>”, or Left. That last bit is important: the argument to <code>toRightDisjunction</code> is used to create a value for a Left Disjunction.</p>
 
-<p>Here, we call the implicit function <code>toRightDisjunction</code> upon an instance of <code>Option</code> (<code>None</code>, in this case). Specifically, <code>toRightDisjunction</code> says &ldquo;Convert an <code>Option</code> to a disjunction where <code>Some[T]</code> becomes <code>\/-(T)</code>&mdash;Right&mdash;and <code>None</code> becomes <code>-\/(&lt;argument&gt;)</code>&rdquo;, or Left. That last bit is important: the argument to <code>toRightDisjunction</code> is used to create a value for a Left Disjunction.</p>
+<p>For those who prefer ‘concise’ over ‘explicit’, there is also a symbolic version of <code>toRightDisjunction</code>, which is functionally identical:</p>
 
-<p>For those who prefer &lsquo;concise&rsquo; over &lsquo;explicit&rsquo;, there is also a symbolic version of <code>toRightDisjunction</code>, which is functionally identical:</p>
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="nc">None</span> <span class="o">\/&gt;</span> <span class="s">&quot;No object found&quot;</span>
+<span class="lineno">2</span> <span class="cm">/* res7: scalaz.\/[String,Nothing] = -\/(No object found) */</span></code></pre></div>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="nc">None</span> <span class="o">\/&gt;</span> <span class="s">&quot;No object found&quot;</span>
-</span><span class='line'><span class="cm">/* res7: scalaz.\/[String,Nothing] = -\/(No object found) */</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>So, when there’s a <code>None</code> we use the argument to <code>toRightDisjunction</code> to create a <code>-\/</code>, but if there’s a <code>Some</code> we convert the value from <code>Some[T]</code> to <code>\/-[T]</code>. Here’s what it looks like with <code>Some</code> values:</p>
 
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno">1</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;My Hovercraft Is Full of Eels&quot;</span><span class="o">)</span> <span class="o">\/&gt;</span> <span class="s">&quot;No object found&quot;</span>
+<span class="lineno">2</span> <span class="cm">/* res8: scalaz.\/[String, String] = \/-(My Hovercraft Is Full of Eels) */</span>
+<span class="lineno">3</span> 
+<span class="lineno">4</span> <span class="nc">Some</span><span class="o">(</span><span class="s">&quot;I Will Not Buy This Record It Is Scratched&quot;</span><span class="o">)</span>
+<span class="lineno">5</span>   <span class="o">.</span><span class="n">toRightDisjunction</span><span class="o">(</span><span class="s">&quot;No object found&quot;</span><span class="o">)</span>
+<span class="lineno">6</span> <span class="cm">/* res9: scalaz.\/[String, String] = </span>
+<span class="lineno">7</span> <span class="cm">  \/-(I Will Not Buy This Record, It Is Scratched&quot;) */</span></code></pre></div>
 
-<p>So, when there&rsquo;s a <code>None</code> we use the argument to <code>toRightDisjunction</code> to create a <code>-\/</code>, but if there&rsquo;s a <code>Some</code> we convert the value from <code>Some[T]</code> to <code>\/-[T]</code>. Here&rsquo;s what it looks like with <code>Some</code> values:</p>
+<p>Given these new tools, let’s look at that user/address extraction again.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="nc">Some</span><span class="o">(</span><span class="s">&quot;My Hovercraft Is Full of Eels&quot;</span><span class="o">)</span> <span class="o">\/&gt;</span> <span class="s">&quot;No object found&quot;</span>
-</span><span class='line'><span class="cm">/* res8: scalaz.\/[String, String] = \/-(My Hovercraft Is Full of Eels) */</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">Some</span><span class="o">(</span><span class="s">&quot;I Will Not Buy This Record It Is Scratched&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">.</span><span class="n">toRightDisjunction</span><span class="o">(</span><span class="s">&quot;No object found&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="cm">/* res9: scalaz.\/[String, String] = </span>
-</span><span class='line'><span class="cm">  \/-(I Will Not Buy This Record, It Is Scratched&quot;) */</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Given these new tools, let&rsquo;s look at that user/address extraction again.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">brendan</span> <span class="o">\/&gt;</span> <span class="s">&quot;No user by that ID&quot;</span>
-</span><span class='line'>  <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span> <span class="o">\/&gt;</span> <span class="s">&quot;Join failed: no user object&quot;</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="n">user</span>
-</span><span class='line'><span class="cm">/* res10: scalaz.\/[String,User] = \/-(User(Brendan,McAdams,None)) */</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">someOtherGuy</span> <span class="o">\/&gt;</span> <span class="s">&quot;No user by that ID&quot;</span>
-</span><span class='line'>  <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span> <span class="o">\/&gt;</span> <span class="s">&quot;Join failed: no user object&quot;</span>
-</span><span class='line'>  <span class="n">address</span> <span class="k">&lt;-</span> <span class="n">user</span><span class="o">.</span><span class="n">address</span> <span class="o">\/&gt;</span> <span class="s">&quot;Join failed: No address on user&quot;</span>
-</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="n">address</span>
-</span><span class='line'><span class="cm">/* res11: scalaz.\/[String,Address] = -\/(Join failed: no user object) */</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="highlight"><pre><code class="language-scala" data-lang="scala"><span class="lineno"> 1</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno"> 2</span>   <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">brendan</span> <span class="o">\/&gt;</span> <span class="s">&quot;No user by that ID&quot;</span>
+<span class="lineno"> 3</span>   <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span> <span class="o">\/&gt;</span> <span class="s">&quot;Join failed: no user object&quot;</span>
+<span class="lineno"> 4</span> <span class="o">}</span> <span class="k">yield</span> <span class="n">user</span>
+<span class="lineno"> 5</span> <span class="cm">/* res10: scalaz.\/[String,User] = \/-(User(Brendan,McAdams,None)) */</span>
+<span class="lineno"> 6</span> 
+<span class="lineno"> 7</span> <span class="k">for</span> <span class="o">{</span>
+<span class="lineno"> 8</span>   <span class="n">dao</span> <span class="k">&lt;-</span> <span class="n">someOtherGuy</span> <span class="o">\/&gt;</span> <span class="s">&quot;No user by that ID&quot;</span>
+<span class="lineno"> 9</span>   <span class="n">user</span> <span class="k">&lt;-</span> <span class="n">dao</span><span class="o">.</span><span class="n">user</span> <span class="o">\/&gt;</span> <span class="s">&quot;Join failed: no user object&quot;</span>
+<span class="lineno">10</span>   <span class="n">address</span> <span class="k">&lt;-</span> <span class="n">user</span><span class="o">.</span><span class="n">address</span> <span class="o">\/&gt;</span> <span class="s">&quot;Join failed: No address on user&quot;</span>
+<span class="lineno">11</span> <span class="o">}</span> <span class="k">yield</span> <span class="n">address</span>
+<span class="lineno">12</span> <span class="cm">/* res11: scalaz.\/[String,Address] = -\/(Join failed: no user object) */</span></code></pre></div>
 
 <p>Hey, look at that! On our second comprehension, we got some useful information back about what went wrong. Now we can log that, return it to the frontend, or whatever else it is you do with failure data.</p>
 
-<p>What if we want to do something beyond comprehensions? Stay tuned for our next episode, where we&rsquo;ll talk about <code>Validation</code>, and how to use it to check multiple error conditions.</p>
+<p>What if we want to do something beyond comprehensions? Stay tuned for our next episode, where we’ll talk about <code>Validation</code>, and how to use it to check multiple error conditions.</p>
 </div>
 
 
@@ -305,7 +217,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/" data-via="rit" data-counturl="http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/" >Tweet</a>
   
   
   
@@ -332,17 +244,17 @@
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 
@@ -444,8 +356,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/';
-        var disqus_url = 'http://blog.evilmonkeylabs.com/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/';
+        var disqus_identifier = 'http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/';
+        var disqus_url = 'http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/';
         var disqus_script = 'embed.js';
       
     (function () {

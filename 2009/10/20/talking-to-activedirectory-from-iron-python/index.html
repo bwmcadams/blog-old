@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Talking to ActiveDirectory from IronPython - Evil Monkey Labs</title>
+  <title>Talking to ActiveDirectory from IronPython - Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
-  <meta name="description" content="We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for. Namely, since the &hellip;">
+  <meta name="description" content="We’re building a new intranet system at work, and I’ve been toying with a few things that the Windows admin asked for. Namely, since the secretaries &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,14 +18,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/">
+  <link rel="canonical" href="http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/atom.xml" rel="alternate" title="Evil Monkey Labs" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Bytes.Codes" type="application/atom+xml">
   <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 
 <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
@@ -71,16 +71,15 @@
   </header>
 
 
-<div class="entry-content"><p>We&rsquo;re building a new intranet system at work, and I&rsquo;ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people&rsquo;s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
+<div class="entry-content"><p>We’re building a new intranet system at work, and I’ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people’s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
 
-<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I&rsquo;ve been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
+<p>This seemed like a fairly reasonable request, presuming we could figure out how to do it and since I’ve been using Mono and IronPython a lot more lately, I figured there would be a way to accomplish it.  Most of the information I found online was either really old and/or crappy docs for doing it in C#, or more commonly using PowerShell or VBScript.  So, I managed to poke around and sort out how to get IronPython on Mono (IronPython 2.6RC + Mono 2.4.2.3) to find and update our users.</p>
 
-<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of &lsquo;valid&rsquo; attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn&rsquo;t know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
+<p>The end result is that I can now, from IronPython, find and update valid information on ActiveDirectory entries to reflect the latest and greatest information.  One thing to note, the MS .Net ActiveDirectory APIs (System.DirectoryServices, which is mirrored in Mono) do something that confused and annoyed me.  There are a limited set of ‘valid’ attribute keys for a user object in Active Directory (Which is really just LDAP, in case you didn’t know).  The <code>DirectoryEntry</code> object has a Properties attribute, which contains a hashmap of these values.</p>
 
 <!--more-->
 
-
-<p>The object will <strong>not</strong> allow you to set an &ldquo;Invalid&rdquo; key (see <a href="http://www.dotnetactivedirectory.com/Understanding_LDAP_Active_Directory_User_Object_Properties.html">this list</a> for valid keys).  But if you call <code>.Properties.Keys</code> you <em>only</em> get back the Properties that have values set.  So, it doesn&rsquo;t appear to be possible to actually ask <em>What keys are valid?</em> and do some introspective programming.  I have written a wrapper class to make the DirectoryEntry properties look a bit more pythonic (but disabled support for multi-value attributes for now) - at some point in the near future i&rsquo;ll likely add in a &ldquo;valid value&rdquo; filter.</p>
+<p>The object will <strong>not</strong> allow you to set an “Invalid” key (see <a href="http://www.dotnetactivedirectory.com/Understanding_LDAP_Active_Directory_User_Object_Properties.html">this list</a> for valid keys).  But if you call <code>.Properties.Keys</code> you <em>only</em> get back the Properties that have values set.  So, it doesn’t appear to be possible to actually ask <em>What keys are valid?</em> and do some introspective programming.  I have written a wrapper class to make the DirectoryEntry properties look a bit more pythonic (but disabled support for multi-value attributes for now) - at some point in the near future i’ll likely add in a “valid value” filter.</p>
 
 <p>The end result is, if I want to find my own user in ActiveDirectory by my name, I can do the following from the IronPython console:</p>
 
@@ -94,8 +93,7 @@
 <span class="o">&gt;&gt;&gt;</span> <span class="n">userObj</span>
 <span class="o">&lt;</span><span class="n">DirectoryEntryHelper</span><span class="p">:{</span><span class="n">sn</span><span class="o">=</span><span class="n">McAdams</span><span class="p">,</span><span class="n">givenName</span><span class="o">=</span><span class="n">Brendan</span><span class="p">,</span><span class="n">mail</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">sAMAccountName</span><span class="o">=</span><span class="n">brendan</span><span class="o">.</span><span class="n">mcadams</span><span class="p">}</span><span class="o">&gt;</span></code></pre></div>
 
-
-<p>You&rsquo;ll note the object returned is a &ldquo;DirectoryEntryHelper&rdquo; type; this is a crappy little wrapper class I put together to simplify attribute access, etc.   You can tell any of the find_ methods to return a raw .Net API object instead of wrapped by passing the kwarg <code>nowrap=True</code>;  <code>find_name()</code> takes <code>last_name, first_name</code>.  Several other utility methods exist on the class including find by account name.  Note that, in order to filter out entries in the Global Address List I&rsquo;m requiring the search to find objects who have sAMAccountNames. I know the bare minimum about ActiveDirectory, but my Windows admin here tells me that sAMAccountName is a required and <em>unique</em> attribute on any actual domain account object.</p>
+<p>You’ll note the object returned is a “DirectoryEntryHelper” type; this is a crappy little wrapper class I put together to simplify attribute access, etc.   You can tell any of the find_ methods to return a raw .Net API object instead of wrapped by passing the kwarg <code>nowrap=True</code>;  <code>find_name()</code> takes <code>last_name, first_name</code>.  Several other utility methods exist on the class including find by account name.  Note that, in order to filter out entries in the Global Address List I’m requiring the search to find objects who have sAMAccountNames. I know the bare minimum about ActiveDirectory, but my Windows admin here tells me that sAMAccountName is a required and <em>unique</em> attribute on any actual domain account object.</p>
 
 <p>You can see the keys that are already defined on the object with the <code>keys</code> helper method I added onto <code>DirectoryEntryHelper</code>:</p>
 
@@ -107,10 +105,9 @@
 <span class="s">&#39;codepage&#39;</span><span class="p">,</span> <span class="s">&#39;physicaldeliveryofficename&#39;</span><span class="p">,</span> <span class="s">&#39;samaccounttype&#39;</span><span class="p">,</span> <span class="s">&#39;sn&#39;</span><span class="p">,</span> <span class="s">&#39;objectcategory&#39;</span><span class="p">,</span> <span class="s">&#39;telephonenumber&#39;</span><span class="p">,</span> <span class="s">&#39;pwdlastset&#39;</span><span class="p">,</span> 
 <span class="s">&#39;usnchanged&#39;</span><span class="p">,</span> <span class="s">&#39;lastlogoff&#39;</span><span class="p">,</span> <span class="s">&#39;initials&#39;</span><span class="p">]</span></code></pre></div>
 
-
 <p>This returns a comprehended list of the keys (Rather than calling resultObj.Properties.Keys, which returns a Hashtable of HashKeys.  It just makes life easier.</p>
 
-<p>If I want to setup my mobile phone # (which isn&rsquo;t already set already) in Active Directory:</p>
+<p>If I want to setup my mobile phone # (which isn’t already set already) in Active Directory:</p>
 
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="o">&gt;&gt;&gt;</span> <span class="n">userObj</span><span class="o">.</span><span class="n">mobile</span>
 <span class="c"># Nothing returned as mobile isn&#39;t set...</span>
@@ -122,8 +119,7 @@
 <span class="o">&gt;&gt;&gt;</span> <span class="n">newUserObj</span><span class="o">.</span><span class="n">mobile</span>
 <span class="s">&#39;(646)555-1212&#39;</span></code></pre></div>
 
-
-<p>I&rsquo;ll leave the rest as an exercise for the reader, but I&rsquo;m interested in comments and changes.  You can fetch the latest code from <a href="http://bitbucket.org/bwmcadams/toybox/src/tip/ad_util.py">my BitBucket toybox</a>.  I&rsquo;ve also pasted it, for posterity sake, below the fold.</p>
+<p>I’ll leave the rest as an exercise for the reader, but I’m interested in comments and changes.  You can fetch the latest code from <a href="http://bitbucket.org/bwmcadams/toybox/src/tip/ad_util.py">my BitBucket toybox</a>.  I’ve also pasted it, for posterity sake, below the fold.</p>
 
 <div class="highlight"><pre><code class="language-python" data-lang="python"><span class="c">#!IronPython Specific Script!</span>
 <span class="c"># </span>
@@ -412,8 +408,6 @@
 
       <span class="k">return</span> <span class="n">result</span></code></pre></div>
 
-
-
 </div>
 
 
@@ -443,7 +437,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/" data-via="rit" data-counturl="http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/" data-via="rit" data-counturl="http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/" >Tweet</a>
   
   
   
@@ -472,17 +466,17 @@
 <aside class="sidebar">
   
     <section id="titles">
-  <a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs"><img id="logo" src="http://blog.evilmonkeylabs.com/images/logo_small.png" /></a>
-  <h1 id="site_title"><a href="http://blog.evilmonkeylabs.com" title="Evil Monkey Labs">Evil Monkey Labs</a></h1>
+  <a href="http://bytes.codes" title="Bytes.Codes"><img id="logo" src="http://bytes.codes/images/logo_small.png" /></a>
+  <h1 id="site_title"><a href="http://bytes.codes" title="Bytes.Codes">Bytes.Codes</a></h1>
   <h3 id="site_subtitle">Code and random ramblings.</h3>
 </section>
 
 <section id="menu">
   <ul>
-    <li><i class="fa fa-home fa-lg"></i><a href="http://blog.evilmonkeylabs.com"> Home </a></li>
-    <li><i class="fa fa-calendar fa-lg"></i><a href="http://blog.evilmonkeylabs.com/blog/archives/"> Archives </a></li>
-    <li><i class="fa fa-user fa-lg"></i><a href="http://blog.evilmonkeylabs.com/about/"> About </a></li>
-    <li><i class="fa fa-rss fa-lg"></i><a href="http://blog.evilmonkeylabs.com/atom.xml"> Feed </a></li>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://bytes.codes"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://bytes.codes/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://bytes.codes/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://bytes.codes/atom.xml"> Feed </a></li>
   </ul>
 </section>
 
@@ -584,8 +578,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/';
-        var disqus_url = 'http://blog.evilmonkeylabs.com/2009/10/20/talking-to-activedirectory-from-iron-python/';
+        var disqus_identifier = 'http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/';
+        var disqus_url = 'http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/';
         var disqus_script = 'embed.js';
       
     (function () {
