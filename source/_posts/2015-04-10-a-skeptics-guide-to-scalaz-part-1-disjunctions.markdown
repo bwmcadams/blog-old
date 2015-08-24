@@ -20,7 +20,7 @@ So, tools like `scalaz` were a bit scary to me. Plus, "what's wrong with the Sca
 <!--more-->
 Scala's builtin [Either](http://www.scala-lang.org/api/current/#scala.util.Either) is a common construct used to indicate one of two conditions: Success or Error. These are, by convention, `Left` for Errors, and `Right` for Success. The concept is good, but there are some limits to interaction. By default, we cannot use it in a for comprehension:
 
-```scala
+{% highlight scala linenos %}
 scala> val success = Right("Success!")
 success: scala.util.Right[Nothing,String] = Right(Success!)
 
@@ -36,7 +36,7 @@ scala> for {
        <console>:10: error: value map is not a member of scala.util.Right[Nothing,String]
                       x <- success
                            ^
-``` 
+{% endhighlight %} 
 
 *(Note, there is a function called `rightProjection` which converts an `Either` into something comprehendable)*
 
@@ -48,21 +48,21 @@ With Disjunctions, there is an assumption that we prefer Success (the right, or 
 
 When declaring a return type of a Disjunction, you should generally prefer to use the Infix notation for clarity sake. That is to say:
 
-```scala
+{% highlight scala linenos %}
 def query(arg: String): Error \/ Success
-```
+{% endhighlight %}
 
 with the Infix notation for the return type, is preferable to this:
 
-```scala
+{% highlight scala linenos %}
 def query(arg: String): \/[Error, Success]
-```
+{% endhighlight %}
 
 the standard notation, which may not read as clearly.
 
 As for declaring instances of Left or Right, there are a few options in `scalaz`. The first is postfix operators, `.left` and `.right`, which wrap an existing value in a Disjunction instance:
 
-```scala
+{% highlight scala linenos %}
 import scalaz._
 import Scalaz._
 
@@ -71,11 +71,11 @@ res7: scalaz.\/[Nothing,String] = \/-(Success!)
 
 scala> "Failure!".left
 res8: scalaz.\/[String,Nothing] = -\/(Failure!)
-```
+{% endhighlight %}
 
 Alternately, we can use the Disjunction singleton instance instead:
 
-```scala
+{% highlight scala linenos %}
 import scalaz._
 import Scalaz._
 
@@ -85,13 +85,13 @@ res10: scalaz.\/[String,Nothing] = -\/(Failure!)
 
 scala> \/.right("Success!")
 res12: scalaz.\/[Nothing,String] = \/-(Success!)
-```
+{% endhighlight %}
 
 which, by virtue of being more explicit, may be clearer to the reader.
 
 Finally, we can construct instances of Left and Right directly:
 
-```scala
+{% highlight scala linenos %}
 import scalaz._
 import Scalaz._
 
@@ -100,7 +100,7 @@ res9: scalaz.-\/[String] = -\/(Failure!)
 
 scala> \/-("Success!")
 res11: scalaz.\/-[String] = \/-(Success!)
-```
+{% endhighlight %}
 
 Remember I talked about how we could comprehend over Disjunctions, and success continued while failure aborted?
 
@@ -108,7 +108,7 @@ Remember I talked about how we could comprehend over Disjunctions, and success c
 
 Let's look at what that looks like with some sample data:
 
-```scala
+{% highlight scala linenos %}
 
 import scalaz._
 import Scalaz._
@@ -121,24 +121,24 @@ val fail1 = \/.left("This failed miserably...")
 
 val fail2 = \/.left("Oops :(")
 
-```
+{% endhighlight %}
 
 We now have a couple of Disjunction instances we can use. If we comprehend over only Right, we get back an instance of Right.
 
-```scala
+{% highlight scala linenos %}
 for {
   one <- success1
   two <- success2 
 } yield (one, two)
 /* res0: scalaz.\/[Nothing,(String, String)] = 
       \/-((This succeeded,This succeeded also!)) */
-```
+{% endhighlight %}
 
 Since both instances we used were Right, we get back an instance of Right ( `\/-` ).
 
 What if we include a Left in there?
 
-```scala
+{% highlight scala linenos %}
 for {
   one <- success1
   two <- fail1  
@@ -146,7 +146,8 @@ for {
 } yield (one, three)
 /* res1: scalaz.\/[String,(String, String)] = 
       -\/(This failed miserably...) */
-``` 
+{% endhighlight %} 
+
 The behavior here is much like with an `Option` instance of `None` (Which we'll talk about in the next post). When Scala encounters a "failure" - in this case a Left ( `-\/` ) - it aborts the iteration and returns an instance of the failure. This case means the `yield` never gets run. This can be valuable as an easy way to work with multiple Disjunctions all of which needed to be Right.
 
 Now you've had a (hopefully) gentle introduction to the world of `\/`. In [the next part](http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/), we'll talk about using Scala's `Option` in conjunction with Disjunctions to better handle failure conditions with existing code.

@@ -22,7 +22,7 @@ In Scala, `Option` is a container commonly used to indicate a return type that c
 
 Similar to `scalaz` Disjunctions, there is a "Right" bias on `Option`. Specifically, it is biased towards `Some[T]`, and when we comprehend over `Some[T]` the loop continues:
 
-```scala 
+{% highlight scala linenos %} 
 val some1 = Some("This is a value.")
 
 val some2 = Some("This is also a value.")
@@ -38,11 +38,11 @@ for {
 /* res2: Option[(String, String, String)] = 
     Some((This is a value.,This is also a value.,You guessed it. A value)) */
 
-```
+{% endhighlight %}
 
 As I said, `Option` has a bias towards `Some`. Each step of the comprehension here unpacks a value from `Some`. But what if there's a `None` thrown in there?
 
-```scala
+{% highlight scala linenos %}
 
 for {
   one <- some1
@@ -51,11 +51,11 @@ for {
 } yield (one, two, three)
 /* res3: Option[(String, Nothing, String)] = None */
 
-```
+{% endhighlight %}
 
 What went wrong? In short, the same behavior as we saw when we threw a Left Disjunction into a comprehension. When we encounter a `None`, the loop aborts and returns the failure value. For a deeper look at what I mean---and how to fix it---let's construct some more concrete sample data. 
  
-```scala
+{% highlight scala linenos %}
 case class Address(city: String)
 
 case class User(first: String, 
@@ -70,11 +70,11 @@ val brendan =
 
 val someOtherGuy = 
   Some(DBObject(2, None))
-```
+{% endhighlight %}
 
 Here is a set of constructs that will let us represent a user & address in our database. Note that both `User` and `Address` are optional on their respective containers. I've seen a lot of code that works this way: "If the database failed to return a row, let's return `None`". Here's what it looks like in practice when one of those row retrievals fails...
 
-```scala
+{% highlight scala linenos %}
 for {
   dao <- brendan
   user <- dao.user
@@ -82,11 +82,11 @@ for {
 
 /* res4: Option[User] = Some(User(Brendan,McAdams,None)) */
 
-```
+{% endhighlight %}
 
 In our first example, `brendan` is a `DBObject` with a valid `User`. When we comprehend over just the `DBObject` and `User`, we get back a valid `Some`. But what if we try to extract both the `User` and `Address` from `someOtherGuy`?
 
-```scala
+{% highlight scala linenos %}
 for {
   dao <- someOtherGuy
   user <- dao.user
@@ -94,7 +94,7 @@ for {
 } yield address
 /* res5: Option[Address] = None */
 
-```
+{% endhighlight %}
 
 Now, if we were retrieving the data from the database we've run up against a very interesting question. Was there no `User`? Or was there no `Address`? This is the problem I ran into a *lot* with returning `Option` from the database.
 
@@ -102,24 +102,24 @@ Now, if we were retrieving the data from the database we've run up against a ver
 
 Fundamentally, comprehending over groups of `Option` leads to "silent failure". Luckily, `scalaz` includes some implicits to convert an `Option` to a Disjunction. Since Disjunction's right bias makes it easy to comprehend, we can do the conversion in place without rewriting a lot of code. For a Left, we'll still get useful information in place of `None`.
 
-```scala
+{% highlight scala linenos %}
 None.toRightDisjunction("No object found")
 /* res6: scalaz.\/[String,Nothing] = -\/(No object found) */
-```
+{% endhighlight %}
 
 Here, we call the implicit function `toRightDisjunction` upon an instance of `Option` (`None`, in this case). Specifically, `toRightDisjunction` says "Convert an `Option` to a disjunction where `Some[T]` becomes `\/-(T)`---Right---and `None` becomes `-\/(<argument>)`", or Left. That last bit is important: the argument to `toRightDisjunction` is used to create a value for a Left Disjunction.
 
 For those who prefer 'concise' over 'explicit', there is also a symbolic version of `toRightDisjunction`, which is functionally identical:
 
-```scala
+{% highlight scala linenos %}
 None \/> "No object found"
 /* res7: scalaz.\/[String,Nothing] = -\/(No object found) */
-```
+{% endhighlight %}
 
 So, when there's a `None` we use the argument to `toRightDisjunction` to create a `-\/`, but if there's a `Some` we convert the value from `Some[T]` to `\/-[T]`. Here's what it looks like with `Some` values:
 
 
-```scala
+{% highlight scala linenos %}
 Some("My Hovercraft Is Full of Eels") \/> "No object found"
 /* res8: scalaz.\/[String, String] = \/-(My Hovercraft Is Full of Eels) */
 
@@ -127,11 +127,11 @@ Some("I Will Not Buy This Record It Is Scratched")
   .toRightDisjunction("No object found")
 /* res9: scalaz.\/[String, String] = 
   \/-(I Will Not Buy This Record, It Is Scratched") */
-```
+{% endhighlight %}
 
 Given these new tools, let's look at that user/address extraction again.
 
-```scala
+{% highlight scala linenos %}
 for {
   dao <- brendan \/> "No user by that ID"
   user <- dao.user \/> "Join failed: no user object"
@@ -144,7 +144,7 @@ for {
   address <- user.address \/> "Join failed: No address on user"
 } yield address
 /* res11: scalaz.\/[String,Address] = -\/(Join failed: no user object) */
-```
+{% endhighlight %}
 
 Hey, look at that! On our second comprehension, we got some useful information back about what went wrong. Now we can log that, return it to the frontend, or whatever else it is you do with failure data.
 
