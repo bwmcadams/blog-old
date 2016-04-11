@@ -4,7 +4,7 @@
   <title><![CDATA[Category: stupidpettricks | Bytes.Codes]]></title>
   <link href="http://bytes.codes/categories/stupidpettricks/atom.xml" rel="self"/>
   <link href="http://bytes.codes/"/>
-  <updated>2015-08-29T14:12:06-07:00</updated>
+  <updated>2016-04-11T15:51:54-06:00</updated>
   <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Forcing Scala Compiler 'Nothing' Checks]]></title>
     <link href="http://bytes.codes/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
-    <updated>2012-05-31T00:00:00-07:00</updated>
+    <updated>2012-05-31T00:00:00-06:00</updated>
     <id>http://bytes.codes/2012/05/31/Forcing_Compiler_Nothing_checks</id>
     <content type="html"><![CDATA[<p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is “Some type you’d like to fetch a particular field as”. Because of type erasure on the JVM, working with a Mongo Document can be annoying – the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
@@ -138,7 +138,7 @@
   <entry>
     <title type="html"><![CDATA[User Configurable Type Filtering with Scala Type Classes]]></title>
     <link href="http://bytes.codes/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/"/>
-    <updated>2011-07-13T00:00:00-07:00</updated>
+    <updated>2011-07-13T00:00:00-06:00</updated>
     <id>http://bytes.codes/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes</id>
     <content type="html"><![CDATA[<p>When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:</p>
 

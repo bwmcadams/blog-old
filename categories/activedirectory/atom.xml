@@ -4,7 +4,7 @@
   <title><![CDATA[Category: activedirectory | Bytes.Codes]]></title>
   <link href="http://bytes.codes/categories/activedirectory/atom.xml" rel="self"/>
   <link href="http://bytes.codes/"/>
-  <updated>2015-08-29T14:12:06-07:00</updated>
+  <updated>2016-04-11T15:51:54-06:00</updated>
   <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Talking to ActiveDirectory from IronPython]]></title>
     <link href="http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/"/>
-    <updated>2009-10-20T00:00:00-07:00</updated>
+    <updated>2009-10-20T00:00:00-06:00</updated>
     <id>http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python</id>
     <content type="html"><![CDATA[<p>We’re building a new intranet system at work, and I’ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people’s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
 

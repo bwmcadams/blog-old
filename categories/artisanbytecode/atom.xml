@@ -4,7 +4,7 @@
   <title><![CDATA[Category: artisanbytecode | Bytes.Codes]]></title>
   <link href="http://bytes.codes/categories/artisanbytecode/atom.xml" rel="self"/>
   <link href="http://bytes.codes/"/>
-  <updated>2015-08-29T14:12:06-07:00</updated>
+  <updated>2016-04-11T15:51:54-06:00</updated>
   <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Pickling Case Classes to Memcached with Scala]]></title>
     <link href="http://bytes.codes/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
-    <updated>2015-03-23T00:00:00-07:00</updated>
+    <updated>2015-03-23T00:00:00-06:00</updated>
     <id>http://bytes.codes/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
     <content type="html"><![CDATA[<p>Recently, I’ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend’s site which I’ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I’ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site… from Perl, PHP, and Python.</p>
 

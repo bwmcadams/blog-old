@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Bytes.Codes</title>
+  <title>Path Dependent Types in Scala - Bytes.Codes</title>
   <meta name="author" content="Brendan McAdams">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://bytes.codes/">
+  <link rel="canonical" href="http://bytes.codes/2016/04/11/path-dependent-types-in-scala/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
    <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
@@ -48,15 +48,12 @@
 </header>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/2016/04/11/path-dependent-types-in-scala/">Path Dependent Types in Scala</a></h1>
+      <h1 class="entry-title">Path Dependent Types in Scala</h1>
     
     
       <p class="meta">
@@ -67,14 +64,14 @@
 
 <time class='entry-date' datetime='2016-04-11T15:39:19-06:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:39 pm</span></time>
         
-         | <a href="/2016/04/11/path-dependent-types-in-scala/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Often confusing to newer Scala developers, “Inner classes” in Scala do not behave the way they do in many other languages. Thus, they can be perceived to be ‘inconsistent’ from expectations in their behavior.</p>
+<div class="entry-content"><p>Often confusing to newer Scala developers, “Inner classes” in Scala do not behave the way they do in many other languages. Thus, they can be perceived to be ‘inconsistent’ from expectations in their behavior.</p>
 
 <p>It isn’t possible, given the following class definition:</p>
 
@@ -209,183 +206,58 @@
 <p>In short, we can use the Path Dependent Type logic to prevent crossing over into runtime bugs – if we’re smart about our domain design.</p>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/">A Skeptic&#8217;s Guide to Scalaz&#8217; Gateway Drugs: Part 2 - Options With Disjunction</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-04-13T13:14:44-06:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>1:14 pm</span></time>
-        
-         | <a href="/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><em>(This is Part 2 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 – Disjunctions</a>)</em></p>
-
-<p>Welcome back to the Skeptic’s Guide to <code>scalaz</code>. In <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">the last part</a> of this series, we introduced you to the power of <code>scalaz</code> Disjunctions—also known as <code>\/</code>—and how we can use them to indicate a return value of <em>either</em> an Error or a Success. As a reminder, convention dictates that Left—<code>-\/</code>—is an error, while Right—<code>\/-</code>—is success.</p>
-
-<p><img src="/images/buck-phone.gif" alt="Hello? scalaz?" /></p>
-
-<p>In this part, we’ll discuss interactions with Scala’s <code>Option</code>. Specifically, I want to discuss how to manage “stacks” of <code>Option</code> in for comprehensions, and how to use Disjunction to manage them.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/">Read on &rarr;</a>
-    </footer>
   
 
+<span class="byline author vcard">Posted by <span class="fn">Brendan McAdams</span></span>
 
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">A Skeptic&#8217;s Guide to Scalaz&#8217; Gateway Drugs: Part 1 - Disjunctions</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
 
-<time class='entry-date' datetime='2015-04-10T16:41:37-06:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>4:41 pm</span></time>
-        
-         | <a href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><em>(This is Part 1 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
-
-<p>What is <code>scalaz</code> exactly? Well, at its core, <code>scalaz</code> is a functional programming library for Scala. It is intended to bring more functional programming concepts from languages like Haskell into Scala.</p>
-
-<p>Until recently, I’ve looked at <a href="https://github.com/scalaz/scalaz">scalaz</a> rather skeptically. As a self taught developer without any college or advanced mathematics training, I felt intimidated by what I saw. Long before I exited the ranks of rookie Scala programmer, I dabbled in Haskell a bit but left more confused than I started at.</p>
-
-<p><img src="/images/clockwork-eyes.gif" alt="" /></p>
-
-<p>So, tools like <code>scalaz</code> were a bit scary to me. Plus, “what’s wrong with the Scala standard library?”. As it turns out, a lot. Let’s look first at Scala’s Either, and where we can improve upon it.
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+<time class='entry-date' datetime='2016-04-11T15:39:19-06:00'><span class='date'><span class='date-month'>Apr</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>3:39 pm</span></time>
       
-  <header>
+
+<span class="categories">
+  
+    <a class='category' href='/categories/scala/'>scala</a>
+  
+</span>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/2015/03/23/Pickling_Case_Classes_to_Memcached/">Pickling Case Classes to Memcached With Scala</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-03-23T00:00:00-06:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>12:00 am</span></time>
-        
-         | <a href="/2015/03/23/Pickling_Case_Classes_to_Memcached/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently, I’ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend’s site which I’ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I’ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site… from Perl, PHP, and Python.</p>
-
-<p>Today, I’m rewriting the site in <a href="http://www.scala-lang.org">Scala</a> with <a href="http://www.scalatra.org">Scalatra</a> and <a href="http://facebook.github.io/react/">React.js</a>. As a result, I’m discovering all sorts of new fun that I haven’t dealt with in Scala yet. One of these is using Memcached, and specifically serialising/deserialising Case Classes. With the combination of a good Memcached library - <a href="http://github.com/alexandru/shade">shade</a>, in this case - and <a href="https://github.com/scala/pickling">Scala Pickling</a>*, I’ve found a powerful combination.</p>
-
-<p>So far, I’m working with a datastructure representing navigation: the current book, chapter, and section as well as lists of others of those based on context. As a bonus… I’m actually serialising case classes that are fetched from Slick.</p>
-
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://bytes.codes/2016/04/11/path-dependent-types-in-scala/" data-via="rit" data-counturl="http://bytes.codes/2016/04/11/path-dependent-types-in-scala/" >Tweet</a>
+  
+  
+  
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2015/03/23/Pickling_Case_Classes_to_Memcached/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Distributing Akka Workloads - and Shutting Down Afterwards</a></h1>
-    
-    
-      <p class="meta">
-        
+        <a class="basic-alignment left" href="/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/" title="Previous Post: A Skeptic's Guide to Scalaz' Gateway Drugs: Part 2 - Options with Disjunction">&laquo; A Skeptic&#8217;s Guide to Scalaz&#8217; Gateway Drugs: Part 2 - Options with Disjunction</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-
-
-
-<time class='entry-date' datetime='2013-01-17T00:00:00-07:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>12:00 am</span></time>
-        
-         | <a href="/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I’ve gotten a chance to solve some interesting problems and answer obscure questions… which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we’re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
-
-<p>One item in particular came up recently as we tried to create a cron-style job to do interval data processing – big blocks of input data would be separated into individual instructions for processing, using <a href="http://doc.akka.io/docs/akka/2.0.5/">Akka 2.0.x</a>. The developer I was working with found that, among other things, using only a single actor to process all of their data items was not particularly performant. Further, once we solved this problem we couldn’t figure out how to cleanly shut down Akka without interrupting any messages being processed. Fortunately, Akka offers simple answers to both of these problems… if you know where to look.</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="2">&larr; Older</a>
-    
-    <a href="/blog/archives/"> Archives </a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     <section id="titles">
@@ -485,6 +357,7 @@
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -499,7 +372,10 @@
       var disqus_shortname = 'evilmonkeyblog';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://bytes.codes/2016/04/11/path-dependent-types-in-scala/';
+        var disqus_url = 'http://bytes.codes/2016/04/11/path-dependent-types-in-scala/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

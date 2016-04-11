@@ -4,7 +4,7 @@
   <title><![CDATA[Category: release | Bytes.Codes]]></title>
   <link href="http://bytes.codes/categories/release/atom.xml" rel="self"/>
   <link href="http://bytes.codes/"/>
-  <updated>2015-08-29T14:12:06-07:00</updated>
+  <updated>2016-04-11T15:51:54-06:00</updated>
   <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Casbah 2.3.0-RC1 Released]]></title>
     <link href="http://bytes.codes/2012/05/29/Casbah2.3_Released/"/>
-    <updated>2012-05-29T00:00:00-07:00</updated>
+    <updated>2012-05-29T00:00:00-06:00</updated>
     <id>http://bytes.codes/2012/05/29/Casbah2.3_Released</id>
     <content type="html"><![CDATA[<p>Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as  <code>"org.mongodb" % "casbah" % "2.3.0-RC1"</code>. My <a href="http://notes.implicit.ly/post/24009446396/casbah-2-3-0rc1">release announcement</a> to <a href="http://implicit.ly">implicit.ly</a> contains the details on all of the bugs fixed – I will also be posting another set of blog entries shortly outlining the specific improvements to the code and demoing fetaures.</p>
 

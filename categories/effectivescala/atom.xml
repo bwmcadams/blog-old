@@ -4,7 +4,7 @@
   <title><![CDATA[Category: effectivescala | Bytes.Codes]]></title>
   <link href="http://bytes.codes/categories/effectivescala/atom.xml" rel="self"/>
   <link href="http://bytes.codes/"/>
-  <updated>2015-08-29T14:12:06-07:00</updated>
+  <updated>2016-04-11T15:51:54-06:00</updated>
   <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Understanding Scala's Type Classes]]></title>
     <link href="http://bytes.codes/2012/06/11/Understanding_Scala_Type_Classes/"/>
-    <updated>2012-06-11T00:00:00-07:00</updated>
+    <updated>2012-06-11T00:00:00-06:00</updated>
     <id>http://bytes.codes/2012/06/11/Understanding_Scala_Type_Classes</id>
     <content type="html"><![CDATA[<p>Over the last year or so, I have found myself making more and more use of Scala’s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
 
@@ -139,7 +139,7 @@
   <entry>
     <title type="html"><![CDATA[Forcing Scala Compiler 'Nothing' Checks]]></title>
     <link href="http://bytes.codes/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
-    <updated>2012-05-31T00:00:00-07:00</updated>
+    <updated>2012-05-31T00:00:00-06:00</updated>
     <id>http://bytes.codes/2012/05/31/Forcing_Compiler_Nothing_checks</id>
     <content type="html"><![CDATA[<p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is “Some type you’d like to fetch a particular field as”. Because of type erasure on the JVM, working with a Mongo Document can be annoying – the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
@@ -261,7 +261,7 @@
   <entry>
     <title type="html"><![CDATA[Immutability and Clever Variable Usage in the Land of Blocks and Branches]]></title>
     <link href="http://bytes.codes/2011/08/05/ScalaPythonJavaCaptureBlockResult/"/>
-    <updated>2011-08-05T00:00:00-07:00</updated>
+    <updated>2011-08-05T00:00:00-06:00</updated>
     <id>http://bytes.codes/2011/08/05/ScalaPythonJavaCaptureBlockResult</id>
     <content type="html"><![CDATA[<p>Last night, I found myself unconciously refactoring some Scala code (I don’t recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don’t seem entirely aware of one of my favorite features.  What I’m talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
 

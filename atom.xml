@@ -4,7 +4,7 @@
   <title><![CDATA[Bytes.Codes]]></title>
   <link href="http://bytes.codes/atom.xml" rel="self"/>
   <link href="http://bytes.codes/"/>
-  <updated>2015-08-29T14:12:06-07:00</updated>
+  <updated>2016-04-11T15:51:54-06:00</updated>
   <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -14,9 +14,151 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Path Dependent Types in Scala]]></title>
+    <link href="http://bytes.codes/2016/04/11/path-dependent-types-in-scala/"/>
+    <updated>2016-04-11T15:39:19-06:00</updated>
+    <id>http://bytes.codes/2016/04/11/path-dependent-types-in-scala</id>
+    <content type="html"><![CDATA[<p>Often confusing to newer Scala developers, “Inner classes” in Scala do not behave the way they do in many other languages. Thus, they can be perceived to be ‘inconsistent’ from expectations in their behavior.</p>
+
+<p>It isn’t possible, given the following class definition:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="k">class</span> <span class="nc">Outer</span> <span class="o">{</span>
+</span><span class="line">  <span class="k">class</span> <span class="nc">Inner</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">put</span><span class="o">(</span><span class="n">inner</span><span class="k">:</span> <span class="kt">Inner</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">()</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>To instantiate the <code>Inner</code> class directly:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="k">new</span> <span class="nc">Outer</span><span class="o">.</span><span class="nc">Inner</span>
+</span><span class="line"><span class="o">&lt;</span><span class="n">console</span><span class="k">&gt;:</span><span class="mi">12</span><span class="k">:</span> <span class="kt">error:</span> <span class="kt">not</span> <span class="kt">found:</span> <span class="kt">value</span> <span class="kt">Outer</span>
+</span><span class="line">       <span class="k">new</span> <span class="nc">Outer</span><span class="o">.</span><span class="nc">Inner</span>
+</span><span class="line">           <span class="o">^</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Instead, we need an <em>instance</em> of <code>Outer</code> to create an <code>Inner</code> instance:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="k">val</span> <span class="n">outer1</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Outer</span>
+</span><span class="line"><span class="k">val</span> <span class="n">inner1</span> <span class="k">=</span> <span class="k">new</span> <span class="n">outer1</span><span class="o">.</span><span class="nc">Inner</span>
+</span><span class="line"><span class="k">val</span> <span class="n">outer2</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Outer</span>
+</span><span class="line"><span class="k">val</span> <span class="n">inner2</span> <span class="k">=</span> <span class="k">new</span> <span class="n">outer2</span><span class="o">.</span><span class="nc">Inner</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>In other words, the <em>path</em> to an Inner instance depends upon the Outer instance. Note as well that there is no true relationship between <code>outer1.Inner</code> and <code>outer2.Inner</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="n">outer1</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="n">inner1</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="n">outer1</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="n">inner2</span><span class="o">)</span>
+</span><span class="line"><span class="o">&lt;</span><span class="n">console</span><span class="k">&gt;:</span><span class="mi">16</span><span class="k">:</span> <span class="kt">error:</span> <span class="k">type</span> <span class="kt">mismatch</span><span class="o">;</span>
+</span><span class="line"> <span class="n">found</span>   <span class="k">:</span> <span class="kt">outer2.Inner</span>
+</span><span class="line"> <span class="n">required</span><span class="k">:</span> <span class="kt">outer1.Inner</span>
+</span><span class="line">       <span class="n">outer1</span><span class="o">.</span><span class="n">put</span><span class="o">(</span><span class="n">inner2</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The <code>put</code> method on <code>outer1</code> will not accept just any arbitrary instance of <code>Inner</code>: It must receive one derived from its own instance. ”Great“, you may say, ”but where is this useful?”. In the end, a powerful use of Path Dependent types is creating a tighter coupling between two related classes, in which the compiler can help us avoid mistakes.</p>
+
+<p>Imagine, if you will, a (relatively simple) model of <code>Airplane</code>, <code>Seat</code>, and <code>Passenger</code>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="k">case</span> <span class="k">class</span> <span class="nc">Passenger</span><span class="o">(</span><span class="n">firstName</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">lastName</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">middleInitial</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Char</span><span class="o">])</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">Airplane</span><span class="o">(</span><span class="n">flightNumber</span><span class="k">:</span> <span class="kt">Long</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">  <span class="k">case</span> <span class="k">class</span> <span class="nc">Seat</span><span class="o">(</span><span class="n">row</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">seat</span><span class="k">:</span> <span class="kt">Char</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">seatPassenger</span><span class="o">(</span><span class="n">passenger</span><span class="k">:</span> <span class="kt">Passenger</span><span class="o">,</span> <span class="n">seat</span><span class="k">:</span> <span class="kt">Seat</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">()</span>
+</span><span class="line"><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Given two separate <code>Airplane</code>s, it should be impossible to accidentally sit on the wrong plane!</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">flt102</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Airplane</span><span class="o">(</span><span class="mi">102</span><span class="o">)</span>
+</span><span class="line"><span class="n">flt102</span><span class="k">:</span> <span class="kt">Airplane</span> <span class="o">=</span> <span class="nc">Airplane</span><span class="k">@</span><span class="mi">4</span><span class="n">b8d604b</span>
+</span><span class="line">
+</span><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">flt506</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Airplane</span><span class="o">(</span><span class="mi">506</span><span class="o">)</span>
+</span><span class="line"><span class="n">flt506</span><span class="k">:</span> <span class="kt">Airplane</span> <span class="o">=</span> <span class="nc">Airplane</span><span class="k">@</span><span class="mi">4</span><span class="n">dc27487</span>
+</span><span class="line">
+</span><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">kelland</span> <span class="k">=</span> <span class="nc">Passenger</span><span class="o">(</span><span class="s">&quot;Mike&quot;</span><span class="o">,</span> <span class="s">&quot;Kelland&quot;</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span>
+</span><span class="line"><span class="n">kelland</span><span class="k">:</span> <span class="kt">Passenger</span> <span class="o">=</span> <span class="nc">Passenger</span><span class="o">(</span><span class="nc">Mike</span><span class="o">,</span><span class="nc">Kelland</span><span class="o">,</span><span class="nc">None</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">mcadams</span> <span class="k">=</span> <span class="nc">Passenger</span><span class="o">(</span><span class="s">&quot;Brendan&quot;</span><span class="o">,</span> <span class="s">&quot;McAdams&quot;</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="-Symbol">&#39;W</span><span class="err">&#39;</span><span class="o">))</span>
+</span><span class="line"><span class="n">mcadams</span><span class="k">:</span> <span class="kt">Passenger</span> <span class="o">=</span> <span class="nc">Passenger</span><span class="o">(</span><span class="nc">Brendan</span><span class="o">,</span><span class="nc">McAdams</span><span class="o">,</span><span class="nc">Some</span><span class="o">(</span><span class="n">W</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">nash</span> <span class="k">=</span> <span class="nc">Passenger</span><span class="o">(</span><span class="s">&quot;Michael&quot;</span><span class="o">,</span> <span class="s">&quot;Nash&quot;</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span>
+</span><span class="line"><span class="n">nash</span><span class="k">:</span> <span class="kt">Passenger</span> <span class="o">=</span> <span class="nc">Passenger</span><span class="o">(</span><span class="nc">Michael</span><span class="o">,</span><span class="nc">Nash</span><span class="o">,</span><span class="nc">None</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If three members of the BoldRadius team are headed on journeys, but only two are boarding the same flight… what if we are so wrapped up in conversation that one of us tries boarding the wrong plane?</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="n">flt506</span><span class="o">.</span><span class="n">seatPassenger</span><span class="o">(</span><span class="n">nash</span><span class="o">,</span> <span class="n">flt506Seat20F</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="n">flt506</span><span class="o">.</span><span class="n">seatPassenger</span><span class="o">(</span><span class="n">mcadams</span><span class="o">,</span> <span class="n">flt506Seat21A</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">scala</span><span class="o">&gt;</span> <span class="n">flt506</span><span class="o">.</span><span class="n">seatPassenger</span><span class="o">(</span><span class="n">kelland</span><span class="o">,</span> <span class="n">flt102Seat1A</span><span class="o">)</span>
+</span><span class="line"><span class="o">&lt;</span><span class="n">console</span><span class="k">&gt;:</span><span class="mi">19</span><span class="k">:</span> <span class="kt">error:</span> <span class="k">type</span> <span class="kt">mismatch</span><span class="o">;</span>
+</span><span class="line"> <span class="n">found</span>   <span class="k">:</span> <span class="kt">flt102.Seat</span>
+</span><span class="line"> <span class="n">required</span><span class="k">:</span> <span class="kt">flt506.Seat</span>
+</span><span class="line">       <span class="n">flt506</span><span class="o">.</span><span class="n">seatPassenger</span><span class="o">(</span><span class="n">kelland</span><span class="o">,</span> <span class="n">flt102Seat1A</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Excellent! The compiler catches that while Michael Nash and myself are headed out on the same flight, Mike Kelland isn’t. When Mike tries to board the wrong flight… the type system prevents it.</p>
+
+<p>In short, we can use the Path Dependent Type logic to prevent crossing over into runtime bugs – if we’re smart about our domain design.</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[A Skeptic's Guide to Scalaz' Gateway Drugs: Part 2 - Options with Disjunction]]></title>
     <link href="http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/"/>
-    <updated>2015-04-13T12:14:44-07:00</updated>
+    <updated>2015-04-13T13:14:44-06:00</updated>
     <id>http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction</id>
     <content type="html"><![CDATA[<p><em>(This is Part 2 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end. Previous entries include <a href="http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/">Part 1 – Disjunctions</a>)</em></p>
 
@@ -141,7 +283,7 @@
   <entry>
     <title type="html"><![CDATA[A Skeptic's Guide to scalaz' Gateway Drugs: Part 1 - Disjunctions]]></title>
     <link href="http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/"/>
-    <updated>2015-04-10T15:41:37-07:00</updated>
+    <updated>2015-04-10T16:41:37-06:00</updated>
     <id>http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions</id>
     <content type="html"><![CDATA[<p><em>(This is Part 1 of a series of distillations of a presentation I’ve been giving for the last year, <a href="http://slides.com/bwmcadams/scalaz-gateway-drugs">“A Skeptic’s Guide to scalaz’ Gateway Drugs”</a>. It is meant to provide an introduction to the core functionality of scalaz that a developer might find most useful, without going off the deep end.)</em></p>
 
@@ -272,7 +414,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[Pickling Case Classes to Memcached with Scala]]></title>
     <link href="http://bytes.codes/2015/03/23/Pickling_Case_Classes_to_Memcached/"/>
-    <updated>2015-03-23T00:00:00-07:00</updated>
+    <updated>2015-03-23T00:00:00-06:00</updated>
     <id>http://bytes.codes/2015/03/23/Pickling_Case_Classes_to_Memcached</id>
     <content type="html"><![CDATA[<p>Recently, I’ve been working on a rewrite of <a href="http://www.sluggy.com">Sluggy Freelance</a> - a friend’s site which I’ve worked on for about a decade now. Caching is a big part of keeping site cost down, and over the years I’ve come to trust <a href="http://memcached.org">Memcached</a>. Fast, lightweight, and easy, Memcached has served me well over the years over several iterations of the site… from Perl, PHP, and Python.</p>
 
@@ -365,7 +507,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[Distributing Akka Workloads - And Shutting Down Afterwards]]></title>
     <link href="http://bytes.codes/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After/"/>
-    <updated>2013-01-17T00:00:00-08:00</updated>
+    <updated>2013-01-17T00:00:00-07:00</updated>
     <id>http://bytes.codes/2013/01/17/Distributing_Akka_Workloads_And_Shutting_Down_After</id>
     <content type="html"><![CDATA[<p>Recently, as part of my role with the Professional Services team at <a href="http://typesafe.com">Typesafe</a>, I have been working on site at a customer who is using a lot of Akka and Play. During this time, I’ve gotten a chance to solve some interesting problems and answer obscure questions… which for those who like chasing these kinds of puzzles issues (like myself) is a fantastic way to spend the day (<em>and if this kind of thing sounds exciting to you, we’re aggressively hiring for <a href="http://blog.typesafe.com/send-akka-consultant-candidates-our-way-and-w">this kind of work</a> ;)</em> )</p>
 
@@ -585,7 +727,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[Understanding Scala's Type Classes]]></title>
     <link href="http://bytes.codes/2012/06/11/Understanding_Scala_Type_Classes/"/>
-    <updated>2012-06-11T00:00:00-07:00</updated>
+    <updated>2012-06-11T00:00:00-06:00</updated>
     <id>http://bytes.codes/2012/06/11/Understanding_Scala_Type_Classes</id>
     <content type="html"><![CDATA[<p>Over the last year or so, I have found myself making more and more use of Scala’s Type Class system to add flexibility to my code.  This is especially evident in the MongoDB Scala Driver, <a href="Casbah">http://github.com/mongodb/casbah</a>, where the most recent work has been to simplify many features by migrating them to type classes.</p>
 
@@ -702,7 +844,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[Forcing Scala Compiler 'Nothing' Checks]]></title>
     <link href="http://bytes.codes/2012/05/31/Forcing_Compiler_Nothing_checks/"/>
-    <updated>2012-05-31T00:00:00-07:00</updated>
+    <updated>2012-05-31T00:00:00-06:00</updated>
     <id>http://bytes.codes/2012/05/31/Forcing_Compiler_Nothing_checks</id>
     <content type="html"><![CDATA[<p>Since early in its history, Casbah has had a helper method called <code>getAs[T]</code>, where <code>T</code> is “Some type you’d like to fetch a particular field as”. Because of type erasure on the JVM, working with a Mongo Document can be annoying – the representation in Scala is the equivalent of a <code>Map[String, Any]</code>. If we were to work with the <code>Map[String, Any]</code> in a standard mode, fetching a field <em>balance</em> which is a <code>Double</code> would require manual casting.</p>
 
@@ -822,7 +964,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[Casbah 2.3.0-RC1 Released]]></title>
     <link href="http://bytes.codes/2012/05/29/Casbah2.3_Released/"/>
-    <updated>2012-05-29T00:00:00-07:00</updated>
+    <updated>2012-05-29T00:00:00-06:00</updated>
     <id>http://bytes.codes/2012/05/29/Casbah2.3_Released</id>
     <content type="html"><![CDATA[<p>Today, I published the first Release Candidate of Casbah 2.3.0, available for SBT users as  <code>"org.mongodb" % "casbah" % "2.3.0-RC1"</code>. My <a href="http://notes.implicit.ly/post/24009446396/casbah-2-3-0rc1">release announcement</a> to <a href="http://implicit.ly">implicit.ly</a> contains the details on all of the bugs fixed – I will also be posting another set of blog entries shortly outlining the specific improvements to the code and demoing fetaures.</p>
 
@@ -843,7 +985,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[Immutability and Clever Variable Usage in the Land of Blocks and Branches]]></title>
     <link href="http://bytes.codes/2011/08/05/ScalaPythonJavaCaptureBlockResult/"/>
-    <updated>2011-08-05T00:00:00-07:00</updated>
+    <updated>2011-08-05T00:00:00-06:00</updated>
     <id>http://bytes.codes/2011/08/05/ScalaPythonJavaCaptureBlockResult</id>
     <content type="html"><![CDATA[<p>Last night, I found myself unconciously refactoring some Scala code (I don’t recall if it was something I wrote or someone else did at this point). As I looked at what I was doing I realized that many Scala developers don’t seem entirely aware of one of my favorite features.  What I’m talking about is effectively capturing values from multibranch block statements in Scala.  Used correctly they can greatly decruft complicated code as well as helping us use mutability in places we might not expect an easy way to do so.</p>
 
@@ -1119,7 +1261,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[User Configurable Type Filtering with Scala Type Classes]]></title>
     <link href="http://bytes.codes/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes/"/>
-    <updated>2011-07-13T00:00:00-07:00</updated>
+    <updated>2011-07-13T00:00:00-06:00</updated>
     <id>http://bytes.codes/2011/07/13/User_Configgable_Type_Filtering_with_Type_Classes</id>
     <content type="html"><![CDATA[<p>When I woke up this morning and looked through my twitter mentions, I found this gem sitting there from the middle of the night:</p>
 
@@ -1234,7 +1376,7 @@ Scala’s builtin <a href="http://www.scala-lang.org/api/current/#scala.util.Eit
   <entry>
     <title type="html"><![CDATA[MapReduce with MongoDB 1.8 and Java]]></title>
     <link href="http://bytes.codes/2011/02/28/MongoDB-1_8-MR-Java/"/>
-    <updated>2011-02-28T00:00:00-08:00</updated>
+    <updated>2011-02-28T00:00:00-07:00</updated>
     <id>http://bytes.codes/2011/02/28/MongoDB-1_8-MR-Java</id>
     <content type="html"><![CDATA[<p>In my <a href="http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/">last post</a>, I introduced the 
 new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://www.mongodb.org/display/DOCS/1.8+Release+Notes">available as a release candidate</a>.  Most importantly the temporary collection system has gone away, now requiring that you specify an output parameter.  With that required output comes new options for how to create incremental output using the <em>merge</em> and <em>reduce</em> output modes.</p>
@@ -1351,7 +1493,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[A Look At MongoDB 1.8's MapReduce Changes]]></title>
     <link href="http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce/"/>
-    <updated>2011-01-27T00:00:00-08:00</updated>
+    <updated>2011-01-27T00:00:00-07:00</updated>
     <id>http://bytes.codes/2011/01/27/MongoDB-1_8-MapReduce</id>
     <content type="html"><![CDATA[<p>MongoDB 1.7.5 shipped yesterday, and is expected to be the last ‘beta’ release of what will become MongoDB 1.8.  As part of the release, I’ve been doing testing of the new MapReduce functionality and thought this a good time to highlight those changes for people.</p>
 
@@ -1605,7 +1747,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[Exploring Scala with MongoDB]]></title>
     <link href="http://bytes.codes/2011/01/10/intro-scala-mongo/"/>
-    <updated>2011-01-10T00:00:00-08:00</updated>
+    <updated>2011-01-10T00:00:00-07:00</updated>
     <id>http://bytes.codes/2011/01/10/intro-scala-mongo</id>
     <content type="html"><![CDATA[<p>2010 proved to be a great year for growth and adoption of many fledgling technologies—not least among them, <a href="http://mongodb.org/" title="MongoDB">MongoDB</a> and <a href="http://scala-lang.org">Scala</a>.  Scala is designed as an alternative language for the Java platform, with a focus on scalability. It merges many of the Object Oriented concepts of languages like Java and C++ with the functional tools of Erlang, Haskell and Lisp with a bit of the dynamic natures of modern languages like Ruby and Python.  This flexible nature has sped Scala’s adoption in the technology stacks of platforms like <a href="http://www.scala-lang.org/node/7806">LinkedIn</a>, <a href="http://www.artima.com/scalazine/articles/twitter_on_scala.html">Twitter</a>, <a href="http://www.10gen.com/video/misc/foursquare">FourSquare</a> and many more.  By running on the JVM Scala has a strong affinity for working alongside existing Java applications, which allows users to build on their existing technology investments.</p>
 
@@ -1690,7 +1832,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[Talking to ActiveDirectory from IronPython]]></title>
     <link href="http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python/"/>
-    <updated>2009-10-20T00:00:00-07:00</updated>
+    <updated>2009-10-20T00:00:00-06:00</updated>
     <id>http://bytes.codes/2009/10/20/talking-to-activedirectory-from-iron-python</id>
     <content type="html"><![CDATA[<p>We’re building a new intranet system at work, and I’ve been toying with a few things that the Windows admin asked for.  Namely, since the secretaries here will update the intranet data to add people’s Work &amp; Emergency contact numbers, AIM handles, email addresses, etc. that we find a way to keep it all in sync with ActiveDirectory.  Thereby keeping all the Outlooks  and Blackberries up to date with the latest contact information.</p>
 
@@ -2035,7 +2177,7 @@ new MapReduce features introduced in MongoDB 1.8, which is now <a href="http://w
   <entry>
     <title type="html"><![CDATA[Double Clicking in IronPython + Silverlight]]></title>
     <link href="http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight/"/>
-    <updated>2009-09-02T00:00:00-07:00</updated>
+    <updated>2009-09-02T00:00:00-06:00</updated>
     <id>http://bytes.codes/2009/09/02/double-clicking-in-ironpython-and-silverlight</id>
     <content type="html"><![CDATA[<p>Silverlight rather oddly lacks a double click event.  You can detect single click, but for double clicking you’re on your own.  I found some examples for C#, but none for IronPython and had, a few months ago, ported some code I found <a href="http://shemesh.wordpress.com/2009/03/05/silverlight-attach-a-double-click-to-any-object/">here</a> for IronPython.</p>
 
