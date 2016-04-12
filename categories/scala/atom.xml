@@ -4,7 +4,7 @@
   <title><![CDATA[Category: scala | Bytes.Codes]]></title>
   <link href="http://bytes.codes/categories/scala/atom.xml" rel="self"/>
   <link href="http://bytes.codes/"/>
-  <updated>2016-04-11T15:51:54-06:00</updated>
+  <updated>2016-04-12T09:01:09-06:00</updated>
   <id>http://bytes.codes/</id>
   <author>
     <name><![CDATA[Brendan McAdams]]></name>
@@ -95,6 +95,15 @@ mcadams: Passenger = Passenger(Brendan,McAdams,Some(W))
 
 scala&gt; val nash = Passenger(&#8220;Michael&#8221;, &#8220;Nash&#8221;, None)
 nash: Passenger = Passenger(Michael,Nash,None)
+
+scala&gt; val flt102Seat1A = new flt102.Seat(1, &#8216;A&#8217;)
+flt102Seat1A: flt102.Seat = Seat(1,A)
+
+scala&gt; val flt506Seat21A = new flt506.Seat(21, &#8216;A&#8217;)
+flt506Seat21A: flt506.Seat = Seat(21,A)
+
+scala&gt; val flt506Seat20F = new flt506.Seat(20, &#8216;F&#8217;)
+flt506Seat20F: flt506.Seat = Seat(20,F)
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>
